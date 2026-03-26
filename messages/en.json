@@ -1,0 +1,152 @@
+{
+  "nav": {
+    "portfolio": "Portfolio",
+    "collections": "Collections",
+    "about": "About",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "favorites": "Favorites",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "hero": {
+    "cta": "View Portfolio",
+    "scrollHint": "Scroll to explore"
+  },
+  "gallery": {
+    "title": "Portfolio",
+    "allPhotos": "All",
+    "newBadge": "New",
+    "licenseBadge": "Available for license",
+    "loadMore": "Load more",
+    "editions": "{sold} of {max} remaining",
+    "openEdition": "Open edition",
+    "noPhotos": "No photos yet — check back soon.",
+    "page": "Page {current} of {total}"
+  },
+  "moods": {
+    "Golden Hour": "Golden Hour",
+    "Blue Hour": "Blue Hour",
+    "Storm": "Storm",
+    "Solitude": "Solitude",
+    "Urban Chaos": "Urban Chaos",
+    "Mist": "Mist",
+    "Silence": "Silence",
+    "Neon": "Neon",
+    "Vast": "Vast",
+    "Intimate": "Intimate"
+  },
+  "photo": {
+    "inquire": "Inquire about a license",
+    "wallMockup": "See it on your wall",
+    "hideWallMockup": "Hide wall mockup",
+    "behindTheLens": "Behind the lens",
+    "cameraBody": "Camera",
+    "lens": "Lens",
+    "focalLength": "Focal length",
+    "aperture": "Aperture",
+    "iso": "ISO",
+    "shutterSpeed": "Shutter speed",
+    "edition": "Edition {sold} of {max}",
+    "openEdition": "Open edition",
+    "availableForLicense": "Available for license"
+  },
+  "favorites": {
+    "title": "Your Favorites",
+    "empty": "You haven't saved any favorites yet.",
+    "browseCta": "Browse the portfolio",
+    "inquireAll": "Inquire about all favorites",
+    "count": "{count} saved"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "Interested in licensing a photo? Fill in the form and I'll get back to you within 48 hours.",
+    "name": "Your name",
+    "email": "Email address",
+    "subject": "Subject",
+    "subjectPersonal": "Personal License",
+    "subjectExtended": "Extended Personal License",
+    "subjectCommercial": "Commercial License",
+    "subjectOther": "Other",
+    "photosInterest": "Photos of interest",
+    "photosInterestPlaceholder": "Title(s) of the photo(s) you're interested in",
+    "intendedUse": "Intended use",
+    "intendedUsePlaceholder": "How do you plan to use the image?",
+    "message": "Message",
+    "messagePlaceholder": "Tell me more about your project...",
+    "gdpr": "I agree to my data being stored to process this inquiry",
+    "submit": "Send inquiry",
+    "sending": "Sending...",
+    "successTitle": "Message sent",
+    "successMessage": "Thank you for your inquiry. I'll be in touch within 48 hours.",
+    "errorMessage": "Something went wrong. Please try again.",
+    "validation": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "messageRequired": "Message is required",
+      "messageTooShort": "Message must be at least 20 characters",
+      "gdprRequired": "You must agree to the data processing terms",
+      "captchaRequired": "Please complete the captcha"
+    }
+  },
+  "pricing": {
+    "title": "Licensing",
+    "subtitle": "Every image is available for personal or commercial use. All prices in EUR.",
+    "personal": "Personal License",
+    "personalDesc": "High-res file for personal home printing. Non-commercial, single household.",
+    "personalPrice": "From €75",
+    "extended": "Extended Personal",
+    "extendedDesc": "Print multiple copies, give as a gift. Personal use only.",
+    "extendedPrice": "From €150",
+    "commercial": "Commercial",
+    "commercialDesc": "Editorial, advertising, product use. Custom quote.",
+    "commercialPrice": "Contact",
+    "howItWorks": "How it works",
+    "step1Title": "Browse",
+    "step1Desc": "Explore the gallery and find a photo you love.",
+    "step2Title": "Inquire",
+    "step2Desc": "Fill in the contact form with the photo(s) you want and intended use.",
+    "step3Title": "Pay",
+    "step3Desc": "Receive a payment request via PayPal, bank transfer, or Bizum.",
+    "step4Title": "Download",
+    "step4Desc": "Receive a secure download link valid for 5 days with your licensed file.",
+    "paymentMethods": "Payment: PayPal, bank transfer, or Bizum",
+    "bizumNote": "Bizum available for Spain-based buyers only.",
+    "copyright": "The photographer retains full copyright. A license grants usage rights only.",
+    "cta": "Inquire about a license",
+    "fileInfo": "High-res JPG, print-ready, colour-profiled for home printing."
+  },
+  "about": {
+    "title": "About",
+    "subtitle": "DAVEJAVU"
+  },
+  "collections": {
+    "title": "Collections",
+    "subtitle": "Series of photographs grouped by place and atmosphere.",
+    "viewCollection": "View collection",
+    "photos": "{count} photos"
+  },
+  "cookie": {
+    "message": "This site uses cookies to improve your experience.",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "footer": {
+    "tagline": "Landscape & Cityscape Photography",
+    "copyright": "© {year} DAVEJAVU. All rights reserved.",
+    "instagram": "Instagram",
+    "privacy": "Privacy Policy"
+  },
+  "lightbox": {
+    "close": "Close",
+    "prev": "Previous photo",
+    "next": "Next photo"
+  },
+  "download": {
+    "expired": "This download link has expired.",
+    "invalid": "This download link is invalid.",
+    "contactUs": "Please contact the photographer to request a new link.",
+    "contact": "Contact photographer"
+  }
+}
