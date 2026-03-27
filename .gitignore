@@ -20,3 +20,9 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Local IDE / tool config
+.claude/
+
+# Downloads / archives
+*.zip

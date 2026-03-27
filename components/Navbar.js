@@ -56,25 +56,11 @@ export default function Navbar({ locale }) {
         }`}
         style={{ height: '72px' }}
       >
-        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-full flex items-center">
 
-          {/* Logo */}
-          <Link href={link('/')} className="flex items-center shrink-0">
-            <Image
-              src="/logo.png"
-              alt="DAVEJAVU"
-              width={130}
-              height={65}
-              className="object-contain"
-            />
-          </Link>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href={link('/')}
-              className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors"
-            >
+          {/* Left nav — desktop only */}
+          <nav className="hidden md:flex items-center gap-8 flex-1">
+            <Link href={link('/')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">
               Portfolio
             </Link>
 
@@ -106,12 +92,23 @@ export default function Navbar({ locale }) {
             </div>
 
             <Link href={link('/about')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">About</Link>
-            <Link href={link('/pricing')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Pricing</Link>
-            <Link href={link('/contact')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Contact</Link>
           </nav>
 
-          {/* Right side: lang + favorites */}
-          <div className="hidden md:flex items-center gap-5">
+          {/* Logo — centered on desktop, left on mobile */}
+          <Link href={link('/')} className="flex items-center shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2">
+            <Image
+              src="/logo.png"
+              alt="DAVEJAVU"
+              width={150}
+              height={75}
+              className="object-contain"
+            />
+          </Link>
+
+          {/* Right side: nav + lang + favorites */}
+          <div className="hidden md:flex items-center gap-5 flex-1 justify-end">
+            <Link href={link('/pricing')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Pricing</Link>
+            <Link href={link('/contact')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Contact</Link>
             {/* Language switcher */}
             <div className="relative">
               <button

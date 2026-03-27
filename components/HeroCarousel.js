@@ -4,6 +4,20 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
+// Ken Burns variants — 6 distinct motions, one per slide in rotation.
+// Safety rule: scale 1.1 gives 5% overhang each side; translations stay within ±3%.
+// Pure pans use constant scale so the zoom level doesn't fight the pan.
+const KB_VARIANTS = [
+  { initial: { scale: 1.08, x: '0%',  y: '0%'  }, animate: { scale: 1.15, x: '0%',  y: '0%'  } }, // pure zoom in
+  { initial: { scale: 1.15, x: '0%',  y: '0%'  }, animate: { scale: 1.08, x: '0%',  y: '0%'  } }, // pure zoom out
+  { initial: { scale: 1.1,  x: '-3%', y: '0%'  }, animate: { scale: 1.1,  x: '3%',  y: '0%'  } }, // pan right
+  { initial: { scale: 1.1,  x: '3%',  y: '0%'  }, animate: { scale: 1.1,  x: '-3%', y: '0%'  } }, // pan left
+  { initial: { scale: 1.1,  x: '0%',  y: '3%'  }, animate: { scale: 1.1,  x: '0%',  y: '-3%' } }, // pan up
+  { initial: { scale: 1.1,  x: '0%',  y: '-3%' }, animate: { scale: 1.1,  x: '0%',  y: '3%'  } }, // pan down
+];
+
+const SLIDE_INTERVAL = 6500;
+
 // Placeholder slides — replaced with DB-driven featured photos once photos are uploaded
 const PLACEHOLDER_SLIDES = [
   { id: 1, image: 'https://picsum.photos/seed/dj-hero1/1920/1080', title: 'Into the Mist', location: 'Zhangjiajie, China' },
@@ -22,7 +36,7 @@ export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
 
   useEffect(() => {
     if (paused) return;
-    const timer = setInterval(next, 5500);
+    const timer = setInterval(next, SLIDE_INTERVAL);
     return () => clearInterval(timer);
   }, [next, paused]);
 
@@ -32,8 +46,8 @@ export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
 
   return (
     <section
-      className="relative w-full overflow-hidden"
-      style={{ height: '100vh' }}
+      className="relative w-full overflow-hidden isolate"
+      style={{ height: '75vh', minHeight: '480px' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -44,15 +58,15 @@ export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.2 }}
-          className="absolute inset-0"
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 overflow-hidden"
         >
           {/* Ken Burns */}
           <motion.div
             className="absolute inset-0"
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.08, x: '-1%', y: '-0.5%' }}
-            transition={{ duration: 10, ease: 'linear' }}
+            initial={KB_VARIANTS[current % KB_VARIANTS.length].initial}
+            animate={KB_VARIANTS[current % KB_VARIANTS.length].animate}
+            transition={{ duration: SLIDE_INTERVAL / 1000, ease: 'linear' }}
           >
             <img
               src={slides[current].image}

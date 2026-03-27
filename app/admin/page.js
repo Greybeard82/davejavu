@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError) {
       const newAttempts = attempts + 1;
@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
         setLockedUntil(Date.now() + LOCKOUT_MS);
         setError('Too many failed attempts. Try again in 15 minutes.');
       } else {
-        setError(`Supabase error: ${signInError.message} (status: ${signInError.status})`);
+        setError(`Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempt${MAX_ATTEMPTS - newAttempts !== 1 ? 's' : ''} remaining.`);
       }
       setLoading(false);
       return;
