@@ -46,7 +46,17 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
     setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
-  const removePhoto = (id) => setSelectedPhotos((prev) => prev.filter((p) => p.id !== id));
+  const removePhoto = (id) => {
+    setSelectedPhotos((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const favs = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
+      const updated = favs.filter((f) => f.id !== id);
+      if (updated.length !== favs.length) {
+        localStorage.setItem('davejavu_favorites', JSON.stringify(updated));
+        window.dispatchEvent(new StorageEvent('storage', { key: 'davejavu_favorites' }));
+      }
+    } catch { /* ignore */ }
+  };
 
   const addManualPhoto = () => {
     const title = manualInput.trim();
