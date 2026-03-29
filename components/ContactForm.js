@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SUBJECTS = [
@@ -13,19 +13,26 @@ const SUBJECTS = [
 const inputClass = 'w-full px-4 py-3 border border-[#d1d1d1] bg-white text-sm text-charcoal placeholder:text-mid-gray focus:outline-none focus:border-orange transition-colors';
 const labelClass = 'block text-[10px] uppercase tracking-widest text-mid-gray mb-1.5';
 
-function initSelectedPhotos(prefilledPhoto) {
-  if (prefilledPhoto) return [{ id: 'prefilled', title: prefilledPhoto, image: null }];
-  try {
-    const favs = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
-    return favs.map((f) => ({ id: f.id, title: f.title, image: f.image }));
-  } catch { return []; }
-}
-
 export default function ContactForm({ locale, prefilledPhoto = '' }) {
   const [fields, setFields] = useState({
     name: '', email: '', subject: 'Personal License', intendedUse: '', message: '', gdpr: false,
   });
-  const [selectedPhotos, setSelectedPhotos] = useState(() => initSelectedPhotos(prefilledPhoto));
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
+
+  // Populate on mount: merge ?photo= param with saved favorites (deduped by title)
+  useEffect(() => {
+    try {
+      const favs = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
+      const fromFavs = favs.map((f) => ({ id: f.id, title: f.title, image: f.image }));
+      if (prefilledPhoto) {
+        const alreadyInFavs = fromFavs.some((f) => f.title === prefilledPhoto);
+        const prefilled = alreadyInFavs ? [] : [{ id: 'prefilled', title: prefilledPhoto, image: null }];
+        setSelectedPhotos([...prefilled, ...fromFavs]);
+      } else {
+        setSelectedPhotos(fromFavs);
+      }
+    } catch { /* localStorage unavailable */ }
+  }, [prefilledPhoto]);
   const [manualInput, setManualInput] = useState('');
   const [errors, setErrors] = useState({});
   const [captchaToken, setCaptchaToken] = useState('');

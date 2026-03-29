@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 
 // Ken Burns variants — 6 distinct motions, one per slide in rotation.
 // Safety rule: scale 1.1 gives 5% overhang each side; translations stay within ±3%.

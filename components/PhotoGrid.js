@@ -163,7 +163,7 @@ function Lightbox({ photo, locale, onClose }) {
   );
 }
 
-function PhotoCard({ photo, locale, onSelect }) {
+function PhotoCard({ photo, onSelect }) {
   const [hovered, setHovered] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
