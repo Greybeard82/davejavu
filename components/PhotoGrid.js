@@ -76,6 +76,7 @@ function Lightbox({ photo, locale, onClose }) {
           alt={photo.title}
           className="block max-w-full max-h-[92vh] object-contain shadow-2xl"
           draggable="false"
+          onContextMenu={(e) => e.preventDefault()}
         />
       </motion.div>
 
@@ -85,12 +86,20 @@ function Lightbox({ photo, locale, onClose }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
         transition={{ delay: 0.25, duration: 0.3 }}
-        className="absolute bottom-0 left-0 right-0 pb-8 text-center z-10 pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 pb-8 text-center z-10"
+        onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-white font-700 text-lg tracking-tight">{photo.title}</h3>
         {photo.location && (
           <p className="text-white/55 text-[11px] uppercase tracking-[3px] mt-1">{photo.location}</p>
         )}
+        <Link
+          href={`/${locale}/photo/${photo.id}`}
+          className="inline-block mt-3 text-[10px] uppercase tracking-widest text-white/60 hover:text-white border-b border-white/30 hover:border-white transition-colors pb-0.5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          View details →
+        </Link>
       </motion.div>
 
       {/* Close button */}
