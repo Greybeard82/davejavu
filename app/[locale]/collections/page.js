@@ -8,7 +8,7 @@ async function getCollections(locale) {
     .select(`
       id, slug,
       collection_translations ( locale, title, description ),
-      cover:cover_photo_id ( cloudinary_id ),
+      cover:cover_photo ( cloudinary_id ),
       photo_collections ( photo_id )
     `)
     .eq('published', true)

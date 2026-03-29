@@ -11,7 +11,7 @@ export async function GET() {
       .select(`
         id, slug, published, created_at,
         collection_translations ( locale, title, description ),
-        cover:cover_photo_id ( id, cloudinary_id ),
+        cover:cover_photo ( id, cloudinary_id ),
         photo_collections ( photo_id )
       `)
       .order('created_at', { ascending: false });
@@ -34,20 +34,19 @@ export async function POST(request) {
 
     const { data: collection, error: collError } = await supabase
       .from('collections')
-      .insert({
+      .upsert({
         slug: slug.trim(),
-        cover_photo_id: coverPhotoId || null,
+        cover_photo: coverPhotoId || null,
         published: published ?? false,
-      })
+      }, { onConflict: 'slug' })
       .select('id')
       .single();
     if (collError) throw new Error(collError.message);
 
-    const { error: transError } = await supabase.from('collection_translations').insert({
-      collection_id: collection.id,
-      locale: 'en',
-      title: title.trim(),
-      description: description?.trim() || null,
+    const { error: transError } = await supabase.rpc('save_collection_translation', {
+      p_collection_id: collection.id,
+      p_title: title.trim(),
+      p_description: description?.trim() || null,
     });
     if (transError) throw new Error(transError.message);
 

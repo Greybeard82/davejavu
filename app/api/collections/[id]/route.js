@@ -12,7 +12,7 @@ export async function PATCH(request, { params }) {
     const updates = {};
     if (slug !== undefined) updates.slug = slug.trim();
     if (published !== undefined) updates.published = published;
-    if (coverPhotoId !== undefined) updates.cover_photo_id = coverPhotoId || null;
+    if (coverPhotoId !== undefined) updates.cover_photo = coverPhotoId || null;
 
     if (Object.keys(updates).length > 0) {
       const { error } = await supabase.from('collections').update(updates).eq('id', params.id);
@@ -21,12 +21,11 @@ export async function PATCH(request, { params }) {
 
     // Upsert translation
     if (title !== undefined || description !== undefined) {
-      const { error } = await supabase.from('collection_translations').upsert({
-        collection_id: params.id,
-        locale: 'en',
-        title: title?.trim(),
-        description: description?.trim() || null,
-      }, { onConflict: 'collection_id,locale' });
+      const { error } = await supabase.rpc('save_collection_translation', {
+        p_collection_id: params.id,
+        p_title: title?.trim() || '',
+        p_description: description?.trim() || null,
+      });
       if (error) throw new Error(error.message);
     }
 
