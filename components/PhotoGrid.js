@@ -120,18 +120,40 @@ function Lightbox({ photo, locale, onClose }) {
   );
 }
 
+const FAV_KEY = 'davejavu_favorites';
+
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; }
+}
+
+function saveFavorites(favs) {
+  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  // Notify navbar (and other listeners) in the same tab
+  window.dispatchEvent(new StorageEvent('storage', { key: FAV_KEY }));
+}
+
 function PhotoCard({ photo, locale, onSelect }) {
   const [hovered, setHovered] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
+  const [favorited, setFavorited] = useState(false);
   const imgRef = useRef(null);
 
   useEffect(() => {
-    // If image was already cached, onLoad won't fire — check manually
-    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
-      setLoaded(true);
-    }
-  }, []);
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
+    setFavorited(getFavorites().some((f) => f.id === photo.id));
+  }, [photo.id]);
+
+  const toggleFavorite = (e) => {
+    e.stopPropagation();
+    const favs = getFavorites();
+    const isFav = favs.some((f) => f.id === photo.id);
+    const updated = isFav
+      ? favs.filter((f) => f.id !== photo.id)
+      : [...favs, { id: photo.id, title: photo.title, location: photo.location, image: photo.image }];
+    saveFavorites(updated);
+    setFavorited(!isFav);
+  };
 
   if (errored) return null;
 
@@ -186,6 +208,21 @@ function PhotoCard({ photo, locale, onSelect }) {
             </span>
           )}
         </div>
+
+        {/* Favorite button */}
+        <button
+          onClick={toggleFavorite}
+          aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+          className={`absolute top-3 right-3 z-30 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
+            favorited
+              ? 'bg-white text-orange'
+              : 'bg-black/30 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100'
+          }`}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
       </motion.div>
     </div>
   );

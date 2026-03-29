@@ -14,14 +14,15 @@ const inputClass = 'w-full px-4 py-3 border border-[#d1d1d1] bg-white text-sm te
 const labelClass = 'block text-[10px] uppercase tracking-widest text-mid-gray mb-1.5';
 
 export default function ContactForm({ locale, prefilledPhoto = '' }) {
-  const [fields, setFields] = useState({
-    name: '',
-    email: '',
-    subject: 'Personal License',
-    photosInterest: prefilledPhoto,
-    intendedUse: '',
-    message: '',
-    gdpr: false,
+  const [fields, setFields] = useState(() => {
+    let photosInterest = prefilledPhoto;
+    if (!photosInterest && typeof window !== 'undefined') {
+      try {
+        const favs = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
+        if (favs.length > 0) photosInterest = favs.map((f) => f.title).join(', ');
+      } catch { /* ignore */ }
+    }
+    return { name: '', email: '', subject: 'Personal License', photosInterest, intendedUse: '', message: '', gdpr: false };
   });
   const [errors, setErrors] = useState({});
   const [captchaToken, setCaptchaToken] = useState('');
