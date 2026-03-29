@@ -38,7 +38,20 @@ function BlurHashPlaceholder({ hash }) {
 
 const MOODS = ['Golden Hour', 'Blue Hour', 'Storm', 'Solitude', 'Urban Chaos', 'Mist', 'Silence', 'Neon', 'Vast', 'Intimate'];
 
+const FAV_KEY = 'davejavu_favorites';
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; }
+}
+function saveFavorites(favs) {
+  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  window.dispatchEvent(new StorageEvent('storage', { key: FAV_KEY }));
+}
+
 function Lightbox({ photo, locale, onClose }) {
+  const [favorited, setFavorited] = useState(() =>
+    getFavorites().some((f) => f.id === photo.id)
+  );
+
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -49,6 +62,17 @@ function Lightbox({ photo, locale, onClose }) {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
+
+  const toggleFavorite = (e) => {
+    e.stopPropagation();
+    const favs = getFavorites();
+    const isFav = favs.some((f) => f.id === photo.id);
+    const updated = isFav
+      ? favs.filter((f) => f.id !== photo.id)
+      : [...favs, { id: photo.id, title: photo.title, location: photo.location, image: photo.image }];
+    saveFavorites(updated);
+    setFavorited(!isFav);
+  };
 
   return (
     <motion.div
@@ -102,34 +126,41 @@ function Lightbox({ photo, locale, onClose }) {
         </Link>
       </motion.div>
 
-      {/* Close button */}
-      <motion.button
+      {/* Top-right controls */}
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ delay: 0.1 }}
-        className="absolute top-5 right-5 z-10 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
-        onClick={onClose}
-        aria-label="Close"
+        className="absolute top-5 right-5 z-10 flex items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-          <path d="M18 6L6 18M6 6l12 12"/>
-        </svg>
-      </motion.button>
+        {/* Favorite */}
+        <button
+          onClick={toggleFavorite}
+          aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+          className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 ${
+            favorited ? 'bg-white text-orange' : 'bg-white/10 text-white/60 hover:text-white hover:bg-white/20'
+          }`}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+
+        {/* Close */}
+        <button
+          className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </motion.div>
     </motion.div>
   );
-}
-
-const FAV_KEY = 'davejavu_favorites';
-
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; }
-}
-
-function saveFavorites(favs) {
-  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-  // Notify navbar (and other listeners) in the same tab
-  window.dispatchEvent(new StorageEvent('storage', { key: FAV_KEY }));
 }
 
 function PhotoCard({ photo, locale, onSelect }) {
