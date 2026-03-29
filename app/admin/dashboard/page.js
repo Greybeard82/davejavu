@@ -73,10 +73,12 @@ export default function AdminDashboard() {
           <Image src="/logo.png" alt="DAVEJAVU" width={80} height={40} className="object-contain" />
           <span className="text-[11px] uppercase tracking-widest text-mid-gray">Admin</span>
         </div>
-        <div className="flex items-center gap-6">
-          <a href="/admin/messages" className="text-xs uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Messages</a>
+        <nav className="flex items-center gap-6">
+          <a href="/admin/dashboard" className="text-xs uppercase tracking-widest text-orange">Photos</a>
+          <a href="/admin/collections" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors">Collections</a>
+          <a href="/admin/messages" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors">Messages</a>
           <button onClick={handleSignOut} className="text-xs uppercase tracking-widest text-mid-gray hover:text-red-500 transition-colors">Sign out</button>
-        </div>
+        </nav>
       </header>
 
       <main className="max-w-6xl mx-auto px-8 py-10">
