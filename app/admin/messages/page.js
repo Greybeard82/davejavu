@@ -4,12 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 
-const NAV_LINKS = [
-  { href: '/admin/dashboard', label: 'Photos' },
-  { href: '/admin/collections', label: 'Collections' },
-  { href: '/admin/moods', label: 'Moods' },
-  { href: '/admin/messages', label: 'Messages' },
-];
 
 function ReplyModal({ msg, onClose, onSent }) {
   const [text, setText] = useState('');
@@ -206,18 +200,7 @@ export default function AdminMessagesPage() {
 
   return (
     <div className="min-h-screen bg-[#fafaf8]">
-      {/* Nav */}
-      <header className="border-b border-[#e8e8e8] bg-white px-8 py-4 flex items-center justify-between">
-        <span className="font-700 text-xs uppercase tracking-widest text-charcoal">DAVEJAVU Admin</span>
-        <nav className="flex items-center gap-6">
-          {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href}
-              className={`text-xs uppercase tracking-widest transition-colors ${l.href === '/admin/messages' ? 'text-charcoal font-600' : 'text-mid-gray hover:text-charcoal'}`}>
-              {l.label}{l.href === '/admin/messages' && unreadCount > 0 ? ` (${unreadCount})` : ''}
-            </a>
-          ))}
-        </nav>
-      </header>
+
 
       <main className="max-w-4xl mx-auto px-8 py-10">
         <div className="flex items-end justify-between mb-8">

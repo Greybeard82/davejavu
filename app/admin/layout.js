@@ -1,4 +1,5 @@
 import '../../app/globals.css';
+import AdminNav from '@/components/admin/AdminNav';
 
 export const metadata = {
   title: 'Admin — DAVEJAVU',
@@ -6,5 +7,10 @@ export const metadata = {
 };
 
 export default function AdminLayout({ children }) {
-  return children;
+  return (
+    <>
+      <AdminNav />
+      {children}
+    </>
+  );
 }

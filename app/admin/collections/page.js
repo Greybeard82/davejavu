@@ -55,19 +55,7 @@ export default function AdminCollectionsPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
-      <header className="bg-white border-b border-[#d1d1d1] px-4 md:px-8 py-4 flex items-center justify-between sticky top-0 z-10 gap-4">
-        <div className="flex items-center gap-2 shrink-0">
-          <Image src="/logo.png" alt="DAVEJAVU" width={60} height={30} className="object-contain" />
-          <span className="text-[11px] uppercase tracking-widest text-mid-gray hidden sm:inline">Admin</span>
-        </div>
-        <nav className="flex items-center gap-4 md:gap-6 overflow-x-auto">
-          <a href="/admin/dashboard" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Photos</a>
-          <a href="/admin/collections" className="text-xs uppercase tracking-widest text-orange shrink-0">Collections</a>
-          <a href="/admin/moods" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Moods</a>
-          <a href="/admin/messages" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Messages</a>
-          <button onClick={handleSignOut} className="text-xs uppercase tracking-widest text-mid-gray hover:text-red-500 transition-colors shrink-0">Sign out</button>
-        </nav>
-      </header>
+
 
       <main className="max-w-6xl mx-auto px-8 py-10">
         <div className="flex items-center justify-between mb-8">
