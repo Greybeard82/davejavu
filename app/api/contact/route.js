@@ -41,12 +41,11 @@ export async function POST(request) {
 
     // Store in Supabase
     const supabase = createAdminClient();
-    const { error: dbError } = await supabase.from('contact_messages').insert({
+    const { error: dbError } = await supabase.from('messages').insert({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       subject: subject || null,
       photos_interest: photosInterest?.trim() || null,
-      intended_use: intendedUse?.trim() || null,
       message: message.trim(),
       locale: locale || 'en',
     });
