@@ -39,7 +39,6 @@ export default function BasketPage() {
   };
 
   const onApprove = async (data, actions) => {
-    // Capture the order first so PayPal marks it COMPLETED
     await actions.order.capture();
     const basketId = sessionStorage.getItem('davejavu_basket_id');
     const res = await fetch('/api/basket/complete', {
@@ -49,9 +48,8 @@ export default function BasketPage() {
     });
     const result = await res.json();
     if (!res.ok) { setError(result.error || 'Something went wrong'); return; }
-    sessionStorage.setItem('davejavu_download_links', JSON.stringify(result.links));
     clearBasket();
-    router.push(`/${locale}/thank-you`);
+    router.push(`/${locale}/thank-you?order=${data.orderID}&basket=${basketId}`);
   };
 
   if (items.length === 0) {

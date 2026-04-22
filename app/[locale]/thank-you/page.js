@@ -2,21 +2,30 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 
 export default function ThankYouPage() {
   const { locale } = useParams();
+  const searchParams = useSearchParams();
   const [links, setLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem('davejavu_download_links');
-      if (stored) {
-        setLinks(JSON.parse(stored));
-        sessionStorage.removeItem('davejavu_download_links');
-      }
-    } catch {}
-  }, []);
+    const orderId = searchParams.get('order');
+    const basketId = searchParams.get('basket');
+
+    if (!orderId || !basketId) { setLoading(false); return; }
+
+    fetch('/api/basket/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId, basketId }),
+    })
+      .then((r) => r.json())
+      .then((data) => { if (data.links) setLinks(data.links); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [searchParams]);
 
   return (
     <div className="max-w-2xl mx-auto px-6 pt-[72px] pb-24">
@@ -28,11 +37,13 @@ export default function ThankYouPage() {
         </div>
         <h1 className="text-3xl font-700 text-charcoal tracking-tight mb-3">Payment confirmed</h1>
         <p className="text-sm text-mid-gray leading-relaxed max-w-sm mx-auto">
-          Thank you for your purchase. Your download links are below and have also been sent to your email — they're valid for 14 days.
+          Thank you for your purchase. Your download links are below and have also been sent to your email — valid for 14 days.
         </p>
       </div>
 
-      {links.length > 0 ? (
+      {loading ? (
+        <div className="text-center text-sm text-mid-gray py-8">Loading your downloads…</div>
+      ) : links.length > 0 ? (
         <div className="flex flex-col gap-4 mb-16">
           {links.map((link, i) => (
             <div key={i} className="border border-[#d1d1d1] bg-white p-6 flex items-center justify-between gap-4 flex-wrap">
@@ -56,10 +67,7 @@ export default function ThankYouPage() {
       )}
 
       <div className="text-center">
-        <Link
-          href={`/${locale}`}
-          className="text-xs uppercase tracking-[3px] font-600 text-charcoal hover:text-orange transition-colors"
-        >
+        <Link href={`/${locale}`} className="text-xs uppercase tracking-[3px] font-600 text-charcoal hover:text-orange transition-colors">
           Back to portfolio
         </Link>
       </div>
