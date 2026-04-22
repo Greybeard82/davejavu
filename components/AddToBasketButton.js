@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { addToBasket, isInBasket } from '@/lib/basket';
 
 export default function AddToBasketButton({ photo }) {
+  const { locale } = useParams();
   const [inBasket, setInBasket] = useState(false);
   const [flash, setFlash] = useState(false);
 
@@ -25,17 +28,28 @@ export default function AddToBasketButton({ photo }) {
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={inBasket}
-      className={`w-full py-4 text-xs uppercase tracking-[3px] font-600 transition-colors ${
-        inBasket
-          ? 'bg-[#f4f3ef] text-mid-gray cursor-default border border-[#d1d1d1]'
-          : 'bg-charcoal text-white hover:bg-orange'
-      }`}
-    >
-      {flash ? '✓ Added to basket' : inBasket ? 'In basket' : 'Add to basket'}
-    </button>
+    <div className="flex flex-col gap-3">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={inBasket}
+        className={`w-full py-4 text-xs uppercase tracking-[3px] font-600 transition-colors ${
+          inBasket
+            ? 'bg-[#f4f3ef] text-mid-gray cursor-default border border-[#d1d1d1]'
+            : 'bg-charcoal text-white hover:bg-orange'
+        }`}
+      >
+        {flash ? '✓ Added to basket' : inBasket ? 'In basket' : 'Add to basket'}
+      </button>
+
+      {inBasket && (
+        <Link
+          href={`/${locale}/basket`}
+          className="w-full py-4 text-xs uppercase tracking-[3px] font-600 text-center bg-orange text-white hover:bg-orange-dark transition-colors"
+        >
+          Go to basket →
+        </Link>
+      )}
+    </div>
   );
 }
