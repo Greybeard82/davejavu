@@ -38,7 +38,9 @@ export default function BasketPage() {
     return data.orderId;
   };
 
-  const onApprove = async (data) => {
+  const onApprove = async (data, actions) => {
+    // Capture the order first so PayPal marks it COMPLETED
+    await actions.order.capture();
     const basketId = sessionStorage.getItem('davejavu_basket_id');
     const res = await fetch('/api/basket/complete', {
       method: 'POST',
