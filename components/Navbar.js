@@ -14,6 +14,7 @@ export default function Navbar({ locale, collections = [] }) {
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
+  const [basketCount, setBasketCount] = useState(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -25,11 +26,16 @@ export default function Navbar({ locale, collections = [] }) {
     const readCounts = () => {
       try {
         setFavCount(JSON.parse(localStorage.getItem('davejavu_favorites') || '[]').length);
+        setBasketCount(JSON.parse(localStorage.getItem('davejavu_basket') || '[]').length);
       } catch { /* ignore */ }
     };
     readCounts();
     window.addEventListener('storage', readCounts);
-    return () => window.removeEventListener('storage', readCounts);
+    window.addEventListener('basket-updated', readCounts);
+    return () => {
+      window.removeEventListener('storage', readCounts);
+      window.removeEventListener('basket-updated', readCounts);
+    };
   }, []);
 
   const pathWithoutLocale = pathname.replace(`/${locale}`, '') || '/';
@@ -128,6 +134,18 @@ export default function Navbar({ locale, collections = [] }) {
               )}
             </div>
 
+            {/* Basket */}
+            <Link href={link('/basket')} className="relative text-charcoal hover:text-orange transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+              {basketCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-orange text-white text-[9px] font-700 rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                  {basketCount}
+                </span>
+              )}
+            </Link>
+
             {/* Favorites */}
             <Link href={link('/favorites')} className="relative text-charcoal hover:text-orange transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -180,6 +198,7 @@ export default function Navbar({ locale, collections = [] }) {
               { href: '/about', label: 'About' },
               { href: '/pricing', label: 'Pricing' },
               { href: '/contact', label: 'Contact' },
+              { href: '/basket', label: `Basket${basketCount > 0 ? ` (${basketCount})` : ''}` },
               { href: '/favorites', label: `Favorites${favCount > 0 ? ` (${favCount})` : ''}` },
             ].map(({ href, label }) => (
               <Link

@@ -6,6 +6,7 @@ import { getHeroUrl } from '@/lib/cloudinary';
 import ProtectedImage from '@/components/ProtectedImage';
 import BuyButtons from '@/components/BuyButtons';
 import WallMockup from '@/components/WallMockup';
+import AddToBasketButton from '@/components/AddToBasketButton';
 
 const getPhotoDetail = cache(async (uuid, locale) => {
   const supabase = createAdminClient();
@@ -169,7 +170,8 @@ export default async function PhotoDetailPage({ params }) {
           <>
             <hr className="border-[#d1d1d1] my-8" />
             <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-5">Get this photo</h2>
-            <BuyButtons photo={{ id: photo.id, title: photo.title }} />
+            <AddToBasketButton photo={{ id: photo.id, title: photo.title, image: photo.image }} />
+            <p className="text-[10px] text-mid-gray mt-3">Choose your size and pay in the basket</p>
           </>
         )}
 
