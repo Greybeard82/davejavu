@@ -43,11 +43,15 @@ export async function POST(request) {
       .single();
     if (collError) throw new Error(collError.message);
 
-    const { error: transError } = await supabase.rpc('save_collection_translation', {
-      p_collection_id: collection.id,
-      p_title: title.trim(),
-      p_description: description?.trim() || null,
-    });
+    const { error: transError } = await supabase
+      .from('collection_translations')
+      .upsert({
+        collection_id: collection.id,
+        locale: 'en',
+        name: title.trim(),
+        title: title.trim(),
+        description: description?.trim() || null,
+      }, { onConflict: 'collection_id,locale' });
     if (transError) throw new Error(transError.message);
 
     if (photoIds?.length > 0) {

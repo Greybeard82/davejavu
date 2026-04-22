@@ -7,17 +7,7 @@ import Image from 'next/image';
 
 const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
 
-const COLLECTIONS = [
-  { slug: 'china', name: 'China' },
-  { slug: 'japan', name: 'Japan' },
-  { slug: 'south-korea', name: 'South Korea' },
-  { slug: 'vietnam', name: 'Vietnam' },
-  { slug: 'thailand', name: 'Thailand' },
-  { slug: 'canada', name: 'Canada' },
-  { slug: 'barcelona-spain', name: 'Barcelona & Spain' },
-];
-
-export default function Navbar({ locale }) {
+export default function Navbar({ locale, collections = [] }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,14 +22,14 @@ export default function Navbar({ locale }) {
   }, []);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
-    setFavCount(stored.length);
-    const onStorage = () => {
-      const updated = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
-      setFavCount(updated.length);
+    const readCounts = () => {
+      try {
+        setFavCount(JSON.parse(localStorage.getItem('davejavu_favorites') || '[]').length);
+      } catch { /* ignore */ }
     };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    readCounts();
+    window.addEventListener('storage', readCounts);
+    return () => window.removeEventListener('storage', readCounts);
   }, []);
 
   const pathWithoutLocale = pathname.replace(`/${locale}`, '') || '/';
@@ -76,8 +66,8 @@ export default function Navbar({ locale }) {
                 </svg>
               </button>
               {collectionsOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 bg-[#FAF9F6] border border-[#d1d1d1] shadow-lg rounded py-2 z-50">
-                  {COLLECTIONS.map((c) => (
+                <div className="absolute top-full left-0 mt-3 w-48 bg-[#FAF9F6] border border-[#d1d1d1] shadow-lg rounded py-2 z-50">
+                  {collections.map((c) => (
                     <Link
                       key={c.slug}
                       href={link(`/collections/${c.slug}`)}
@@ -153,9 +143,10 @@ export default function Navbar({ locale }) {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-charcoal"
+            className="md:hidden text-charcoal ml-auto p-3 -mr-3 touch-manipulation"
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Open menu"
+            type="button"
           >
             {menuOpen ? (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -172,8 +163,18 @@ export default function Navbar({ locale }) {
 
       {/* Mobile overlay menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#FAF9F6] flex flex-col pt-24 px-8 md:hidden">
-          <nav className="flex flex-col gap-6">
+        <div className="fixed inset-0 z-50 bg-[#FAF9F6] flex flex-col pt-[72px] overflow-y-auto">
+          <button
+            type="button"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            className="absolute top-0 right-0 h-[72px] w-[72px] flex items-center justify-center text-charcoal touch-manipulation"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+          <nav className="flex flex-col px-6 py-8 gap-5">
             {[
               { href: '/', label: 'Portfolio' },
               { href: '/about', label: 'About' },
@@ -185,7 +186,7 @@ export default function Navbar({ locale }) {
                 key={href}
                 href={link(href)}
                 onClick={() => setMenuOpen(false)}
-                className="text-2xl font-700 uppercase tracking-widest text-charcoal hover:text-orange transition-colors"
+                className="text-xl font-700 uppercase tracking-widest text-charcoal hover:text-orange transition-colors py-1"
               >
                 {label}
               </Link>
@@ -193,13 +194,13 @@ export default function Navbar({ locale }) {
 
             <div>
               <p className="text-xs uppercase tracking-widest text-mid-gray mb-3">Collections</p>
-              <div className="flex flex-col gap-3">
-                {COLLECTIONS.map((c) => (
+              <div className="flex flex-col gap-2">
+                {collections.map((c) => (
                   <Link
                     key={c.slug}
                     href={link(`/collections/${c.slug}`)}
                     onClick={() => setMenuOpen(false)}
-                    className="text-base font-400 uppercase tracking-wider text-charcoal hover:text-orange transition-colors"
+                    className="text-sm font-400 uppercase tracking-wider text-charcoal hover:text-orange transition-colors py-1"
                   >
                     {c.name}
                   </Link>
@@ -207,15 +208,15 @@ export default function Navbar({ locale }) {
               </div>
             </div>
 
-            <div>
+            <div className="pb-8">
               <p className="text-xs uppercase tracking-widest text-mid-gray mb-3">Language</p>
-              <div className="flex gap-4 flex-wrap">
+              <div className="flex gap-3 flex-wrap">
                 {LOCALES.map((l) => (
                   <Link
                     key={l}
                     href={switchLocalePath(l)}
                     onClick={() => setMenuOpen(false)}
-                    className={`text-sm uppercase tracking-widest font-600 ${l === locale ? 'text-orange' : 'text-charcoal hover:text-orange'}`}
+                    className={`text-sm uppercase tracking-widest font-600 py-1 px-2 ${l === locale ? 'text-orange' : 'text-charcoal hover:text-orange'}`}
                   >
                     {l}
                   </Link>

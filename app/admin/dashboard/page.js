@@ -68,16 +68,16 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
       {/* Admin navbar */}
-      <header className="bg-white border-b border-[#d1d1d1] px-8 py-4 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="DAVEJAVU" width={80} height={40} className="object-contain" />
-          <span className="text-[11px] uppercase tracking-widest text-mid-gray">Admin</span>
+      <header className="bg-white border-b border-[#d1d1d1] px-4 md:px-8 py-4 flex items-center justify-between sticky top-0 z-10 gap-4">
+        <div className="flex items-center gap-2 shrink-0">
+          <Image src="/logo.png" alt="DAVEJAVU" width={60} height={30} className="object-contain" />
+          <span className="text-[11px] uppercase tracking-widest text-mid-gray hidden sm:inline">Admin</span>
         </div>
-        <nav className="flex items-center gap-6">
-          <a href="/admin/dashboard" className="text-xs uppercase tracking-widest text-orange">Photos</a>
-          <a href="/admin/collections" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors">Collections</a>
-          <a href="/admin/messages" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors">Messages</a>
-          <button onClick={handleSignOut} className="text-xs uppercase tracking-widest text-mid-gray hover:text-red-500 transition-colors">Sign out</button>
+        <nav className="flex items-center gap-4 md:gap-6 overflow-x-auto">
+          <a href="/admin/dashboard" className="text-xs uppercase tracking-widest text-orange shrink-0">Photos</a>
+          <a href="/admin/collections" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Collections</a>
+          <a href="/admin/messages" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Messages</a>
+          <button onClick={handleSignOut} className="text-xs uppercase tracking-widest text-mid-gray hover:text-red-500 transition-colors shrink-0">Sign out</button>
         </nav>
       </header>
 
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
                       onClick={() => deletePhoto(photo.id)}
-                      className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+                      className="w-11 h-11 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
                       title="Delete"
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

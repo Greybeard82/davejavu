@@ -2,9 +2,29 @@
 
 ## DAVEJAVU Photography Portfolio
 
-**Version:** 2.0
+**Version:** 3.0
 **Author:** David
-**Stack:** Next.js 14 (App Router) + Supabase + Cloudinary + Claude API + Resend + next-intl + Tailwind CSS + Framer Motion + hCaptcha
+**Stack:** Next.js 14 (App Router) + Supabase + Cloudinary + Claude API + Resend + next-intl + Tailwind CSS + Framer Motion + hCaptcha + PayPal Orders v2
+
+---
+
+## Changelog
+
+### v3.0 — 2026-04-17 — Licensing simplification
+- **Revenue model**: replaced two-tier personal/extended model (€40/€100) with two output-resolution tiers (Web/Small Print €15, Full Resolution €49). Global pricing, no per-image custom prices.
+- **Checkout model**: removed multi-photo basket + separate checkout page. Buy buttons are now inline on the individual photo page. PayPal modal opens on tier selection.
+- **Payment verification**: delivery now triggered by PayPal webhook (`PAYMENT.CAPTURE.COMPLETED`) with signature verification, not by client-side capture callback. This prevents spoofed delivery.
+- **License terms**: replaced legalese with a single plain-English paragraph on `/[locale]/license`.
+- **Enforcement**: switched watermark from image overlay to `l_text` Cloudinary overlay on all gallery URLs. Added EXIF/IPTC metadata stamping on paid downloads via `exiftool-vendored`.
+- **Download tokens**: 14-day validity. Fresh 60-second signed URL generated on each access. Stamped file stored in Supabase Storage; Cloudinary used as fallback.
+- **Commercial licensing**: removed from checkout entirely. Single `mailto:` link on photo pages and `/license` page.
+- **Out of scope** (explicitly): Stripe and all other payment processors, commercial checkout path, A/B testing, bundle pricing, Pixsy, invisible watermarking, multi-currency.
+- **12-month checkpoint**: review conversion data honestly after 12 months. Not a reason to abandon — a signal about traffic, catalog depth, or funnel. Revenue target is covering hosting (~€100–€200/year ≈ 4 full-res sales).
+
+### v2.2 — 2026-04-16 — PayPal basket MVP
+- Added basket (localStorage), LicensePickerModal, checkout page, PayPal integration, download tokens.
+
+### v2.1 — Initial release
 **Hosting:** Netlify (via @netlify/plugin-nextjs adapter)
 
 \---
@@ -32,7 +52,7 @@ A personal photography portfolio website for landscape and cityscape photographe
 |Framework|Next.js 14 (App Router)|SSR + SSG, i18n routing, API routes|
 |Database + Auth|Supabase|PostgreSQL, Row Level Security, TOTP 2FA|
 |Image CDN + Processing|Cloudinary|Upload, compression, signed URLs, watermarking, auto-tagging|
-|Multilingual SEO Copy|Claude API (claude-sonnet-4-20250514)|Takes Cloudinary tags as input, returns titles, descriptions, alt text in all 6 languages|
+|Multilingual SEO Copy|Claude API (claude-sonnet-4-6)|Claude Vision analyses the uploaded photo directly; returns titles, descriptions, alt text in all 6 languages. Falls back to Cloudinary tags if available (paid plan only).|
 |Email|Resend|Contact form notifications + download link delivery|
 |i18n|next-intl|Locale routing: /en /pt /es /fr /it /de|
 |Styling|Tailwind CSS|Dark-first design system|
@@ -186,11 +206,13 @@ Admin defines and manages mood tags. Multiple tags per photo allowed. Filter bar
 
 ### 5.7 Pricing Page (`/\\\[locale]/pricing`)
 
-|License|What's included|Price|
+|Tier|What's included|Price|
 |-|-|-|
-|Personal License|High-res file, print for personal home use, non-commercial, single household|From €75|
-|Extended Personal|High-res file, print multiple copies, give as a gift, personal use only|From €150|
-|Commercial|Editorial, advertising, product use -- custom quote|Contact|
+|Web / Small Print|2000px long edge, personal use|€15|
+|Full Resolution|Native resolution from source file, personal use|€49|
+|Commercial|Editorial, advertising, product use — contact only|—|
+
+Payment processor: **PayPal only** (Orders v2 API, Smart Payment Buttons, server-side capture, webhook-verified delivery). Stripe and all other processors are explicitly out of scope.
 
 Additional page content:
 
@@ -204,10 +226,10 @@ Additional page content:
 
 Shown on the pricing page and optionally as a homepage section:
 
-1. **Browse** -- explore the gallery and find a photo you love
-2. **Inquire** -- fill in the contact form with the photo(s) you want and intended use
-3. **Pay** -- receive a payment request via PayPal, bank transfer, or Bizum
-4. **Download** -- receive a secure download link valid for 5 days with your high-res licensed file
+1. **Browse** — explore the gallery and find a photo you love
+2. **Choose a tier** — Web/Small Print (€15) or Full Resolution (€49), directly on the photo page
+3. **Pay with PayPal** — secure checkout, no account required
+4. **Download** — receive a secure download link by email, valid for 14 days
 
 ### 5.9 Favorites / Wishlist
 
@@ -260,35 +282,41 @@ On submit:
 
 ## 6\. Image SEO Pipeline (Upload Flow)
 
-When admin uploads a photo, the following automated sequence runs:
+When admin uploads a photo, the following sequence runs:
 
-1. **Cloudinary upload** -- full-res file sent to Cloudinary; auto-tagging via Google Vision returns English content tags (e.g. `\\\["mountain", "fog", "sunrise", "landscape", "dramatic sky"]`)
-2. **Claude API call** -- `/api/seo-suggest` sends those tags plus location (if provided) to the Claude API requesting:
+1. **Cloudinary upload** -- full-res file sent to Cloudinary; display copy generated (1920px, 65% quality). Auto-tagging via Google Vision available on paid Cloudinary plans only; on free plan, tags array is empty.
+2. **"Auto-fill with AI" button** -- admin clicks the button in the upload form; `/api/seo-suggest` sends the Cloudinary display URL directly to Claude Vision (claude-sonnet-4-6), which analyses the photo visually and returns:
 
    * Suggested title in all 6 languages
    * SEO meta description in all 6 languages (max 155 characters each)
    * Alt text in all 6 languages
-   * 5 suggested mood/vibe tags
-3. **Admin review** -- upload form pre-fills all metadata fields with Claude suggestions; admin reviews and edits before saving
-4. **No blind auto-save** -- admin always has final say
+   * Suggested location ("City, Country" if identifiable)
+   * 1-3 suggested mood/vibe tags
+3. **Admin review** -- all metadata fields are pre-filled with Claude suggestions; admin reviews and edits before saving
+4. **No blind auto-save** -- admin always has final say; AI suggestions are a starting point only
 
 Claude API prompt (server-side only, never exposed to client):
 
 ```
-You are an SEO assistant for a landscape and cityscape photography portfolio.
-Given these image tags: {tags}
-And this location: {location}
+You are an SEO assistant for a landscape and cityscape photography portfolio called DAVEJAVU.
+[optional: Cloudinary auto-tags if available]
+[optional: known location if admin pre-filled it]
 
-Return ONLY a valid JSON object with no preamble or markdown. Structure:
+Analyse this photo and return ONLY a valid JSON object — no markdown, no preamble:
 {
   "titles": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
   "descriptions": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
-  "alt\\\_text": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
-  "suggested\\\_moods": \\\[]
+  "alt_text": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "location": "",
+  "suggested_moods": []
 }
-Descriptions must be under 155 characters. Titles evocative and under 60 characters.
-Mood tags chosen from: \\\[Golden Hour, Blue Hour, Storm, Solitude, Urban Chaos, Mist, Silence, Neon, Vast, Intimate].
+Titles: evocative, emotional, under 60 characters.
+Descriptions: SEO meta, under 155 characters.
+location: "City, Country" if identifiable, otherwise empty string.
+Mood tags chosen from: [Golden Hour, Blue Hour, Storm, Solitude, Urban Chaos, Mist, Silence, Neon, Vast, Intimate].
 ```
+
+**Note:** Bulk upload (queue multiple files, auto-fill each with AI, save sequentially) is planned for a future iteration.
 
 \---
 
@@ -375,12 +403,10 @@ img, .photo-overlay {
 
 ### 8.2 Photo Upload Flow
 
-1. Admin selects files (JPG, PNG, TIFF, HEIC; max 50MB per file)
-2. Upload progress shown
-3. File uploaded to private Supabase Storage bucket
-4. Cloudinary upload triggered server-side (display version + auto-tagging)
-5. Cloudinary tags passed to `/api/seo-suggest` → Claude API returns multilingual suggestions
-6. Admin reviews pre-filled form per photo:
+1. Admin selects a file (JPG, PNG, TIFF, HEIC; max 50MB)
+2. File uploaded to private Supabase Storage bucket + display copy generated on Cloudinary
+3. Admin clicks **"Auto-fill with AI"** button — Claude Vision analyses the photo and pre-fills all metadata fields across all 6 languages
+4. Admin reviews pre-filled form:
 
    * Title, description, alt text (6 languages, pre-filled)
    * Behind the lens text (6 languages, free text)
@@ -647,9 +673,118 @@ DOWNLOAD\\\_TOKEN\\\_SECRET=
 
 \---
 
-## 15\. Out of Scope (v1.0)
+## 15\. PayPal Basket & Checkout System
 
-* Payment processing / e-commerce (inquiry + manual payment confirmation only)
+### 15.1 Overview
+
+Users can add photos to a basket, choose a license tier, and pay directly via PayPal. On payment confirmation, download links are automatically emailed to the buyer — no manual admin step required.
+
+### 15.2 Basket (Client-Side)
+
+* "Add to basket" button on every photo card (grid + lightbox) and individual photo page
+* Clicking opens a **License Picker Modal** with two options:
+  * **Personal License** — €40 — home printing, non-commercial, single household
+  * **Extended Personal** — €100 — multiple prints, gifting, personal use only
+* Commercial licenses remain inquiry-only (no basket)
+* Basket stored in `localStorage` under key `davejavu_basket`
+* Data shape: `[{ id, title, image, location, license: 'personal'|'extended', price: 75|150 }]`
+* Basket icon (shopping bag) in navbar right area, with count badge matching Favorites pattern
+* Each photo can only appear once in the basket; adding again replaces the license
+
+### 15.3 Checkout Page (`/[locale]/checkout`)
+
+* Lists all basket items: photo thumbnail, title, license type, price
+* Shows order total in EUR
+* **PayPal button** rendered via `@paypal/react-paypal-js`
+* On click: `createOrder` calls `/api/paypal/create-order` server-side → returns PayPal order ID
+* PayPal popup opens; user logs in and approves
+* `onApprove`: calls `/api/paypal/capture-order` with `orderId` + buyer email
+* On success: order stored in DB, download tokens generated, email sent → success screen shown
+* On failure: error message with retry option
+* Empty basket redirects back to portfolio
+
+### 15.4 PayPal API Routes
+
+**`/api/paypal/create-order` (POST)**
+* Receives basket items from client (validated server-side against real photo prices)
+* Calls PayPal REST API `POST /v2/checkout/orders` with line items and total
+* Returns `{ orderId }` to client
+
+**`/api/paypal/capture-order` (POST)**
+* Receives `{ orderId, email, name, items }` 
+* Calls PayPal REST API `POST /v2/checkout/orders/{orderId}/capture`
+* On success:
+  1. Stores record in `orders` table with buyer info and status `completed`
+  2. Stores line items in `order_items` table
+  3. For each photo, generates a UUID download token (5-day expiry) in `download_tokens` table
+  4. Sends email via Resend with all download links and license summary
+  5. Returns `{ success: true }`
+
+### 15.5 Database Schema Additions
+
+**`orders`**
+```sql
+id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
+paypal_order_id TEXT UNIQUE NOT NULL
+email           TEXT NOT NULL
+name            TEXT NOT NULL
+status          TEXT DEFAULT 'completed'
+total_amount    NUMERIC NOT NULL
+created_at      TIMESTAMPTZ DEFAULT now()
+```
+
+**`order_items`**
+```sql
+id           UUID PRIMARY KEY DEFAULT gen_random_uuid()
+order_id     UUID REFERENCES orders(id) ON DELETE CASCADE
+photo_id     UUID REFERENCES photos(id)
+photo_title  TEXT NOT NULL
+license_type TEXT NOT NULL  -- 'personal' | 'extended'
+price        NUMERIC NOT NULL
+```
+
+**`download_tokens`** (updated — supports both order-based and admin-issued tokens)
+```sql
+id          UUID PRIMARY KEY DEFAULT gen_random_uuid()
+order_id    UUID REFERENCES orders(id) ON DELETE CASCADE  -- NULL for admin-issued
+message_id  UUID REFERENCES messages(id) ON DELETE CASCADE  -- NULL for order-based
+photo_id    UUID REFERENCES photos(id)
+email       TEXT NOT NULL
+token       TEXT UNIQUE NOT NULL DEFAULT gen_random_uuid()
+expires_at  TIMESTAMPTZ NOT NULL
+invalidated BOOLEAN DEFAULT false
+created_at  TIMESTAMPTZ DEFAULT now()
+```
+
+### 15.6 Download Token Route (`/api/download/[token]`)
+
+* Validates token: exists, not expired, not invalidated
+* Generates a short-lived Supabase Storage signed URL for the original file
+* Redirects buyer to it
+* Expired/invalid: renders friendly error page
+
+### 15.7 New Environment Variables
+
+```
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=   # PayPal app client ID (sandbox or live)
+PAYPAL_SECRET=                  # PayPal app secret (server-side only)
+PAYPAL_BASE_URL=                # https://api-m.sandbox.paypal.com or https://api-m.paypal.com
+```
+
+---
+
+## 16\. Out of Scope (deliberate non-goals)
+
+The following were considered and explicitly rejected. Do not reintroduce without a strong reason.
+
+* **Alternative payment processors** (Stripe, Lemon Squeezy, Square, etc.) — PayPal only
+* **Commercial checkout path** — ad-hoc via contact email only
+* **Bundle / multi-image pricing** — too complex for current catalog size
+* **A/B testing or pricing experiments** — not worth the infrastructure at this scale
+* **Multi-currency** — EUR only at launch
+* **Invisible watermarking** (Digimarc, Imatag) — not cost-effective at this revenue target
+* **Pixsy or automated reverse-image-search monitoring** — manual enforcement only
+* **Buyer accounts / login** — anonymous purchase + download link is sufficient
 * Automated print fulfillment
 * Blog or editorial section
 * Analytics dashboard in admin
@@ -674,7 +809,7 @@ DOWNLOAD\\\_TOKEN\\\_SECRET=
 |Favorites|Heart toggle persists in localStorage; pre-fills contact form|
 |Limited editions|Counter shown on card and photo page; decrements automatically on "Mark as Paid"|
 |Photo upload|Master stored privately; display version auto-generated via Cloudinary|
-|SEO pipeline|Cloudinary tags → Claude API → multilingual suggestions pre-fill upload form|
+|SEO pipeline|Claude Vision analyses photo → multilingual suggestions pre-fill upload form via "Auto-fill with AI" button|
 |Dynamic URLs|Cloudinary URLs are signed and expire; no stable asset links in HTML|
 |Admin login|2FA required; lockout after 5 failed attempts|
 |Contact form|hCaptcha + honeypot + GDPR checkbox; stored in DB; email sent to admin; rate-limited|

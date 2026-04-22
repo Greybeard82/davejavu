@@ -1,1 +1,18 @@
-{}
+{
+  "buy": {
+    "getThisPhoto": "Dieses Foto kaufen",
+    "webSmall": "Web / Kleindruck",
+    "webSmallSize": "2000px lange Seite · Persönlicher Gebrauch",
+    "fullRes": "Volle Auflösung",
+    "fullResSize": "Native Auflösung · Persönlicher Gebrauch",
+    "paymentConfirmed": "Zahlung bestätigt",
+    "paymentConfirmedDesc": "Prüfen Sie Ihren Posteingang — Ihr Download-Link wird in Kürze eintreffen.",
+    "licenseTerms": "Lizenzbedingungen",
+    "commercialCta": "Kommerzielle Nutzung? Kontaktieren Sie mich.",
+    "paypalError": "PayPal hat einen Fehler festgestellt. Bitte versuchen Sie es erneut."
+  },
+  "license": {
+    "title": "Lizenzbedingungen",
+    "back": "Zurück zum Portfolio"
+  }
+}

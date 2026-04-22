@@ -1,1 +1,18 @@
-{}
+{
+  "buy": {
+    "getThisPhoto": "Obtener esta foto",
+    "webSmall": "Web / Impresión Pequeña",
+    "webSmallSize": "2000px lado largo · Uso personal",
+    "fullRes": "Resolución Total",
+    "fullResSize": "Resolución nativa · Uso personal",
+    "paymentConfirmed": "Pago confirmado",
+    "paymentConfirmedDesc": "Revisa tu bandeja de entrada — el enlace de descarga llegará en breve.",
+    "licenseTerms": "Términos de licencia",
+    "commercialCta": "¿Uso comercial? Contáctame.",
+    "paypalError": "PayPal encontró un error. Por favor inténtalo de nuevo."
+  },
+  "license": {
+    "title": "Términos de Licencia",
+    "back": "Volver al portafolio"
+  }
+}

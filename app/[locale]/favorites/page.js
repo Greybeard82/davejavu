@@ -1,16 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
-
-const FAV_KEY = 'davejavu_favorites';
-
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; }
-}
+import { getFavorites, saveFavorites, FAV_KEY } from '@/lib/favorites';
 
 export default function FavoritesPage({ params }) {
-  const { locale } = params;
+  const { locale } = use(params);
   const [favorites, setFavorites] = useState([]);
   const [mounted, setMounted] = useState(false);
 
@@ -25,8 +20,7 @@ export default function FavoritesPage({ params }) {
 
   const remove = (id) => {
     const updated = favorites.filter((f) => f.id !== id);
-    localStorage.setItem(FAV_KEY, JSON.stringify(updated));
-    window.dispatchEvent(new StorageEvent('storage', { key: FAV_KEY }));
+    saveFavorites(updated);
     setFavorites(updated);
   };
 

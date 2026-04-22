@@ -4,13 +4,14 @@ import { cache } from 'react';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getHeroUrl } from '@/lib/cloudinary';
 import ProtectedImage from '@/components/ProtectedImage';
+import BuyButtons from '@/components/BuyButtons';
 
 const getPhotoDetail = cache(async (uuid, locale) => {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('photos')
     .select(`
-      id, cloudinary_id, available_for_license, edition_max, edition_sold, created_at,
+      id, cloudinary_id, available_for_license, created_at,
       photo_translations ( locale, title, location, description, alt_text, behind_lens ),
       photo_moods ( mood ),
       photo_metadata ( camera_body, lens, focal_length, aperture, iso, shutter_speed )
@@ -29,6 +30,7 @@ const getPhotoDetail = cache(async (uuid, locale) => {
 
   return {
     id: data.id,
+    cloudinaryId: data.cloudinary_id,
     image: getHeroUrl(data.cloudinary_id),
     title: t.title || '(untitled)',
     location: t.location || '',
@@ -37,8 +39,6 @@ const getPhotoDetail = cache(async (uuid, locale) => {
     altText: t.alt_text || t.title || '',
     moods: data.photo_moods?.map((m) => m.mood) || [],
     licensed: data.available_for_license ?? false,
-    editionMax: data.edition_max ?? null,
-    editionSold: data.edition_sold ?? 0,
     meta: {
       cameraBody: meta.camera_body || '',
       lens: meta.lens || '',
@@ -51,7 +51,7 @@ const getPhotoDetail = cache(async (uuid, locale) => {
 });
 
 export async function generateMetadata({ params }) {
-  const { uuid, locale } = params;
+  const { uuid, locale } = await params;
   const photo = await getPhotoDetail(uuid, locale);
   if (!photo) return {};
   return {
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function PhotoDetailPage({ params }) {
-  const { uuid, locale } = params;
+  const { uuid, locale } = await params;
   const photo = await getPhotoDetail(uuid, locale);
 
   if (!photo) notFound();
@@ -159,24 +159,12 @@ export default async function PhotoDetailPage({ params }) {
           </>
         )}
 
-        {/* License / edition */}
+        {/* Buy section */}
         {photo.licensed && (
           <>
             <hr className="border-[#d1d1d1] my-8" />
-            <div className="p-5 border border-[#d1d1d1] bg-[#f4f3ef]">
-              <p className="text-[10px] uppercase tracking-widest text-mid-gray">Available for license</p>
-              <p className="text-sm text-charcoal mt-1">
-                {photo.editionMax
-                  ? `Edition ${photo.editionSold} of ${photo.editionMax}`
-                  : 'Open edition'}
-              </p>
-              <Link
-                href={`/${locale}/contact?photo=${encodeURIComponent(photo.title)}`}
-                className="mt-4 inline-block bg-orange text-white text-[10px] uppercase tracking-widest font-600 px-6 py-3 hover:bg-orange-dark transition-colors"
-              >
-                Inquire about a license
-              </Link>
-            </div>
+            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-5">Get this photo</h2>
+            <BuyButtons photo={{ id: photo.id, title: photo.title }} />
           </>
         )}
 

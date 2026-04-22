@@ -71,7 +71,7 @@ const getCollection = cache(async (slug, locale) => {
 });
 
 export async function generateMetadata({ params }) {
-  const { slug, locale } = params;
+  const { slug, locale } = await params;
   const collection = await getCollection(slug, locale);
   if (!collection) return {};
   return {
@@ -81,7 +81,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CollectionPage({ params }) {
-  const { slug, locale } = params;
+  const { slug, locale } = await params;
   const collection = await getCollection(slug, locale);
 
   if (!collection) notFound();

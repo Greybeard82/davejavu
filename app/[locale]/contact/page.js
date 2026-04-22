@@ -5,9 +5,10 @@ export const metadata = {
   description: 'Inquire about licensing a photo or get in touch.',
 };
 
-export default function ContactPage({ params, searchParams }) {
-  const { locale } = params;
-  const prefilledPhoto = searchParams?.photo || '';
+export default async function ContactPage({ params, searchParams }) {
+  const { locale } = await params;
+  const resolvedSearch = await searchParams;
+  const prefilledPhoto = resolvedSearch?.photo || '';
 
   return (
     <div className="max-w-2xl mx-auto px-6 pt-[72px] pb-24">

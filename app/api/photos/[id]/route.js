@@ -13,11 +13,11 @@ cloudinary.config({
 // Toggle published / featured / available_for_license
 export async function PATCH(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const supabase = createAdminClient();
 
-    const allowed = ['published', 'featured', 'available_for_license', 'edition_max'];
+    const allowed = ['published', 'featured', 'available_for_license'];
     const updates = Object.fromEntries(
       Object.entries(body).filter(([k]) => allowed.includes(k))
     );
@@ -38,7 +38,7 @@ export async function PATCH(request, { params }) {
 // Delete photo — removes from Cloudinary + Supabase Storage + DB
 export async function DELETE(_request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const supabase = createAdminClient();
 
     // Get photo record first

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { getFavorites, saveFavorites, FAV_KEY } from '@/lib/favorites';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SUBJECTS = [
@@ -22,7 +23,7 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
   // Populate on mount: merge ?photo= param with saved favorites (deduped by title)
   useEffect(() => {
     try {
-      const favs = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
+      const favs = getFavorites();
       const fromFavs = favs.map((f) => ({ id: f.id, title: f.title, image: f.image }));
       if (prefilledPhoto) {
         const alreadyInFavs = fromFavs.some((f) => f.title === prefilledPhoto);
@@ -33,7 +34,6 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
       }
     } catch { /* localStorage unavailable */ }
   }, [prefilledPhoto]);
-  const [manualInput, setManualInput] = useState('');
   const [errors, setErrors] = useState({});
   const [captchaToken, setCaptchaToken] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -49,20 +49,10 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
   const removePhoto = (id) => {
     setSelectedPhotos((prev) => prev.filter((p) => p.id !== id));
     try {
-      const favs = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]');
+      const favs = getFavorites();
       const updated = favs.filter((f) => f.id !== id);
-      if (updated.length !== favs.length) {
-        localStorage.setItem('davejavu_favorites', JSON.stringify(updated));
-        window.dispatchEvent(new StorageEvent('storage', { key: 'davejavu_favorites' }));
-      }
+      if (updated.length !== favs.length) saveFavorites(updated);
     } catch { /* ignore */ }
-  };
-
-  const addManualPhoto = () => {
-    const title = manualInput.trim();
-    if (!title) return;
-    setSelectedPhotos((prev) => [...prev, { id: `manual-${Date.now()}`, title, image: null }]);
-    setManualInput('');
   };
 
   const validate = () => {
@@ -164,9 +154,8 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
       <div>
         <label className={labelClass}>Photos of interest</label>
 
-        {/* Selected photos list */}
-        {selectedPhotos.length > 0 && (
-          <div className="border border-[#d1d1d1] divide-y divide-[#d1d1d1] mb-2">
+        {selectedPhotos.length > 0 ? (
+          <div className="border border-[#d1d1d1] divide-y divide-[#d1d1d1]">
             {selectedPhotos.map((photo) => (
               <div key={photo.id} className="flex items-center gap-3 px-3 py-2">
                 {photo.image ? (
@@ -187,25 +176,11 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
               </div>
             ))}
           </div>
+        ) : (
+          <p className="text-xs text-mid-gray py-3">
+            No photos selected — save photos from the gallery using the ♡ button and they'll appear here automatically.
+          </p>
         )}
-
-        {/* Add manually */}
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={manualInput}
-            onChange={(e) => setManualInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addManualPhoto(); } }}
-            placeholder={selectedPhotos.length === 0 ? "Photo title(s) you're interested in" : 'Add another photo…'}
-            className={inputClass}
-          />
-          {manualInput.trim() && (
-            <button type="button" onClick={addManualPhoto}
-              className="shrink-0 px-4 border border-[#d1d1d1] text-xs uppercase tracking-widest text-charcoal hover:border-orange hover:text-orange transition-colors">
-              Add
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Intended use */}

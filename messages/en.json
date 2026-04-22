@@ -95,10 +95,10 @@
     "subtitle": "Every image is available for personal or commercial use. All prices in EUR.",
     "personal": "Personal License",
     "personalDesc": "High-res file for personal home printing. Non-commercial, single household.",
-    "personalPrice": "From €75",
+    "personalPrice": "From €40",
     "extended": "Extended Personal",
     "extendedDesc": "Print multiple copies, give as a gift. Personal use only.",
-    "extendedPrice": "From €150",
+    "extendedPrice": "From €100",
     "commercial": "Commercial",
     "commercialDesc": "Editorial, advertising, product use. Custom quote.",
     "commercialPrice": "Contact",
@@ -148,5 +148,21 @@
     "invalid": "This download link is invalid.",
     "contactUs": "Please contact the photographer to request a new link.",
     "contact": "Contact photographer"
+  },
+  "buy": {
+    "getThisPhoto": "Get this photo",
+    "webSmall": "Web / Small Print",
+    "webSmallSize": "2000px long edge · Personal use",
+    "fullRes": "Full Resolution",
+    "fullResSize": "Native resolution · Personal use",
+    "paymentConfirmed": "Payment confirmed",
+    "paymentConfirmedDesc": "Check your inbox — your download link will arrive within a minute.",
+    "licenseTerms": "License terms",
+    "commercialCta": "Commercial use? Contact me.",
+    "paypalError": "PayPal encountered an error. Please try again."
+  },
+  "license": {
+    "title": "License Terms",
+    "back": "Back to portfolio"
   }
 }

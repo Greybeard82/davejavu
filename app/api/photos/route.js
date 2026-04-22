@@ -10,13 +10,13 @@ export async function POST(request) {
       photoId,
       cloudinaryId,
       storagePath,
-      translations,       // { en: { title, description, alt_text, behind_lens, location }, pt: {...}, ... }
-      moods,              // string[]
-      camera,             // { camera_body, lens, focal_length, aperture, iso, shutter_speed }
-      editionMax,         // number | null
+      translations,
+      moods,
+      camera,
       availableForLicense,
       featured,
       published,
+      collectionIds,
     } = body;
 
     if (!photoId || !cloudinaryId || !storagePath) {
@@ -28,19 +28,16 @@ export async function POST(request) {
 
     const supabase = createAdminClient();
 
-    // Insert into photos
     const { error: photoError } = await supabase.from('photos').insert({
       id: photoId,
       cloudinary_id: cloudinaryId,
       storage_path: storagePath,
-      edition_max: editionMax || null,
       available_for_license: availableForLicense ?? false,
       featured: featured ?? false,
       published: published ?? false,
     });
     if (photoError) throw new Error(`photos: ${photoError.message}`);
 
-    // Insert translations (only locales with a title filled in)
     const translationRows = Object.entries(translations)
       .filter(([, t]) => t?.title?.trim())
       .map(([locale, t]) => ({
@@ -53,31 +50,36 @@ export async function POST(request) {
         location: t.location?.trim() || null,
       }));
 
-    if (translationRows.length > 0) {
-      const { error: translError } = await supabase.from('photo_translations').insert(translationRows);
-      if (translError) throw new Error(`translations: ${translError.message}`);
-    }
-
-    // Insert camera metadata (only if at least one field is filled)
     const hasCamera = camera && Object.values(camera).some(v => v?.toString().trim());
-    if (hasCamera) {
-      const { error: camError } = await supabase.from('photo_metadata').insert({
-        photo_id: photoId,
-        camera_body: camera.camera_body?.trim() || null,
-        lens: camera.lens?.trim() || null,
-        focal_length: camera.focal_length?.trim() || null,
-        aperture: camera.aperture?.trim() || null,
-        iso: camera.iso ? parseInt(camera.iso) : null,
-        shutter_speed: camera.shutter_speed?.trim() || null,
-      });
-      if (camError) throw new Error(`metadata: ${camError.message}`);
-    }
 
-    // Insert moods
-    if (moods?.length > 0) {
-      const { error: moodError } = await supabase.from('photo_moods')
-        .insert(moods.map(mood => ({ photo_id: photoId, mood })));
-      if (moodError) throw new Error(`moods: ${moodError.message}`);
+    const inserts = await Promise.all([
+      translationRows.length > 0
+        ? supabase.from('photo_translations').insert(translationRows)
+        : Promise.resolve({ error: null }),
+      hasCamera
+        ? supabase.from('photo_metadata').insert({
+            photo_id: photoId,
+            camera_body: camera.camera_body?.trim() || null,
+            lens: camera.lens?.trim() || null,
+            focal_length: camera.focal_length?.trim() || null,
+            aperture: camera.aperture?.trim() || null,
+            iso: camera.iso ? parseInt(camera.iso) : null,
+            shutter_speed: camera.shutter_speed?.trim() || null,
+          })
+        : Promise.resolve({ error: null }),
+      moods?.length > 0
+        ? supabase.from('photo_moods').insert(moods.map(mood => ({ photo_id: photoId, mood })))
+        : Promise.resolve({ error: null }),
+      collectionIds?.length > 0
+        ? supabase.from('photo_collections').insert(
+            collectionIds.map((collectionId, i) => ({ collection_id: collectionId, photo_id: photoId, position: i }))
+          )
+        : Promise.resolve({ error: null }),
+    ]);
+
+    const labels = ['translations', 'metadata', 'moods', 'collections'];
+    for (let i = 0; i < inserts.length; i++) {
+      if (inserts[i].error) throw new Error(`${labels[i]}: ${inserts[i].error.message}`);
     }
 
     return NextResponse.json({ id: photoId });
@@ -94,8 +96,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from('photos')
       .select(`
-        id, cloudinary_id, published, featured, available_for_license,
-        edition_max, edition_sold, created_at,
+        id, cloudinary_id, published, featured, available_for_license, created_at,
         photo_translations ( locale, title, location )
       `)
       .order('created_at', { ascending: false });

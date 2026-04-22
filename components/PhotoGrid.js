@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { decode } from 'blurhash';
+import { MOODS } from '@/lib/moods';
+import { getFavorites, saveFavorites } from '@/lib/favorites';
 
 function BlurHashPlaceholder({ hash }) {
   const canvasRef = useRef(null);
@@ -36,17 +38,6 @@ function BlurHashPlaceholder({ hash }) {
   );
 }
 
-const MOODS = ['Golden Hour', 'Blue Hour', 'Storm', 'Solitude', 'Urban Chaos', 'Mist', 'Silence', 'Neon', 'Vast', 'Intimate'];
-
-const FAV_KEY = 'davejavu_favorites';
-function getFavorites() {
-  try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; }
-}
-function saveFavorites(favs) {
-  localStorage.setItem(FAV_KEY, JSON.stringify(favs));
-  window.dispatchEvent(new StorageEvent('storage', { key: FAV_KEY }));
-}
-
 function Lightbox({ photo, locale, onClose }) {
   const [favorited, setFavorited] = useState(() =>
     getFavorites().some((f) => f.id === photo.id)
@@ -76,104 +67,110 @@ function Lightbox({ photo, locale, onClose }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50"
       onClick={onClose}
     >
-      {/* Blurred backdrop */}
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+        className="absolute inset-0 bg-black/90 backdrop-blur-md"
       />
 
-      {/* Photo — shared layout element animates from card */}
-      <motion.div
-        layoutId={`photo-${photo.id}`}
-        className="relative z-10 flex items-center justify-center"
-        style={{ maxWidth: '95vw', maxHeight: '92vh' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <img
-          src={photo.image}
-          alt={photo.title}
-          className="block max-w-full max-h-[92vh] object-contain shadow-2xl"
-          draggable="false"
-          onContextMenu={(e) => e.preventDefault()}
-        />
-      </motion.div>
+      {/* Photo + action bar — inline-flex column so bar width matches photo width exactly */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center">
+        <div className="inline-flex flex-col">
 
-      {/* Caption — fades in after layout animation */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0 }}
-        transition={{ delay: 0.25, duration: 0.3 }}
-        className="absolute bottom-0 left-0 right-0 pb-8 text-center z-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="text-white font-700 text-lg tracking-tight">{photo.title}</h3>
-        {photo.location && (
-          <p className="text-white/55 text-[11px] uppercase tracking-[3px] mt-1">{photo.location}</p>
-        )}
-        <Link
-          href={`/${locale}/photo/${photo.id}`}
-          className="inline-block mt-3 text-[10px] uppercase tracking-widest text-white/60 hover:text-white border-b border-white/30 hover:border-white transition-colors pb-0.5"
-          onClick={(e) => e.stopPropagation()}
-        >
-          View details →
-        </Link>
-      </motion.div>
+          <motion.div layoutId={`photo-${photo.id}`}>
+            <img
+              src={photo.image}
+              alt={photo.title}
+              className="block"
+              style={{ maxWidth: '95vw', maxHeight: 'calc(100vh - 100px)', objectFit: 'contain' }}
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </motion.div>
 
-      {/* Top-right controls */}
-      <motion.div
+          {/* Action bar — same width as rendered photo */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.25, duration: 0.3 }}
+            className="flex items-center justify-between gap-4 pt-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Caption — left */}
+            <div>
+              <h3 className="text-white font-700 text-base tracking-tight leading-tight">{photo.title}</h3>
+              {photo.location && (
+                <p className="text-white/55 text-[11px] uppercase tracking-[3px] mt-0.5">{photo.location}</p>
+              )}
+            </div>
+
+            {/* Buttons — right */}
+            <div className="shrink-0 flex items-center gap-3">
+              <Link
+                href={`/${locale}/photo/${photo.id}`}
+                className="flex flex-col items-center gap-1 group"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200 hover:scale-105">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+                  </svg>
+                </div>
+                <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">Details</span>
+              </Link>
+
+              <button
+                onClick={toggleFavorite}
+                aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+                className="flex flex-col items-center gap-1 group"
+              >
+                <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200 ${
+                  favorited ? 'bg-white text-orange scale-110' : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white hover:scale-105'
+                }`}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                </div>
+                <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">
+                  {favorited ? 'Saved' : 'Save'}
+                </span>
+              </button>
+
+            </div>
+          </motion.div>
+
+        </div>
+      </div>
+
+      {/* Close — top-right */}
+      <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ delay: 0.1 }}
-        className="absolute top-5 right-5 z-10 flex items-center gap-2"
-        onClick={(e) => e.stopPropagation()}
+        className="absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+        onClick={onClose}
+        aria-label="Close"
       >
-        {/* Favorite */}
-        <button
-          onClick={toggleFavorite}
-          aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
-          className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200 ${
-            favorited ? 'bg-white text-orange' : 'bg-white/10 text-white/60 hover:text-white hover:bg-white/20'
-          }`}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-
-        {/* Close */}
-        <button
-          className="w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </motion.div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </motion.button>
     </motion.div>
   );
 }
 
 function PhotoCard({ photo, onSelect }) {
   const [hovered, setHovered] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
-  const [favorited, setFavorited] = useState(false);
-  const imgRef = useRef(null);
-
-  useEffect(() => {
-    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
-    setFavorited(getFavorites().some((f) => f.id === photo.id));
-  }, [photo.id]);
+  const [favorited, setFavorited] = useState(() => getFavorites().some((f) => f.id === photo.id));
 
   const toggleFavorite = (e) => {
     e.stopPropagation();
@@ -204,12 +201,10 @@ function PhotoCard({ photo, onSelect }) {
         <div className="photo-overlay absolute inset-0 z-10" />
 
         <img
-          ref={imgRef}
           src={photo.image}
           alt={photo.title}
-          onLoad={() => setLoaded(true)}
           onError={() => setErrored(true)}
-          className={`relative w-full block transition-all duration-700 ${hovered ? 'scale-105' : 'scale-100'} ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`relative w-full block transition-transform duration-700 ${hovered ? 'scale-105' : 'scale-100'}`}
           draggable="false"
         />
 
@@ -240,21 +235,24 @@ function PhotoCard({ photo, onSelect }) {
           )}
         </div>
 
-        {/* Favorite button */}
-        <button
-          onClick={toggleFavorite}
-          aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
-          className={`absolute top-3 right-3 z-30 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
-            favorited
-              ? 'bg-white text-orange'
-              : 'bg-black/30 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100'
-          }`}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
+        {/* Top-right buttons */}
+        <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5">
+          <button
+            onClick={toggleFavorite}
+            aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
+              favorited
+                ? 'bg-white text-orange'
+                : 'bg-black/30 backdrop-blur-sm text-white/70 opacity-0 group-hover:opacity-100'
+            }`}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
       </motion.div>
+
     </div>
   );
 }

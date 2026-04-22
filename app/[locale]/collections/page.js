@@ -40,7 +40,7 @@ export const metadata = {
 };
 
 export default async function CollectionsPage({ params }) {
-  const { locale } = params;
+  const { locale } = await params;
   const collections = await getCollections(locale);
 
   return (

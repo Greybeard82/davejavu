@@ -163,7 +163,7 @@ export default function CollectionModal({ collection, onClose, onSuccess }) {
             ) : photos.length === 0 ? (
               <p className="text-xs text-mid-gray py-4 text-center">No photos uploaded yet.</p>
             ) : (
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-60 overflow-y-auto border border-[#d1d1d1] p-2 rounded">
+              <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2 max-h-60 overflow-y-auto border border-[#d1d1d1] p-2 rounded">
                 {photos.map((photo) => {
                   const selected = selectedIds.includes(photo.id);
                   const isCover = photo.id === effectiveCover;
