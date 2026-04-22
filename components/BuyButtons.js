@@ -5,7 +5,7 @@ import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import Link from 'next/link';
 
 const TIERS = [
-  { key: 'web_small', label: 'Web / Small Print', size: '2000px long edge', price: 15 },
+  { key: 'web_small', label: 'Web / Small Print', size: '2000px long edge', price: 19 },
   { key: 'full_res',  label: 'Full Resolution',   size: 'Native resolution', price: 49 },
 ];
 
