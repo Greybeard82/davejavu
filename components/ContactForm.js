@@ -6,7 +6,6 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 const SUBJECTS = [
   { value: 'Personal License', label: 'Personal License' },
-  { value: 'Extended Personal License', label: 'Extended Personal License' },
   { value: 'Commercial License', label: 'Commercial License' },
   { value: 'Other', label: 'Other' },
 ];
@@ -16,7 +15,7 @@ const labelClass = 'block text-[10px] uppercase tracking-widest text-mid-gray mb
 
 export default function ContactForm({ locale, prefilledPhoto = '' }) {
   const [fields, setFields] = useState({
-    name: '', email: '', subject: 'Personal License', intendedUse: '', message: '', gdpr: false,
+    name: '', email: '', subject: 'Personal License', message: '', gdpr: false,
   });
   const [selectedPhotos, setSelectedPhotos] = useState([]);
 
@@ -89,7 +88,6 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
           email: fields.email.trim(),
           subject: fields.subject,
           photosInterest: selectedPhotos.map((p) => p.title).join(', '),
-          intendedUse: fields.intendedUse.trim(),
           message: fields.message.trim(),
           locale,
           captchaToken,
@@ -131,7 +129,7 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
         <div>
           <label className={labelClass}>Your name <span className="text-orange">*</span></label>
           <input type="text" value={fields.name} onChange={(e) => set('name', e.target.value)}
-            placeholder="David" className={inputClass} autoComplete="name" />
+            placeholder="John Doe" className={inputClass} autoComplete="name" />
           {errors.name && <p className="text-[11px] text-red-500 mt-1">{errors.name}</p>}
         </div>
         <div>
@@ -183,18 +181,11 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
         )}
       </div>
 
-      {/* Intended use */}
-      <div>
-        <label className={labelClass}>Intended use</label>
-        <input type="text" value={fields.intendedUse} onChange={(e) => set('intendedUse', e.target.value)}
-          placeholder="How do you plan to use the image?" className={inputClass} />
-      </div>
-
       {/* Message */}
       <div>
         <label className={labelClass}>Message <span className="text-orange">*</span></label>
         <textarea rows={5} value={fields.message} onChange={(e) => set('message', e.target.value)}
-          placeholder="Tell me more about your project..." className={`${inputClass} resize-none`} />
+          placeholder="What would you like to talk about?" className={`${inputClass} resize-none`} />
         {errors.message && <p className="text-[11px] text-red-500 mt-1">{errors.message}</p>}
       </div>
 

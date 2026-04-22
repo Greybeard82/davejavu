@@ -31,7 +31,7 @@ export default function FavoritesPage({ params }) {
   if (!mounted) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-[72px] pb-24">
+    <div className="max-w-[1800px] mx-auto px-6 pt-[72px] pb-24">
       <div className="pt-16 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
           <h1 className="text-3xl md:text-4xl font-700 text-charcoal tracking-tight">Your Favorites</h1>

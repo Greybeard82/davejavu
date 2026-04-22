@@ -119,7 +119,19 @@
   },
   "about": {
     "title": "About",
-    "subtitle": "DAVEJAVU"
+    "subtitle": "DAVEJAVU",
+    "heroAlt": "The photographer behind DAVEJAVU",
+    "storyHeading": "Who I am",
+    "storyBody": "[YOUR STORY HERE — 2–3 sentences: who you are, where you're from, how you got into photography.]",
+    "philosophyHeading": "What I look for",
+    "philosophyBody": "[YOUR PHILOSOPHY HERE — what draws you to a scene, the mood or quality of light you chase, what makes a frame worth keeping.]",
+    "gearHeading": "How I shoot",
+    "gearBody": "[GEAR / PROCESS NOTE — brief: camera body, a favourite lens, how you approach a location. One short paragraph.]",
+    "signaturesHeading": "A few favourites",
+    "ctaHeading": "Like what you see?",
+    "ctaBody": "Browse the portfolio or get in touch about a license.",
+    "ctaPortfolio": "View portfolio",
+    "ctaContact": "Get in touch"
   },
   "collections": {
     "title": "Collections",

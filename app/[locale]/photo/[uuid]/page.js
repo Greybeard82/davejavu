@@ -77,7 +77,7 @@ export default async function PhotoDetailPage({ params }) {
   ].filter((r) => r.value);
 
   return (
-    <article className="max-w-7xl mx-auto px-6 pt-[72px] md:flex md:gap-12 lg:gap-20 md:min-h-screen">
+    <article className="max-w-[1800px] mx-auto px-6 pt-[72px] md:flex md:gap-12 lg:gap-20 md:min-h-screen">
 
       {/* Left — sticky image */}
       <div className="md:w-[58%] lg:w-[62%] md:sticky md:top-[72px] md:self-start md:h-[calc(100vh-72px)] flex items-center justify-center py-10">

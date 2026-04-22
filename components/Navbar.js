@@ -46,7 +46,7 @@ export default function Navbar({ locale, collections = [] }) {
         }`}
         style={{ height: '72px' }}
       >
-        <div className="max-w-7xl mx-auto px-6 h-full flex items-center">
+        <div className="max-w-[1800px] mx-auto px-6 h-full flex items-center">
 
           {/* Left nav — desktop only */}
           <nav className="hidden md:flex items-center gap-8 flex-1">

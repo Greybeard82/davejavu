@@ -268,7 +268,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
 
   return (
     <>
-      <section id="portfolio" className="max-w-7xl mx-auto px-6 py-20">
+      <section id="portfolio" className="max-w-[1800px] mx-auto px-6 py-20">
         {/* Section header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>

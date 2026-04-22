@@ -44,7 +44,7 @@ export default async function CollectionsPage({ params }) {
   const collections = await getCollections(locale);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-[72px] pb-24">
+    <div className="max-w-[1800px] mx-auto px-6 pt-[72px] pb-24">
       <div className="pt-16 mb-12">
         <h1 className="text-3xl md:text-4xl font-700 text-charcoal tracking-tight">Collections</h1>
         <p className="text-sm text-mid-gray mt-2 leading-relaxed">

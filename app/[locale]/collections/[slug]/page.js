@@ -88,7 +88,7 @@ export default async function CollectionPage({ params }) {
 
   return (
     <div className="pt-[72px]">
-      <div className="max-w-7xl mx-auto px-6 pt-16 pb-10">
+      <div className="max-w-[1800px] mx-auto px-6 pt-16 pb-10">
         <p className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">
           <Link href={`/${locale}/collections`} className="hover:text-orange transition-colors">
             Collections

@@ -55,7 +55,7 @@ export async function POST(request) {
     // Send email notification to admin
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL,
-      to: process.env.ADMIN_NOTIFICATION_EMAIL,
+      to: 'contact@davejavuphoto.com',
       replyTo: email.trim(),
       subject: `New inquiry: ${subject || 'General'} — ${name}`,
       html: `

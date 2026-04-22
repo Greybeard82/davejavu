@@ -6,7 +6,7 @@ export default function Footer({ locale }) {
 
   return (
     <footer className="bg-[#f4f3ef] border-t border-[#d1d1d1] mt-24">
-      <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="max-w-[1800px] mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="text-center md:text-left">
           <p className="font-700 text-xs uppercase tracking-widest text-charcoal">DAVEJAVU</p>
           <p className="text-xs text-mid-gray mt-1 tracking-wide">Landscape & Cityscape Photography</p>
