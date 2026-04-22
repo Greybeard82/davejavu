@@ -133,6 +133,8 @@ export default function BasketPage() {
 
           <PayPalScriptProvider options={PAYPAL_INIT}>
             <PayPalButtons
+              key={`${items.map(i => i.photoId + i.tier).join('-')}`}
+              forceReRender={[items, total]}
               style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', height: 44 }}
               createOrder={createOrder}
               onApprove={onApprove}
