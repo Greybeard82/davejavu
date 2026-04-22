@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { decode } from 'blurhash';
-import { MOODS } from '@/lib/moods';
+import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 import { getFavorites, saveFavorites } from '@/lib/favorites';
 
 function BlurHashPlaceholder({ hash }) {
@@ -228,11 +228,6 @@ function PhotoCard({ photo, onSelect }) {
               New
             </span>
           )}
-          {photo.licensed && (
-            <span className="bg-black/50 backdrop-blur-sm text-white text-[9px] font-400 uppercase tracking-wider px-2 py-0.5 rounded">
-              License available
-            </span>
-          )}
         </div>
 
         {/* Top-right buttons */}
@@ -257,7 +252,7 @@ function PhotoCard({ photo, onSelect }) {
   );
 }
 
-export default function PhotoGrid({ photos = [], locale }) {
+export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK }) {
   const [activeFilters, setActiveFilters] = useState([]);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
@@ -283,7 +278,7 @@ export default function PhotoGrid({ photos = [], locale }) {
 
           {/* Mood filters */}
           <div className="flex flex-wrap gap-2">
-            {MOODS.map((mood) => (
+            {moods.map((mood) => (
               <button
                 key={mood}
                 onClick={() => toggleFilter(mood)}
@@ -313,7 +308,7 @@ export default function PhotoGrid({ photos = [], locale }) {
             <p className="text-sm uppercase tracking-widest">No photos match the selected filters.</p>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
+          <div className="columns-1 sm:columns-2 gap-4">
             {filtered.map((photo) => (
               <PhotoCard key={photo.id} photo={photo} locale={locale} onSelect={setLightboxPhoto} />
             ))}

@@ -5,10 +5,68 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase';
 import UploadModal from '@/components/admin/UploadModal';
+import { MOODS } from '@/lib/moods';
+
+function MoodsModal({ photo, onClose, onSaved }) {
+  const [selected, setSelected] = useState(
+    () => (photo.photo_moods || []).map((m) => m.mood)
+  );
+  const [saving, setSaving] = useState(false);
+
+  const toggle = (mood) =>
+    setSelected((prev) => prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood]);
+
+  const save = async () => {
+    setSaving(true);
+    await fetch(`/api/photos/${photo.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ moods: selected }),
+    });
+    setSaving(false);
+    onSaved();
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/50" />
+      <div className="relative bg-white rounded shadow-xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-sm font-700 text-charcoal mb-1">Edit Moods</h3>
+        <p className="text-[10px] text-mid-gray uppercase tracking-widest mb-4">{photo.photo_translations?.find(t => t.locale === 'en')?.title || 'Untitled'}</p>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {MOODS.map((mood) => (
+            <button
+              key={mood}
+              type="button"
+              onClick={() => toggle(mood)}
+              className={`text-[10px] uppercase tracking-widest font-600 px-3 py-1.5 rounded-full border transition-all ${
+                selected.includes(mood)
+                  ? 'bg-orange border-orange text-white'
+                  : 'border-[#d1d1d1] text-charcoal hover:border-orange hover:text-orange'
+              }`}
+            >
+              {mood}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2 border border-[#d1d1d1] text-xs uppercase tracking-widest text-mid-gray hover:border-charcoal transition-colors">
+            Cancel
+          </button>
+          <button onClick={save} disabled={saving} className="flex-1 py-2 bg-orange text-white text-xs uppercase tracking-widest font-600 hover:bg-orange-dark transition-colors disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [showUpload, setShowUpload] = useState(false);
+  const [moodsPhoto, setMoodsPhoto] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, published: 0, drafts: 0 });
@@ -76,6 +134,7 @@ export default function AdminDashboard() {
         <nav className="flex items-center gap-4 md:gap-6 overflow-x-auto">
           <a href="/admin/dashboard" className="text-xs uppercase tracking-widest text-orange shrink-0">Photos</a>
           <a href="/admin/collections" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Collections</a>
+          <a href="/admin/moods" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Moods</a>
           <a href="/admin/messages" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Messages</a>
           <button onClick={handleSignOut} className="text-xs uppercase tracking-widest text-mid-gray hover:text-red-500 transition-colors shrink-0">Sign out</button>
         </nav>
@@ -169,6 +228,18 @@ export default function AdminDashboard() {
                       {photo.featured ? '★ Featured' : 'Feature'}
                     </button>
                   </div>
+                  {/* Moods */}
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <p className="text-[9px] text-mid-gray truncate">
+                      {(photo.photo_moods || []).map(m => m.mood).join(', ') || 'No moods'}
+                    </p>
+                    <button
+                      onClick={() => setMoodsPhoto(photo)}
+                      className="text-[9px] uppercase tracking-wider text-orange hover:underline shrink-0"
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -180,6 +251,14 @@ export default function AdminDashboard() {
         <UploadModal
           onClose={() => setShowUpload(false)}
           onSuccess={fetchPhotos}
+        />
+      )}
+
+      {moodsPhoto && (
+        <MoodsModal
+          photo={moodsPhoto}
+          onClose={() => setMoodsPhoto(null)}
+          onSaved={fetchPhotos}
         />
       )}
     </div>

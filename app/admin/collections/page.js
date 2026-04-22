@@ -63,6 +63,7 @@ export default function AdminCollectionsPage() {
         <nav className="flex items-center gap-4 md:gap-6 overflow-x-auto">
           <a href="/admin/dashboard" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Photos</a>
           <a href="/admin/collections" className="text-xs uppercase tracking-widest text-orange shrink-0">Collections</a>
+          <a href="/admin/moods" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Moods</a>
           <a href="/admin/messages" className="text-xs uppercase tracking-widest text-mid-gray hover:text-charcoal transition-colors shrink-0">Messages</a>
           <button onClick={handleSignOut} className="text-xs uppercase tracking-widest text-mid-gray hover:text-red-500 transition-colors shrink-0">Sign out</button>
         </nav>

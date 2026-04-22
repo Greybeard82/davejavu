@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MOODS } from '@/lib/moods';
+import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 
 const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
 const LOCALE_LABELS = { en: 'English', pt: 'Português', es: 'Español', fr: 'Français', it: 'Italiano', de: 'Deutsch' };
@@ -57,7 +57,12 @@ export default function UploadModal({ onClose, onSuccess }) {
   const [activeLocale, setActiveLocale] = useState('en');
   const [useAI, setUseAI] = useState(false);
   const [collections, setCollections] = useState([]);
+  const [moods, setMoods] = useState(MOODS_FALLBACK);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    fetch('/api/moods').then(r => r.json()).then(d => { if (d.moods?.length) setMoods(d.moods); }).catch(() => {});
+  }, []);
 
   // ── Fetch collections on mount ────────────────────────────────
   useEffect(() => {
@@ -151,7 +156,7 @@ export default function UploadModal({ onClose, onSuccess }) {
           };
         });
 
-        const moods = (data.suggested_moods || []).filter(m => MOODS.includes(m));
+        const moods = (data.suggested_moods || []).filter(m => MOODS_FALLBACK.includes(m));
         updateItem(item.id, { status: 'ready', translations, moods });
       } catch (err) {
         // AI failed — still mark ready so admin can fill manually
@@ -438,7 +443,7 @@ export default function UploadModal({ onClose, onSuccess }) {
                     <div>
                       <p className="text-[11px] uppercase tracking-widest text-mid-gray mb-2">Mood tags</p>
                       <div className="flex flex-wrap gap-2">
-                        {MOODS.map(mood => (
+                        {moods.map(mood => (
                           <button
                             key={mood}
                             onClick={() => toggleMood(currentItem.id, mood)}

@@ -97,7 +97,8 @@ export async function GET() {
       .from('photos')
       .select(`
         id, cloudinary_id, published, featured, available_for_license, created_at,
-        photo_translations ( locale, title, location )
+        photo_translations ( locale, title, location ),
+        photo_moods ( mood )
       `)
       .order('created_at', { ascending: false });
 

@@ -17,6 +17,18 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
     const supabase = createAdminClient();
 
+    // Moods update — replace all moods for this photo
+    if (Array.isArray(body.moods)) {
+      const { error: delErr } = await supabase.from('photo_moods').delete().eq('photo_id', id);
+      if (delErr) throw new Error(delErr.message);
+      if (body.moods.length > 0) {
+        const { error: insErr } = await supabase.from('photo_moods')
+          .insert(body.moods.map((mood) => ({ photo_id: id, mood })));
+        if (insErr) throw new Error(insErr.message);
+      }
+      return NextResponse.json({ ok: true });
+    }
+
     const allowed = ['published', 'featured', 'available_for_license'];
     const updates = Object.fromEntries(
       Object.entries(body).filter(([k]) => allowed.includes(k))

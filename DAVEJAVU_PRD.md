@@ -2,13 +2,21 @@
 
 ## DAVEJAVU Photography Portfolio
 
-**Version:** 3.0
+**Version:** 3.1
 **Author:** David
 **Stack:** Next.js 14 (App Router) + Supabase + Cloudinary + Claude API + Resend + next-intl + Tailwind CSS + Framer Motion + hCaptcha + PayPal Orders v2
 
 ---
 
 ## Changelog
+
+### v3.1 — 2026-04-22 — UX polish
+- Removed "License available" badge from photo cards — all displayed photos are available for purchase by default
+- "New" badge window reduced from 30 days to 14 days
+- Photo grid reduced to 2 columns on desktop for larger, more impactful cards
+- Hero skips rendering when no featured photos are set (no picsum placeholder fallback)
+- Featured photos queried independently so they show in the hero even when not published
+- Mobile: hamburger menu fully fixed (close button inside overlay, md:hidden removed from menu, allowedDevOrigins for LAN testing)
 
 ### v3.0 — 2026-04-17 — Licensing simplification
 - **Revenue model**: replaced two-tier personal/extended model (€40/€100) with two output-resolution tiers (Web/Small Print €15, Full Resolution €49). Global pricing, no per-image custom prices.
@@ -122,9 +130,8 @@ All user-facing strings must be externalized into locale JSON files under `/mess
 * Below the hero, a full mixed grid of all published photos across all collections
 * Masonry layout
 * Mood/vibe filter bar at the top of the grid (see 5.3)
-* "New drop" badge on photos uploaded within the last 30 days
-* Paginated: 24 photos per page
-* Each card shows: display image, title, location tag, edition status if applicable (e.g. "Ed. 12/25"), and "Available for license" badge
+* "New drop" badge on photos uploaded within the last 14 days
+* Each card shows: display image, title, location tag, "New" badge if applicable
 
 ### 5.3 Mood / Vibe Filters
 
@@ -634,9 +641,8 @@ created\\\_at  TIMESTAMPTZ DEFAULT now()
 
 **Mobile breakpoints:**
 
-* Mobile: < 768px (1-column gallery)
-* Tablet: 768-1024px (2-column gallery)
-* Desktop: > 1024px (3-4 column masonry)
+* Mobile: < 640px (1-column gallery)
+* Tablet/Desktop: ≥ 640px (2-column masonry)
 
 \---
 
