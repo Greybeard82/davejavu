@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
-import { getDownloadUrl } from '@/lib/cloudinary';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -12,7 +11,35 @@ export async function POST(request) {
     if (!orderId || !basketId)
       return NextResponse.json({ error: 'Missing orderId or basketId' }, { status: 400 });
 
-    // Verify PayPal order is actually COMPLETED
+    const supabase = createAdminClient();
+
+    // Idempotency — check purchases by paypal_order_id, return existing tokens if found
+    const { data: existingPurchases } = await supabase
+      .from('purchases')
+      .select('id, photo_title, license_tier, price_paid')
+      .eq('paypal_order_id', orderId);
+
+    if (existingPurchases?.length > 0) {
+      const links = [];
+      for (const p of existingPurchases) {
+        const { data: tokenRow } = await supabase
+          .from('download_tokens')
+          .select('token')
+          .eq('purchase_id', p.id)
+          .single();
+        if (tokenRow) {
+          links.push({
+            title: p.photo_title,
+            tier: TIER_LABELS[p.license_tier] || p.license_tier,
+            price: p.price_paid,
+            url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
+          });
+        }
+      }
+      return NextResponse.json({ links });
+    }
+
+    // Verify PayPal order is COMPLETED
     const token = await getPayPalToken();
     const orderRes = await fetch(`${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -20,21 +47,6 @@ export async function POST(request) {
     const order = await orderRes.json();
     if (order.status !== 'COMPLETED')
       return NextResponse.json({ error: 'Payment not completed' }, { status: 402 });
-
-    const supabase = createAdminClient();
-
-    // Idempotency — if already fulfilled, return existing tokens
-    const { data: existingTokens } = await supabase
-      .from('download_tokens')
-      .select('token, photo_id, photos(title)')
-      .eq('basket_id', basketId);
-    if (existingTokens?.length > 0) {
-      const links = existingTokens.map((t) => ({
-        title: t.photos?.title || t.photo_id,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${t.token}`,
-      }));
-      return NextResponse.json({ links });
-    }
 
     // Load basket
     const { data: basket } = await supabase.from('baskets').select('*').eq('id', basketId).single();
@@ -52,13 +64,12 @@ export async function POST(request) {
     for (const item of basket.items) {
       const { data: photo } = await supabase
         .from('photos')
-        .select('id, cloudinary_id, title')
+        .select('id, title')
         .eq('id', item.photoId)
         .single();
       if (!photo) continue;
 
-      // Insert purchase record
-      const { data: purchase } = await supabase.from('purchases').insert({
+      const { data: purchase, error: purchaseErr } = await supabase.from('purchases').insert({
         buyer_email: buyerEmail,
         buyer_name: buyerName,
         photo_id: photo.id,
@@ -71,29 +82,28 @@ export async function POST(request) {
         exif_stamped: false,
       }).select().single();
 
-      // Insert download token
-      const { data: tokenRow } = await supabase.from('download_tokens').insert({
-        purchase_id: purchase?.id,
+      if (purchaseErr) { console.error('purchase insert error', purchaseErr); continue; }
+
+      const { data: tokenRow, error: tokenErr } = await supabase.from('download_tokens').insert({
+        purchase_id: purchase.id,
         photo_id: photo.id,
         email: buyerEmail,
         expires_at: expiresAt,
         basket_id: basketId,
       }).select().single();
 
-      if (tokenRow) {
-        links.push({
-          title: photo.title,
-          tier: TIER_LABELS[item.tier] || item.tier,
-          price: PRICES[item.tier],
-          url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
-        });
-      }
+      if (tokenErr) { console.error('token insert error', tokenErr); continue; }
+
+      links.push({
+        title: photo.title,
+        tier: TIER_LABELS[item.tier] || item.tier,
+        price: PRICES[item.tier],
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
+      });
     }
 
-    // Mark basket complete
     await supabase.from('baskets').update({ status: 'completed', buyer_email: buyerEmail }).eq('id', basketId);
 
-    // Send email with all download links
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const linkRows = links.map((l) => `
       <tr>
