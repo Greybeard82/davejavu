@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase-admin';
 import { getHeroUrl } from '@/lib/cloudinary';
 import ProtectedImage from '@/components/ProtectedImage';
 import BuyButtons from '@/components/BuyButtons';
+import WallMockup from '@/components/WallMockup';
 
 const getPhotoDetail = cache(async (uuid, locale) => {
   const supabase = createAdminClient();
@@ -158,6 +159,10 @@ export default async function PhotoDetailPage({ params }) {
             </table>
           </>
         )}
+
+        {/* Wall mockup */}
+        <hr className="border-[#d1d1d1] my-8" />
+        <WallMockup src={photo.image} title={photo.title} />
 
         {/* Buy section */}
         {photo.licensed && (
