@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 
-export default function ThankYouPage() {
+function ThankYouContent() {
   const { locale } = useParams();
   const searchParams = useSearchParams();
   const [links, setLinks] = useState([]);
@@ -72,5 +72,17 @@ export default function ThankYouPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ThankYouPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-2xl mx-auto px-6 pt-[72px] pb-24 text-center pt-32">
+        <p className="text-sm text-mid-gray">Loading…</p>
+      </div>
+    }>
+      <ThankYouContent />
+    </Suspense>
   );
 }
