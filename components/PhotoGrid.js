@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { decode } from 'blurhash';
 import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 import { getFavorites, saveFavorites } from '@/lib/favorites';
+import { addToBasket, isInBasket } from '@/lib/basket';
 
 function BlurHashPlaceholder({ hash }) {
   const canvasRef = useRef(null);
@@ -42,6 +43,15 @@ function Lightbox({ photo, locale, onClose }) {
   const [favorited, setFavorited] = useState(() =>
     getFavorites().some((f) => f.id === photo.id)
   );
+  const [inBasket, setInBasket] = useState(() => isInBasket(photo.id));
+
+  const handleBasket = (e) => {
+    e.stopPropagation();
+    if (!inBasket) {
+      addToBasket({ photoId: photo.id, title: photo.title, tier: 'web_small' });
+      setInBasket(true);
+    }
+  };
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -140,6 +150,23 @@ function Lightbox({ photo, locale, onClose }) {
                 </div>
                 <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">
                   {favorited ? 'Saved' : 'Save'}
+                </span>
+              </button>
+
+              <button
+                onClick={handleBasket}
+                aria-label={inBasket ? 'In basket' : 'Add to basket'}
+                className="flex flex-col items-center gap-1 group"
+              >
+                <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200 ${
+                  inBasket ? 'bg-orange text-white scale-110' : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white hover:scale-105'
+                }`}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+                  </svg>
+                </div>
+                <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">
+                  {inBasket ? 'In basket' : 'Basket'}
                 </span>
               </button>
 

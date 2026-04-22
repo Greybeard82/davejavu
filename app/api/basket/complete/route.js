@@ -11,6 +11,7 @@ export async function POST(request) {
     if (!orderId || !basketId)
       return NextResponse.json({ error: 'Missing orderId or basketId' }, { status: 400 });
 
+    console.log('basket/complete called', { orderId, basketId });
     const supabase = createAdminClient();
 
     // Idempotency — check purchases by paypal_order_id, return existing tokens if found
@@ -49,7 +50,8 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Payment not completed' }, { status: 402 });
 
     // Load basket
-    const { data: basket } = await supabase.from('baskets').select('*').eq('id', basketId).single();
+    const { data: basket, error: basketErr } = await supabase.from('baskets').select('*').eq('id', basketId).single();
+    console.log('basket loaded', basket, basketErr);
     if (!basket) return NextResponse.json({ error: 'Basket not found' }, { status: 404 });
 
     const payer = order.payer;
@@ -62,18 +64,24 @@ export async function POST(request) {
     const links = [];
 
     for (const item of basket.items) {
-      const { data: photo } = await supabase
+      console.log('processing item', JSON.stringify(item));
+      const { data: photo, error: photoErr } = await supabase
         .from('photos')
-        .select('id, title')
+        .select('id, photo_translations(locale, title)')
         .eq('id', item.photoId)
         .single();
+      console.log('photo lookup result', photo, photoErr);
       if (!photo) continue;
+      const photoTitle = photo.photo_translations?.find((t) => t.locale === 'en')?.title
+        || photo.photo_translations?.[0]?.title
+        || item.title;
 
+      console.log('inserting purchase for photo', photo.id, photoTitle);
       const { data: purchase, error: purchaseErr } = await supabase.from('purchases').insert({
         buyer_email: buyerEmail,
         buyer_name: buyerName,
         photo_id: photo.id,
-        photo_title: photo.title,
+        photo_title: photoTitle,
         license_tier: item.tier,
         price_paid: PRICES[item.tier],
         paypal_order_id: orderId,
@@ -82,7 +90,7 @@ export async function POST(request) {
         exif_stamped: false,
       }).select().single();
 
-      if (purchaseErr) { console.error('purchase insert error', purchaseErr); continue; }
+      if (purchaseErr) { console.error('purchase insert error', JSON.stringify(purchaseErr)); continue; }
 
       const { data: tokenRow, error: tokenErr } = await supabase.from('download_tokens').insert({
         purchase_id: purchase.id,
@@ -92,10 +100,10 @@ export async function POST(request) {
         basket_id: basketId,
       }).select().single();
 
-      if (tokenErr) { console.error('token insert error', tokenErr); continue; }
+      if (tokenErr) { console.error('token insert error', JSON.stringify(tokenErr)); continue; }
 
       links.push({
-        title: photo.title,
+        title: photoTitle,
         tier: TIER_LABELS[item.tier] || item.tier,
         price: PRICES[item.tier],
         url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
