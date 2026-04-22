@@ -3,17 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { getFavorites, saveFavorites, FAV_KEY } from '@/lib/favorites';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { useTranslations } from 'next-intl';
 
-const SUBJECTS = [
-  { value: 'Personal License', label: 'Personal License' },
-  { value: 'Commercial License', label: 'Commercial License' },
-  { value: 'Other', label: 'Other' },
-];
+const SUBJECT_KEYS = ['subjectPersonal', 'subjectCommercial', 'subjectOther'];
 
 const inputClass = 'w-full px-4 py-3 border border-[#d1d1d1] bg-white text-sm text-charcoal placeholder:text-mid-gray focus:outline-none focus:border-orange transition-colors';
 const labelClass = 'block text-[10px] uppercase tracking-widest text-mid-gray mb-1.5';
 
 export default function ContactForm({ locale, prefilledPhoto = '' }) {
+  const t = useTranslations('contact');
   const [fields, setFields] = useState({
     name: '', email: '', subject: 'Personal License', message: '', gdpr: false,
   });
@@ -56,19 +54,19 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
 
   const validate = () => {
     const e = {};
-    if (!fields.name.trim()) e.name = 'Name is required';
+    if (!fields.name.trim()) e.name = t('validation.nameRequired');
     if (!fields.email.trim()) {
-      e.email = 'Email is required';
+      e.email = t('validation.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
-      e.email = 'Please enter a valid email address';
+      e.email = t('validation.emailInvalid');
     }
     if (!fields.message.trim()) {
-      e.message = 'Message is required';
+      e.message = t('validation.messageRequired');
     } else if (fields.message.trim().length < 20) {
-      e.message = 'Message must be at least 20 characters';
+      e.message = t('validation.messageTooShort');
     }
-    if (!fields.gdpr) e.gdpr = 'You must agree to the data processing terms';
-    if (!captchaToken) e.captcha = 'Please complete the captcha';
+    if (!fields.gdpr) e.gdpr = t('validation.gdprRequired');
+    if (!captchaToken) e.captcha = t('validation.captchaRequired');
     return e;
   };
 
@@ -113,9 +111,9 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
-        <h2 className="text-xl font-700 text-charcoal tracking-tight">Message sent</h2>
+        <h2 className="text-xl font-700 text-charcoal tracking-tight">{t('successTitle')}</h2>
         <p className="text-sm text-mid-gray mt-2 leading-relaxed max-w-sm mx-auto">
-          Thank you for your inquiry. I'll be in touch within 48 hours.
+          {t('successMessage')}
         </p>
       </div>
     );
@@ -127,13 +125,13 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
       {/* Name + Email */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label className={labelClass}>Your name <span className="text-orange">*</span></label>
+          <label className={labelClass}>{t('name')} <span className="text-orange">*</span></label>
           <input type="text" value={fields.name} onChange={(e) => set('name', e.target.value)}
             placeholder="John Doe" className={inputClass} autoComplete="name" />
           {errors.name && <p className="text-[11px] text-red-500 mt-1">{errors.name}</p>}
         </div>
         <div>
-          <label className={labelClass}>Email address <span className="text-orange">*</span></label>
+          <label className={labelClass}>{t('email')} <span className="text-orange">*</span></label>
           <input type="email" value={fields.email} onChange={(e) => set('email', e.target.value)}
             placeholder="you@email.com" className={inputClass} autoComplete="email" />
           {errors.email && <p className="text-[11px] text-red-500 mt-1">{errors.email}</p>}
@@ -142,15 +140,15 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
 
       {/* Subject */}
       <div>
-        <label className={labelClass}>Subject</label>
+        <label className={labelClass}>{t('subject')}</label>
         <select value={fields.subject} onChange={(e) => set('subject', e.target.value)} className={inputClass}>
-          {SUBJECTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          {SUBJECT_KEYS.map((key) => <option key={key} value={t(key)}>{t(key)}</option>)}
         </select>
       </div>
 
       {/* Photos of interest */}
       <div>
-        <label className={labelClass}>Photos of interest</label>
+        <label className={labelClass}>{t('photosInterest')}</label>
 
         {selectedPhotos.length > 0 ? (
           <div className="border border-[#d1d1d1] divide-y divide-[#d1d1d1]">
@@ -183,9 +181,9 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
 
       {/* Message */}
       <div>
-        <label className={labelClass}>Message <span className="text-orange">*</span></label>
+        <label className={labelClass}>{t('message')} <span className="text-orange">*</span></label>
         <textarea rows={5} value={fields.message} onChange={(e) => set('message', e.target.value)}
-          placeholder="What would you like to talk about?" className={`${inputClass} resize-none`} />
+          placeholder={t('messagePlaceholder')} className={`${inputClass} resize-none`} />
         {errors.message && <p className="text-[11px] text-red-500 mt-1">{errors.message}</p>}
       </div>
 
@@ -195,7 +193,7 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
           <input type="checkbox" checked={fields.gdpr} onChange={(e) => set('gdpr', e.target.checked)}
             className="mt-0.5 accent-orange w-4 h-4 shrink-0" />
           <span className="text-xs text-mid-gray leading-relaxed">
-            I agree to my data being stored to process this inquiry
+            {t('gdpr')}
           </span>
         </label>
         {errors.gdpr && <p className="text-[11px] text-red-500 mt-1">{errors.gdpr}</p>}
@@ -213,7 +211,7 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
 
       <button type="submit" disabled={submitting}
         className="w-full py-4 bg-orange text-white text-xs uppercase tracking-[3px] font-600 hover:bg-orange-dark transition-colors disabled:opacity-50">
-        {submitting ? 'Sending…' : 'Send inquiry'}
+        {submitting ? t('sending') : t('submit')}
       </button>
 
     </form>

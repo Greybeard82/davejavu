@@ -1,4 +1,165 @@
 {
+  "nav": {
+    "portfolio": "Portfolio",
+    "collections": "Collections",
+    "about": "À propos",
+    "pricing": "Tarifs",
+    "contact": "Contact",
+    "favorites": "Favoris",
+    "basket": "Panier",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "hero": {
+    "cta": "Voir le portfolio",
+    "scrollHint": "Faites défiler pour explorer"
+  },
+  "gallery": {
+    "title": "Portfolio",
+    "allPhotos": "Toutes",
+    "newBadge": "Nouveau",
+    "licenseBadge": "Disponible en licence",
+    "loadMore": "Charger plus",
+    "editions": "{sold} sur {max} restantes",
+    "openEdition": "Édition ouverte",
+    "noPhotos": "Pas encore de photos — revenez bientôt.",
+    "page": "Page {current} sur {total}"
+  },
+  "moods": {
+    "Golden Hour": "Heure dorée",
+    "Blue Hour": "Heure bleue",
+    "Storm": "Tempête",
+    "Solitude": "Solitude",
+    "Urban Chaos": "Chaos urbain",
+    "Mist": "Brume",
+    "Silence": "Silence",
+    "Neon": "Néon",
+    "Vast": "Vaste",
+    "Intimate": "Intime"
+  },
+  "photo": {
+    "inquire": "Demander une licence",
+    "wallMockup": "Visualiser sur votre mur",
+    "hideWallMockup": "Masquer la simulation",
+    "behindTheLens": "Derrière l'objectif",
+    "cameraBody": "Appareil",
+    "lens": "Objectif",
+    "focalLength": "Focale",
+    "aperture": "Ouverture",
+    "iso": "ISO",
+    "shutterSpeed": "Vitesse d'obturation",
+    "edition": "Édition {sold} sur {max}",
+    "openEdition": "Édition ouverte",
+    "availableForLicense": "Disponible en licence"
+  },
+  "favorites": {
+    "title": "Vos favoris",
+    "empty": "Vous n'avez pas encore sauvegardé de favoris.",
+    "browseCta": "Parcourir le portfolio",
+    "inquireAll": "Demander pour tous les favoris",
+    "count": "{count} sauvegardés"
+  },
+  "contact": {
+    "title": "Prendre contact",
+    "subtitle": "Intéressé par une licence photo ? Remplissez le formulaire et je vous répondrai sous 48 heures.",
+    "name": "Votre nom",
+    "email": "Adresse e-mail",
+    "subject": "Sujet",
+    "subjectPersonal": "Licence personnelle",
+    "subjectExtended": "Licence personnelle étendue",
+    "subjectCommercial": "Licence commerciale",
+    "subjectOther": "Autre",
+    "photosInterest": "Photos d'intérêt",
+    "photosInterestPlaceholder": "Titre(s) de la/des photo(s) qui vous intéresse(nt)",
+    "intendedUse": "Utilisation prévue",
+    "intendedUsePlaceholder": "Comment comptez-vous utiliser l'image ?",
+    "message": "Message",
+    "messagePlaceholder": "Dites-m'en plus sur votre projet...",
+    "gdpr": "J'accepte que mes données soient stockées pour traiter cette demande",
+    "submit": "Envoyer la demande",
+    "sending": "Envoi en cours...",
+    "successTitle": "Message envoyé",
+    "successMessage": "Merci pour votre demande. Je vous contacterai sous 48 heures.",
+    "errorMessage": "Quelque chose s'est mal passé. Veuillez réessayer.",
+    "validation": {
+      "nameRequired": "Le nom est obligatoire",
+      "emailRequired": "L'e-mail est obligatoire",
+      "emailInvalid": "Veuillez saisir une adresse e-mail valide",
+      "messageRequired": "Le message est obligatoire",
+      "messageTooShort": "Le message doit comporter au moins 20 caractères",
+      "gdprRequired": "Vous devez accepter les conditions de traitement des données",
+      "captchaRequired": "Veuillez compléter le captcha"
+    }
+  },
+  "pricing": {
+    "title": "Licences",
+    "subtitle": "Chaque photo est disponible en téléchargement instantané via PayPal. Tous les prix en EUR.",
+    "smallTitle": "Petit",
+    "smallSize": "2000px grand côté",
+    "smallUse": "Parfait pour un usage numérique, les réseaux sociaux et les petites impressions jusqu'au A4.",
+    "smallPrice": "€19",
+    "fullTitle": "Pleine résolution",
+    "fullSize": "Résolution native",
+    "fullUse": "Détail maximal pour l'impression grand format, l'encadrement et l'archivage.",
+    "fullPrice": "€49",
+    "businessTitle": "Professionnel / Commercial",
+    "businessDesc": "Vous utilisez une photo pour de la publicité, de l'éditorial ou tout usage commercial ? Contactez-moi pour un devis personnalisé.",
+    "businessCta": "Me contacter",
+    "howItWorks": "Comment ça marche",
+    "step1Title": "Trouvez une photo",
+    "step1Desc": "Parcourez le portfolio et ouvrez une image qui vous plaît.",
+    "step2Title": "Choisissez une taille",
+    "step2Desc": "Choisissez Petit (€19) ou Pleine résolution (€49) et payez en toute sécurité via PayPal.",
+    "step3Title": "Téléchargez",
+    "step3Desc": "Un lien de téléchargement arrive dans votre boîte mail en quelques minutes — valable 14 jours.",
+    "note": "Usage personnel uniquement. Le photographe conserve tous les droits d'auteur.",
+    "licenseLink": "Lire les conditions complètes de licence",
+    "ctaPortfolio": "Parcourir le portfolio"
+  },
+  "about": {
+    "title": "À propos",
+    "subtitle": "DAVEJAVU",
+    "heroAlt": "Le photographe derrière DAVEJAVU",
+    "storyHeading": "Qui je suis",
+    "storyBody": "[VOTRE HISTOIRE ICI]",
+    "philosophyHeading": "Ce que je cherche",
+    "philosophyBody": "[VOTRE PHILOSOPHIE ICI]",
+    "gearHeading": "Comment je photographie",
+    "gearBody": "[MATÉRIEL / PROCESSUS ICI]",
+    "signaturesHeading": "Quelques favoris",
+    "ctaHeading": "Vous aimez ce que vous voyez ?",
+    "ctaBody": "Parcourez le portfolio ou contactez-moi pour une licence.",
+    "ctaPortfolio": "Voir le portfolio",
+    "ctaContact": "Prendre contact"
+  },
+  "collections": {
+    "title": "Collections",
+    "subtitle": "Séries de photographies regroupées par lieu et atmosphère.",
+    "viewCollection": "Voir la collection",
+    "photos": "{count} photos"
+  },
+  "cookie": {
+    "message": "Ce site utilise des cookies pour améliorer votre expérience.",
+    "accept": "Accepter",
+    "reject": "Refuser"
+  },
+  "footer": {
+    "tagline": "Photographie de paysages et de villes",
+    "copyright": "© {year} DAVEJAVU. Tous droits réservés.",
+    "instagram": "Instagram",
+    "privacy": "Politique de confidentialité"
+  },
+  "lightbox": {
+    "close": "Fermer",
+    "prev": "Photo précédente",
+    "next": "Photo suivante"
+  },
+  "download": {
+    "expired": "Ce lien de téléchargement a expiré.",
+    "invalid": "Ce lien de téléchargement est invalide.",
+    "contactUs": "Veuillez contacter le photographe pour demander un nouveau lien.",
+    "contact": "Contacter le photographe"
+  },
   "buy": {
     "getThisPhoto": "Obtenir cette photo",
     "webSmall": "Web / Petite Impression",
@@ -14,5 +175,33 @@
   "license": {
     "title": "Conditions de Licence",
     "back": "Retour au portfolio"
+  },
+  "basket": {
+    "title": "Panier",
+    "empty": "Votre panier est vide.",
+    "browseCta": "Parcourir le portfolio",
+    "photo": "photo",
+    "photos": "photos",
+    "remove": "Supprimer",
+    "orderSummary": "Récapitulatif de commande",
+    "total": "Total",
+    "emailNote": "Liens de téléchargement envoyés par e-mail · valables 14 jours",
+    "smallLabel": "Petit  ·  2000px  ·  €19",
+    "fullResLabel": "Pleine résolution  ·  Native  ·  €49"
+  },
+  "thankYou": {
+    "title": "Paiement confirmé",
+    "subtitle": "Merci pour votre achat. Vos liens de téléchargement sont ci-dessous et ont également été envoyés à votre e-mail — valables 14 jours.",
+    "loading": "Chargement de vos téléchargements…",
+    "checkInbox": "Vérifiez votre boîte mail — vos liens de téléchargement sont en route.",
+    "download": "Télécharger",
+    "backToPortfolio": "Retour au portfolio"
+  },
+  "lightboxActions": {
+    "details": "Détails",
+    "save": "Sauvegarder",
+    "saved": "Sauvegardé",
+    "basket": "Panier",
+    "inBasket": "Dans le panier"
   }
 }

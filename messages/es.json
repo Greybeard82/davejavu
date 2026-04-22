@@ -1,4 +1,165 @@
 {
+  "nav": {
+    "portfolio": "Portafolio",
+    "collections": "Colecciones",
+    "about": "Sobre mí",
+    "pricing": "Precios",
+    "contact": "Contacto",
+    "favorites": "Favoritos",
+    "basket": "Cesta",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
+  },
+  "hero": {
+    "cta": "Ver portafolio",
+    "scrollHint": "Desplázate para explorar"
+  },
+  "gallery": {
+    "title": "Portafolio",
+    "allPhotos": "Todas",
+    "newBadge": "Nuevo",
+    "licenseBadge": "Disponible para licencia",
+    "loadMore": "Cargar más",
+    "editions": "{sold} de {max} restantes",
+    "openEdition": "Edición abierta",
+    "noPhotos": "Aún no hay fotos — vuelve pronto.",
+    "page": "Página {current} de {total}"
+  },
+  "moods": {
+    "Golden Hour": "Hora dorada",
+    "Blue Hour": "Hora azul",
+    "Storm": "Tormenta",
+    "Solitude": "Soledad",
+    "Urban Chaos": "Caos urbano",
+    "Mist": "Niebla",
+    "Silence": "Silencio",
+    "Neon": "Neón",
+    "Vast": "Vasto",
+    "Intimate": "Íntimo"
+  },
+  "photo": {
+    "inquire": "Consultar sobre una licencia",
+    "wallMockup": "Véalo en tu pared",
+    "hideWallMockup": "Ocultar simulación",
+    "behindTheLens": "Detrás del objetivo",
+    "cameraBody": "Cámara",
+    "lens": "Objetivo",
+    "focalLength": "Distancia focal",
+    "aperture": "Apertura",
+    "iso": "ISO",
+    "shutterSpeed": "Velocidad de obturación",
+    "edition": "Edición {sold} de {max}",
+    "openEdition": "Edición abierta",
+    "availableForLicense": "Disponible para licencia"
+  },
+  "favorites": {
+    "title": "Tus favoritos",
+    "empty": "Aún no has guardado ningún favorito.",
+    "browseCta": "Explorar el portafolio",
+    "inquireAll": "Consultar sobre todos los favoritos",
+    "count": "{count} guardados"
+  },
+  "contact": {
+    "title": "Ponte en contacto",
+    "subtitle": "¿Interesado en licenciar una foto? Rellena el formulario y te responderé en 48 horas.",
+    "name": "Tu nombre",
+    "email": "Correo electrónico",
+    "subject": "Asunto",
+    "subjectPersonal": "Licencia personal",
+    "subjectExtended": "Licencia personal ampliada",
+    "subjectCommercial": "Licencia comercial",
+    "subjectOther": "Otro",
+    "photosInterest": "Fotos de interés",
+    "photosInterestPlaceholder": "Título(s) de la(s) foto(s) que te interesan",
+    "intendedUse": "Uso previsto",
+    "intendedUsePlaceholder": "¿Cómo planeas usar la imagen?",
+    "message": "Mensaje",
+    "messagePlaceholder": "Cuéntame más sobre tu proyecto...",
+    "gdpr": "Acepto que mis datos sean almacenados para procesar esta consulta",
+    "submit": "Enviar consulta",
+    "sending": "Enviando...",
+    "successTitle": "Mensaje enviado",
+    "successMessage": "Gracias por tu consulta. Me pondré en contacto en 48 horas.",
+    "errorMessage": "Algo salió mal. Por favor inténtalo de nuevo.",
+    "validation": {
+      "nameRequired": "El nombre es obligatorio",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "emailInvalid": "Por favor introduce un correo electrónico válido",
+      "messageRequired": "El mensaje es obligatorio",
+      "messageTooShort": "El mensaje debe tener al menos 20 caracteres",
+      "gdprRequired": "Debes aceptar los términos de tratamiento de datos",
+      "captchaRequired": "Por favor completa el captcha"
+    }
+  },
+  "pricing": {
+    "title": "Licencias",
+    "subtitle": "Cada foto está disponible para descarga instantánea vía PayPal. Todos los precios en EUR.",
+    "smallTitle": "Pequeño",
+    "smallSize": "2000px lado largo",
+    "smallUse": "Perfecto para uso digital, redes sociales e impresiones pequeñas hasta A4.",
+    "smallPrice": "€19",
+    "fullTitle": "Resolución total",
+    "fullSize": "Resolución nativa",
+    "fullUse": "Máximo detalle para impresión en gran formato, enmarcado y uso archivístico.",
+    "fullPrice": "€49",
+    "businessTitle": "Empresarial / Comercial",
+    "businessDesc": "¿Usarás la foto para publicidad, editorial o cualquier uso comercial? Ponte en contacto y prepararé un presupuesto personalizado.",
+    "businessCta": "Contáctame",
+    "howItWorks": "Cómo funciona",
+    "step1Title": "Encuentra una foto",
+    "step1Desc": "Explora el portafolio y abre cualquier imagen que te guste.",
+    "step2Title": "Elige un tamaño",
+    "step2Desc": "Elige Pequeño (€19) o Resolución total (€49) y paga de forma segura vía PayPal.",
+    "step3Title": "Descarga",
+    "step3Desc": "Un enlace de descarga llega a tu bandeja de entrada en minutos — válido 14 días.",
+    "note": "Solo uso personal. El fotógrafo conserva todos los derechos. Una licencia otorga derechos de uso, no propiedad.",
+    "licenseLink": "Leer los términos completos de la licencia",
+    "ctaPortfolio": "Explorar el portafolio"
+  },
+  "about": {
+    "title": "Sobre mí",
+    "subtitle": "DAVEJAVU",
+    "heroAlt": "El fotógrafo detrás de DAVEJAVU",
+    "storyHeading": "Quién soy",
+    "storyBody": "[TU HISTORIA AQUÍ]",
+    "philosophyHeading": "Qué busco",
+    "philosophyBody": "[TU FILOSOFÍA AQUÍ]",
+    "gearHeading": "Cómo fotografío",
+    "gearBody": "[EQUIPO / PROCESO AQUÍ]",
+    "signaturesHeading": "Algunos favoritos",
+    "ctaHeading": "¿Te gusta lo que ves?",
+    "ctaBody": "Explora el portafolio o ponte en contacto sobre una licencia.",
+    "ctaPortfolio": "Ver portafolio",
+    "ctaContact": "Contactar"
+  },
+  "collections": {
+    "title": "Colecciones",
+    "subtitle": "Series de fotografías agrupadas por lugar y atmósfera.",
+    "viewCollection": "Ver colección",
+    "photos": "{count} fotos"
+  },
+  "cookie": {
+    "message": "Este sitio usa cookies para mejorar tu experiencia.",
+    "accept": "Aceptar",
+    "reject": "Rechazar"
+  },
+  "footer": {
+    "tagline": "Fotografía de paisajes y ciudades",
+    "copyright": "© {year} DAVEJAVU. Todos los derechos reservados.",
+    "instagram": "Instagram",
+    "privacy": "Política de privacidad"
+  },
+  "lightbox": {
+    "close": "Cerrar",
+    "prev": "Foto anterior",
+    "next": "Foto siguiente"
+  },
+  "download": {
+    "expired": "Este enlace de descarga ha caducado.",
+    "invalid": "Este enlace de descarga no es válido.",
+    "contactUs": "Por favor contacta al fotógrafo para solicitar un nuevo enlace.",
+    "contact": "Contactar al fotógrafo"
+  },
   "buy": {
     "getThisPhoto": "Obtener esta foto",
     "webSmall": "Web / Impresión Pequeña",
@@ -14,5 +175,33 @@
   "license": {
     "title": "Términos de Licencia",
     "back": "Volver al portafolio"
+  },
+  "basket": {
+    "title": "Cesta",
+    "empty": "Tu cesta está vacía.",
+    "browseCta": "Explorar el portafolio",
+    "photo": "foto",
+    "photos": "fotos",
+    "remove": "Eliminar",
+    "orderSummary": "Resumen del pedido",
+    "total": "Total",
+    "emailNote": "Enlaces de descarga enviados a tu email · válidos 14 días",
+    "smallLabel": "Pequeño  ·  2000px  ·  €19",
+    "fullResLabel": "Resolución total  ·  Nativa  ·  €49"
+  },
+  "thankYou": {
+    "title": "Pago confirmado",
+    "subtitle": "Gracias por tu compra. Tus enlaces de descarga están abajo y también se han enviado a tu correo — válidos 14 días.",
+    "loading": "Cargando tus descargas…",
+    "checkInbox": "Revisa tu bandeja de entrada — tus enlaces de descarga están en camino.",
+    "download": "Descargar",
+    "backToPortfolio": "Volver al portafolio"
+  },
+  "lightboxActions": {
+    "details": "Detalles",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "basket": "Cesta",
+    "inBasket": "En cesta"
   }
 }

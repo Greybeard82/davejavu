@@ -3,8 +3,10 @@
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 function ThankYouContent() {
+  const t = useTranslations('thankYou');
   const { locale } = useParams();
   const searchParams = useSearchParams();
   const [links, setLinks] = useState([]);
@@ -35,14 +37,14 @@ function ThankYouContent() {
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
-        <h1 className="text-3xl font-700 text-charcoal tracking-tight mb-3">Payment confirmed</h1>
+        <h1 className="text-3xl font-700 text-charcoal tracking-tight mb-3">{t('title')}</h1>
         <p className="text-sm text-mid-gray leading-relaxed max-w-sm mx-auto">
-          Thank you for your purchase. Your download links are below and have also been sent to your email — valid for 14 days.
+          {t('subtitle')}
         </p>
       </div>
 
       {loading ? (
-        <div className="text-center text-sm text-mid-gray py-8">Loading your downloads…</div>
+        <div className="text-center text-sm text-mid-gray py-8">{t('loading')}</div>
       ) : links.length > 0 ? (
         <div className="flex flex-col gap-4 mb-16">
           {links.map((link, i) => (
@@ -55,20 +57,20 @@ function ThankYouContent() {
                 href={link.url}
                 className="shrink-0 px-6 py-3 bg-charcoal text-white text-xs uppercase tracking-[3px] font-600 hover:bg-orange transition-colors"
               >
-                Download
+                {t('download')}
               </a>
             </div>
           ))}
         </div>
       ) : (
         <div className="text-center text-sm text-mid-gray mb-16 py-8 border border-[#e8e8e8]">
-          Check your inbox — your download links are on their way.
+          {t('checkInbox')}
         </div>
       )}
 
       <div className="text-center">
         <Link href={`/${locale}`} className="text-xs uppercase tracking-[3px] font-600 text-charcoal hover:text-orange transition-colors">
-          Back to portfolio
+          {t('backToPortfolio')}
         </Link>
       </div>
     </div>

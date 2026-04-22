@@ -6,6 +6,7 @@
     "pricing": "Pricing",
     "contact": "Contact",
     "favorites": "Favorites",
+    "basket": "Basket",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
   },
@@ -174,5 +175,33 @@
   "license": {
     "title": "License Terms",
     "back": "Back to portfolio"
+  },
+  "basket": {
+    "title": "Basket",
+    "empty": "Your basket is empty.",
+    "browseCta": "Browse the portfolio",
+    "photo": "photo",
+    "photos": "photos",
+    "remove": "Remove",
+    "orderSummary": "Order summary",
+    "total": "Total",
+    "emailNote": "Download links sent to your email · valid 14 days",
+    "smallLabel": "Small  ·  2000px  ·  €19",
+    "fullResLabel": "Full Resolution  ·  Native  ·  €49"
+  },
+  "thankYou": {
+    "title": "Payment confirmed",
+    "subtitle": "Thank you for your purchase. Your download links are below and have also been sent to your email — valid for 14 days.",
+    "loading": "Loading your downloads…",
+    "checkInbox": "Check your inbox — your download links are on their way.",
+    "download": "Download",
+    "backToPortfolio": "Back to portfolio"
+  },
+  "lightboxActions": {
+    "details": "Details",
+    "save": "Save",
+    "saved": "Saved",
+    "basket": "Basket",
+    "inBasket": "In basket"
   }
 }

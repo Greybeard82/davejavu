@@ -3,8 +3,10 @@
 import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getFavorites, saveFavorites, FAV_KEY } from '@/lib/favorites';
+import { useTranslations } from 'next-intl';
 
 export default function FavoritesPage({ params }) {
+  const t = useTranslations('favorites');
   const { locale } = use(params);
   const [favorites, setFavorites] = useState([]);
   const [mounted, setMounted] = useState(false);
@@ -34,9 +36,9 @@ export default function FavoritesPage({ params }) {
     <div className="max-w-[1800px] mx-auto px-6 pt-[72px] pb-24">
       <div className="pt-16 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl md:text-4xl font-700 text-charcoal tracking-tight">Your Favorites</h1>
+          <h1 className="text-3xl md:text-4xl font-700 text-charcoal tracking-tight">{t('title')}</h1>
           <p className="text-sm text-mid-gray mt-1 tracking-wide">
-            {favorites.length} photo{favorites.length !== 1 ? 's' : ''} saved
+            {t('count', { count: favorites.length })}
           </p>
         </div>
         {favorites.length > 0 && (
@@ -44,7 +46,7 @@ export default function FavoritesPage({ params }) {
             href={inquireAllHref}
             className="shrink-0 inline-block bg-orange text-white text-xs uppercase tracking-[3px] font-600 px-6 py-3 hover:bg-orange-dark transition-colors"
           >
-            Inquire about all
+            {t('inquireAll')}
           </Link>
         )}
       </div>
@@ -54,12 +56,12 @@ export default function FavoritesPage({ params }) {
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-[#d1d1d1] mx-auto mb-6">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
-          <p className="text-sm uppercase tracking-widest text-mid-gray mb-6">No favorites saved yet</p>
+          <p className="text-sm uppercase tracking-widest text-mid-gray mb-6">{t('empty')}</p>
           <Link
             href={`/${locale}`}
             className="text-xs uppercase tracking-widest text-charcoal hover:text-orange transition-colors border-b border-charcoal hover:border-orange pb-0.5"
           >
-            Browse the portfolio
+            {t('browseCta')}
           </Link>
         </div>
       ) : (

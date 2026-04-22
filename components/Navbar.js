@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
 
 export default function Navbar({ locale, collections = [] }) {
+  const t = useTranslations('nav');
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,7 +59,7 @@ export default function Navbar({ locale, collections = [] }) {
           {/* Left nav — desktop only */}
           <nav className="hidden md:flex items-center gap-8 flex-1">
             <Link href={link('/')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">
-              Portfolio
+              {t('portfolio')}
             </Link>
 
             {/* Collections dropdown */}
@@ -66,7 +68,7 @@ export default function Navbar({ locale, collections = [] }) {
                 onClick={() => { setCollectionsOpen(o => !o); setLangOpen(false); }}
                 className="flex items-center gap-1 text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors"
               >
-                Collections
+                {t('collections')}
                 <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={`transition-transform ${collectionsOpen ? 'rotate-180' : ''}`}>
                   <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -87,7 +89,7 @@ export default function Navbar({ locale, collections = [] }) {
               )}
             </div>
 
-            <Link href={link('/about')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">About</Link>
+            <Link href={link('/about')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('about')}</Link>
           </nav>
 
           {/* Logo — centered on desktop, left on mobile */}
@@ -103,8 +105,8 @@ export default function Navbar({ locale, collections = [] }) {
 
           {/* Right side: nav + lang + favorites */}
           <div className="hidden md:flex items-center gap-5 flex-1 justify-end">
-            <Link href={link('/pricing')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Pricing</Link>
-            <Link href={link('/contact')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">Contact</Link>
+            <Link href={link('/pricing')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('pricing')}</Link>
+            <Link href={link('/contact')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('contact')}</Link>
             {/* Language switcher */}
             <div className="relative">
               <button
@@ -194,12 +196,12 @@ export default function Navbar({ locale, collections = [] }) {
           </button>
           <nav className="flex flex-col px-6 py-8 gap-5">
             {[
-              { href: '/', label: 'Portfolio' },
-              { href: '/about', label: 'About' },
-              { href: '/pricing', label: 'Pricing' },
-              { href: '/contact', label: 'Contact' },
-              { href: '/basket', label: `Basket${basketCount > 0 ? ` (${basketCount})` : ''}` },
-              { href: '/favorites', label: `Favorites${favCount > 0 ? ` (${favCount})` : ''}` },
+              { href: '/', label: t('portfolio') },
+              { href: '/about', label: t('about') },
+              { href: '/pricing', label: t('pricing') },
+              { href: '/contact', label: t('contact') },
+              { href: '/basket', label: `${t('basket')}${basketCount > 0 ? ` (${basketCount})` : ''}` },
+              { href: '/favorites', label: `${t('favorites')}${favCount > 0 ? ` (${favCount})` : ''}` },
             ].map(({ href, label }) => (
               <Link
                 key={href}

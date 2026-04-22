@@ -1,4 +1,165 @@
 {
+  "nav": {
+    "portfolio": "Portfolio",
+    "collections": "Kollektionen",
+    "about": "Über mich",
+    "pricing": "Preise",
+    "contact": "Kontakt",
+    "favorites": "Favoriten",
+    "basket": "Warenkorb",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
+  },
+  "hero": {
+    "cta": "Portfolio ansehen",
+    "scrollHint": "Scrollen zum Erkunden"
+  },
+  "gallery": {
+    "title": "Portfolio",
+    "allPhotos": "Alle",
+    "newBadge": "Neu",
+    "licenseBadge": "Zur Lizenzierung verfügbar",
+    "loadMore": "Mehr laden",
+    "editions": "{sold} von {max} verbleibend",
+    "openEdition": "Offene Auflage",
+    "noPhotos": "Noch keine Fotos — schau bald wieder vorbei.",
+    "page": "Seite {current} von {total}"
+  },
+  "moods": {
+    "Golden Hour": "Goldene Stunde",
+    "Blue Hour": "Blaue Stunde",
+    "Storm": "Sturm",
+    "Solitude": "Einsamkeit",
+    "Urban Chaos": "Urbanes Chaos",
+    "Mist": "Nebel",
+    "Silence": "Stille",
+    "Neon": "Neon",
+    "Vast": "Weit",
+    "Intimate": "Intim"
+  },
+  "photo": {
+    "inquire": "Lizenz anfragen",
+    "wallMockup": "An Ihrer Wand sehen",
+    "hideWallMockup": "Simulation ausblenden",
+    "behindTheLens": "Hinter der Linse",
+    "cameraBody": "Kamera",
+    "lens": "Objektiv",
+    "focalLength": "Brennweite",
+    "aperture": "Blende",
+    "iso": "ISO",
+    "shutterSpeed": "Verschlusszeit",
+    "edition": "Auflage {sold} von {max}",
+    "openEdition": "Offene Auflage",
+    "availableForLicense": "Zur Lizenzierung verfügbar"
+  },
+  "favorites": {
+    "title": "Ihre Favoriten",
+    "empty": "Sie haben noch keine Favoriten gespeichert.",
+    "browseCta": "Portfolio durchsuchen",
+    "inquireAll": "Alle Favoriten anfragen",
+    "count": "{count} gespeichert"
+  },
+  "contact": {
+    "title": "Kontakt aufnehmen",
+    "subtitle": "Interesse an einer Fotolizenz? Füllen Sie das Formular aus und ich melde mich innerhalb von 48 Stunden.",
+    "name": "Ihr Name",
+    "email": "E-Mail-Adresse",
+    "subject": "Betreff",
+    "subjectPersonal": "Persönliche Lizenz",
+    "subjectExtended": "Erweiterte persönliche Lizenz",
+    "subjectCommercial": "Kommerzielle Lizenz",
+    "subjectOther": "Sonstiges",
+    "photosInterest": "Fotos von Interesse",
+    "photosInterestPlaceholder": "Titel des/der Fotos, das/die Sie interessiert",
+    "intendedUse": "Beabsichtigter Verwendungszweck",
+    "intendedUsePlaceholder": "Wie planen Sie, das Bild zu verwenden?",
+    "message": "Nachricht",
+    "messagePlaceholder": "Erzählen Sie mir mehr über Ihr Projekt...",
+    "gdpr": "Ich stimme der Speicherung meiner Daten zur Bearbeitung dieser Anfrage zu",
+    "submit": "Anfrage senden",
+    "sending": "Wird gesendet...",
+    "successTitle": "Nachricht gesendet",
+    "successMessage": "Vielen Dank für Ihre Anfrage. Ich melde mich innerhalb von 48 Stunden.",
+    "errorMessage": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "validation": {
+      "nameRequired": "Name ist erforderlich",
+      "emailRequired": "E-Mail ist erforderlich",
+      "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "messageRequired": "Nachricht ist erforderlich",
+      "messageTooShort": "Die Nachricht muss mindestens 20 Zeichen lang sein",
+      "gdprRequired": "Sie müssen den Datenschutzbedingungen zustimmen",
+      "captchaRequired": "Bitte vervollständigen Sie das Captcha"
+    }
+  },
+  "pricing": {
+    "title": "Lizenzierung",
+    "subtitle": "Jedes Foto ist sofort per PayPal herunterladbar. Alle Preise in EUR.",
+    "smallTitle": "Klein",
+    "smallSize": "2000px lange Seite",
+    "smallUse": "Perfekt für digitale Nutzung, soziale Medien und kleine Drucke bis A4.",
+    "smallPrice": "€19",
+    "fullTitle": "Volle Auflösung",
+    "fullSize": "Native Auflösung",
+    "fullUse": "Maximales Detail für Großformatdruck, Rahmung und Archivierung.",
+    "fullPrice": "€49",
+    "businessTitle": "Geschäftlich / Kommerziell",
+    "businessDesc": "Verwenden Sie ein Foto für Werbung, Editorial oder kommerzielle Zwecke? Kontaktieren Sie mich für ein individuelles Angebot.",
+    "businessCta": "Kontakt aufnehmen",
+    "howItWorks": "So funktioniert es",
+    "step1Title": "Foto finden",
+    "step1Desc": "Durchsuchen Sie das Portfolio und öffnen Sie ein Bild, das Ihnen gefällt.",
+    "step2Title": "Größe wählen",
+    "step2Desc": "Wählen Sie Klein (€19) oder Volle Auflösung (€49) und zahlen Sie sicher per PayPal.",
+    "step3Title": "Herunterladen",
+    "step3Desc": "Ein Download-Link landet innerhalb von Minuten in Ihrem Posteingang — gültig 14 Tage.",
+    "note": "Nur für den persönlichen Gebrauch. Der Fotograf behält das vollständige Urheberrecht.",
+    "licenseLink": "Vollständige Lizenzbedingungen lesen",
+    "ctaPortfolio": "Portfolio durchsuchen"
+  },
+  "about": {
+    "title": "Über mich",
+    "subtitle": "DAVEJAVU",
+    "heroAlt": "Der Fotograf hinter DAVEJAVU",
+    "storyHeading": "Wer ich bin",
+    "storyBody": "[IHRE GESCHICHTE HIER]",
+    "philosophyHeading": "Was ich suche",
+    "philosophyBody": "[IHRE PHILOSOPHIE HIER]",
+    "gearHeading": "Wie ich fotografiere",
+    "gearBody": "[AUSRÜSTUNG / PROZESS HIER]",
+    "signaturesHeading": "Einige Lieblinge",
+    "ctaHeading": "Gefällt Ihnen was Sie sehen?",
+    "ctaBody": "Durchsuchen Sie das Portfolio oder kontaktieren Sie mich wegen einer Lizenz.",
+    "ctaPortfolio": "Portfolio ansehen",
+    "ctaContact": "Kontakt aufnehmen"
+  },
+  "collections": {
+    "title": "Kollektionen",
+    "subtitle": "FotoSerien nach Ort und Atmosphäre gruppiert.",
+    "viewCollection": "Kollektion ansehen",
+    "photos": "{count} Fotos"
+  },
+  "cookie": {
+    "message": "Diese Website verwendet Cookies, um Ihre Erfahrung zu verbessern.",
+    "accept": "Akzeptieren",
+    "reject": "Ablehnen"
+  },
+  "footer": {
+    "tagline": "Landschafts- & Stadtfotografie",
+    "copyright": "© {year} DAVEJAVU. Alle Rechte vorbehalten.",
+    "instagram": "Instagram",
+    "privacy": "Datenschutzrichtlinie"
+  },
+  "lightbox": {
+    "close": "Schließen",
+    "prev": "Vorheriges Foto",
+    "next": "Nächstes Foto"
+  },
+  "download": {
+    "expired": "Dieser Download-Link ist abgelaufen.",
+    "invalid": "Dieser Download-Link ist ungültig.",
+    "contactUs": "Bitte kontaktieren Sie den Fotografen, um einen neuen Link anzufordern.",
+    "contact": "Fotografen kontaktieren"
+  },
   "buy": {
     "getThisPhoto": "Dieses Foto kaufen",
     "webSmall": "Web / Kleindruck",
@@ -14,5 +175,33 @@
   "license": {
     "title": "Lizenzbedingungen",
     "back": "Zurück zum Portfolio"
+  },
+  "basket": {
+    "title": "Warenkorb",
+    "empty": "Ihr Warenkorb ist leer.",
+    "browseCta": "Portfolio durchsuchen",
+    "photo": "Foto",
+    "photos": "Fotos",
+    "remove": "Entfernen",
+    "orderSummary": "Bestellübersicht",
+    "total": "Gesamt",
+    "emailNote": "Download-Links per E-Mail · 14 Tage gültig",
+    "smallLabel": "Klein  ·  2000px  ·  €19",
+    "fullResLabel": "Volle Auflösung  ·  Nativ  ·  €49"
+  },
+  "thankYou": {
+    "title": "Zahlung bestätigt",
+    "subtitle": "Vielen Dank für Ihren Kauf. Ihre Download-Links sind unten und wurden auch an Ihre E-Mail gesendet — 14 Tage gültig.",
+    "loading": "Ihre Downloads werden geladen…",
+    "checkInbox": "Prüfen Sie Ihren Posteingang — Ihre Download-Links sind unterwegs.",
+    "download": "Herunterladen",
+    "backToPortfolio": "Zurück zum Portfolio"
+  },
+  "lightboxActions": {
+    "details": "Details",
+    "save": "Speichern",
+    "saved": "Gespeichert",
+    "basket": "Warenkorb",
+    "inBasket": "Im Warenkorb"
   }
 }

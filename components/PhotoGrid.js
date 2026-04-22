@@ -7,6 +7,7 @@ import { decode } from 'blurhash';
 import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 import { getFavorites, saveFavorites } from '@/lib/favorites';
 import { addToBasket, isInBasket } from '@/lib/basket';
+import { useTranslations } from 'next-intl';
 
 function BlurHashPlaceholder({ hash }) {
   const canvasRef = useRef(null);
@@ -40,6 +41,7 @@ function BlurHashPlaceholder({ hash }) {
 }
 
 function Lightbox({ photo, locale, onClose }) {
+  const t = useTranslations('lightboxActions');
   const [favorited, setFavorited] = useState(() =>
     getFavorites().some((f) => f.id === photo.id)
   );
@@ -133,7 +135,7 @@ function Lightbox({ photo, locale, onClose }) {
                     <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
                   </svg>
                 </div>
-                <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">Details</span>
+                <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">{t('details')}</span>
               </Link>
 
               <button
@@ -149,7 +151,7 @@ function Lightbox({ photo, locale, onClose }) {
                   </svg>
                 </div>
                 <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">
-                  {favorited ? 'Saved' : 'Save'}
+                  {favorited ? t('saved') : t('save')}
                 </span>
               </button>
 
@@ -166,7 +168,7 @@ function Lightbox({ photo, locale, onClose }) {
                   </svg>
                 </div>
                 <span className="text-[9px] uppercase tracking-widest text-white/50 group-hover:text-white/80 transition-colors">
-                  {inBasket ? 'In basket' : 'Basket'}
+                  {inBasket ? t('inBasket') : t('basket')}
                 </span>
               </button>
 
