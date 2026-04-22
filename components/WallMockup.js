@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 const WALLS = [
   { key: 'warm',  label: 'Warm White', bg: '#f0ede8', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px),repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(0,0,0,0.008) 2px,rgba(0,0,0,0.008) 4px)' },
-  { key: 'stone', label: 'Stone',      bg: '#d6d2cc', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px),repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(0,0,0,0.015) 2px,rgba(0,0,0,0.015) 4px)' },
+  { key: 'stone', label: 'Stone',      bg: '#d6d2cc', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px)' },
   { key: 'dark',  label: 'Charcoal',   bg: '#2a2a2a', texture: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.015) 3px,rgba(255,255,255,0.015) 6px)' },
 ];
 
@@ -22,6 +22,8 @@ export default function WallMockup({ src, title }) {
   const currentWall = WALLS.find((w) => w.key === wall);
   const currentSize = SIZES.find((s) => s.key === size);
   const isDark = wall === 'dark';
+  const labelColor = isDark ? '#ffffff' : '#1a1a1a';
+  const mutedColor = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
 
   return (
     <>
@@ -35,65 +37,75 @@ export default function WallMockup({ src, title }) {
           <rect x="2" y="3" width="20" height="14" rx="1"/>
           <path d="M8 21h8M12 17v4"/>
         </svg>
-        {open ? 'Hide wall mockup' : 'See it on your wall'}
+        See it on your wall
       </button>
 
-      {/* Mockup panel */}
+      {/* Full-screen mockup */}
       {open && (
         <div
-          className="fixed inset-0 z-40 flex flex-col"
+          className="fixed inset-0 z-[100] flex flex-col"
           style={{ background: currentWall.bg, backgroundImage: currentWall.texture }}
         >
-          {/* Controls bar */}
+          {/* Controls bar — solid background so it's always visible */}
           <div
-            className="flex items-center justify-between px-6 py-3 gap-4 flex-wrap"
-            style={{ background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)' }}
+            className="flex items-center justify-between gap-6 px-6 py-4 flex-wrap shrink-0"
+            style={{ background: isDark ? '#1a1a1a' : '#ffffff', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}
           >
-            <span className={`text-[10px] uppercase tracking-[4px] font-600 ${isDark ? 'text-white/60' : 'text-mid-gray'}`}>
+            {/* Photo title */}
+            <span className="text-xs font-600 uppercase tracking-widest" style={{ color: labelColor }}>
               {title}
             </span>
 
-            <div className="flex items-center gap-6 flex-wrap">
-              {/* Wall colour */}
+            <div className="flex items-center gap-8 flex-wrap">
+              {/* Wall swatches */}
               <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Wall</span>
                 {WALLS.map((w) => (
                   <button
                     key={w.key}
                     onClick={() => setWall(w.key)}
                     title={w.label}
-                    className="w-5 h-5 rounded-full border-2 transition-transform hover:scale-110"
+                    className="w-6 h-6 rounded-full transition-transform hover:scale-110"
                     style={{
                       background: w.bg,
-                      borderColor: wall === w.key ? '#F07E2F' : 'rgba(0,0,0,0.2)',
+                      border: `2px solid ${wall === w.key ? '#F07E2F' : 'rgba(0,0,0,0.25)'}`,
+                      outline: wall === w.key ? '2px solid rgba(240,126,47,0.3)' : 'none',
+                      outlineOffset: '1px',
                     }}
                   />
                 ))}
               </div>
 
-              {/* Print size */}
+              {/* Size buttons */}
               <div className="flex items-center gap-1">
+                <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Size</span>
                 {SIZES.map((s) => (
                   <button
                     key={s.key}
                     onClick={() => setSize(s.key)}
-                    className={`text-[10px] uppercase tracking-widest px-3 py-1 transition-colors ${
-                      size === s.key
-                        ? 'bg-orange text-white'
-                        : isDark ? 'text-white/50 hover:text-white' : 'text-mid-gray hover:text-charcoal'
-                    }`}
+                    className="px-3 py-1.5 text-[10px] uppercase tracking-widest transition-colors"
+                    style={{
+                      background: size === s.key ? '#F07E2F' : 'transparent',
+                      color: size === s.key ? '#ffffff' : mutedColor,
+                      border: `1px solid ${size === s.key ? '#F07E2F' : isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
+                    }}
                   >
-                    {s.label}
-                    <span className="ml-1 normal-case tracking-normal opacity-60">{s.desc}</span>
+                    {s.label} <span className="opacity-60 normal-case tracking-normal">{s.desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* Close button */}
             <button
               onClick={() => setOpen(false)}
-              className={`text-[10px] uppercase tracking-[3px] flex items-center gap-2 transition-colors ${isDark ? 'text-white/50 hover:text-white' : 'text-mid-gray hover:text-charcoal'}`}
+              className="flex items-center gap-2 px-4 py-2 text-[10px] uppercase tracking-widest transition-colors"
+              style={{
+                color: labelColor,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
+              }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M18 6L6 18M6 6l12 12"/>
               </svg>
               Close
@@ -101,19 +113,18 @@ export default function WallMockup({ src, title }) {
           </div>
 
           {/* Wall scene */}
-          <div className="flex-1 flex items-center justify-center">
-            {/* Skirting board hint */}
-            <div className="relative flex flex-col items-center" style={{ width: currentSize.width }}>
+          <div className="flex-1 flex items-center justify-center overflow-hidden px-8">
+            <div className="flex flex-col items-center" style={{ width: currentSize.width, minWidth: '200px', maxWidth: '90vw' }}>
 
-              {/* Frame */}
+              {/* Framed photo */}
               <div
                 style={{
                   width: '100%',
-                  boxShadow: isDark
-                    ? '0 20px 60px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5)'
-                    : '0 20px 60px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.12)',
                   background: '#1a1a1a',
-                  padding: '10px',
+                  padding: '8px',
+                  boxShadow: isDark
+                    ? '0 30px 80px rgba(0,0,0,0.8), 0 8px 20px rgba(0,0,0,0.6)'
+                    : '0 30px 80px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.15)',
                 }}
               >
                 {/* White mat */}
@@ -122,18 +133,14 @@ export default function WallMockup({ src, title }) {
                     src={src}
                     alt={title}
                     draggable="false"
-                    className="w-full h-auto block select-none"
-                    style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-                    onContextMenu={(e) => e.preventDefault()}
+                    className="w-full h-auto block"
+                    style={{ userSelect: 'none', WebkitUserSelect: 'none', pointerEvents: 'none' }}
                   />
                 </div>
               </div>
 
-              {/* Size label below frame */}
-              <p
-                className="mt-4 text-[10px] uppercase tracking-[3px]"
-                style={{ color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }}
-              >
+              {/* Size label */}
+              <p className="mt-5 text-[10px] uppercase tracking-[3px]" style={{ color: mutedColor }}>
                 {currentSize.desc} print
               </p>
             </div>
