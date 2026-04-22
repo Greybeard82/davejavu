@@ -12,29 +12,43 @@ import { getDownloadUrl } from '@/lib/cloudinary';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function verifyWebhookSignature(request, rawBody) {
-  const headers = {
-    auth_algo:         request.headers.get('paypal-auth-algo'),
-    cert_url:          request.headers.get('paypal-cert-url'),
-    transmission_id:   request.headers.get('paypal-transmission-id'),
-    transmission_sig:  request.headers.get('paypal-transmission-sig'),
-    transmission_time: request.headers.get('paypal-transmission-time'),
-  };
+  try {
+    const headers = {
+      auth_algo:         request.headers.get('paypal-auth-algo'),
+      cert_url:          request.headers.get('paypal-cert-url'),
+      transmission_id:   request.headers.get('paypal-transmission-id'),
+      transmission_sig:  request.headers.get('paypal-transmission-sig'),
+      transmission_time: request.headers.get('paypal-transmission-time'),
+    };
 
-  const token = await getPayPalToken();
-  const res = await fetch(
-    `${process.env.PAYPAL_BASE_URL}/v1/notifications/verify-webhook-signature`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        ...headers,
-        webhook_id: process.env.PAYPAL_WEBHOOK_ID,
-        webhook_event: JSON.parse(rawBody),
-      }),
-    }
-  );
-  const result = await res.json();
-  return result.verification_status === 'SUCCESS';
+    if (!Object.values(headers).every(Boolean)) return false;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const token = await getPayPalToken();
+    const res = await fetch(
+      `${process.env.PAYPAL_BASE_URL}/v1/notifications/verify-webhook-signature`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          ...headers,
+          webhook_id: process.env.PAYPAL_WEBHOOK_ID,
+          webhook_event: JSON.parse(rawBody),
+        }),
+        signal: controller.signal,
+      }
+    );
+    clearTimeout(timeout);
+
+    if (!res.ok) return false;
+    const result = await res.json();
+    return result.verification_status === 'SUCCESS';
+  } catch (err) {
+    console.error('Webhook signature verification error:', err);
+    return false;
+  }
 }
 
 async function stampExif(fileBuffer, { buyerEmail, captureId, orderId, tier, purchaseDate }) {

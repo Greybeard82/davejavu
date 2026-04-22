@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export async function GET() {
   const supabase = createAdminClient();
@@ -9,6 +10,8 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   const { name } = await request.json();
   if (!name?.trim()) return NextResponse.json({ error: 'Name required' }, { status: 400 });
   const supabase = createAdminClient();

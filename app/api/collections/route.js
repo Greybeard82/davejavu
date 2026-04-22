@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,8 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const { title, slug, description, published, coverPhotoId, photoIds } = await request.json();
 

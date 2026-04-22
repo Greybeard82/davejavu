@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
 const MOODS = ['Golden Hour', 'Blue Hour', 'Storm', 'Solitude', 'Urban Chaos', 'Mist', 'Silence', 'Neon', 'Vast', 'Intimate'];
 
 export async function POST(request) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const { imageUrl, location, tags } = await request.json();
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { createAdminClient } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,8 @@ cloudinary.config({
 
 // Toggle published / featured / available_for_license
 export async function PATCH(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -48,7 +51,9 @@ export async function PATCH(request, { params }) {
 }
 
 // Delete photo — removes from Cloudinary + Supabase Storage + DB
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const { id } = await params;
     const supabase = createAdminClient();

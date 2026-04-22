@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
 
 export async function PATCH(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const { id } = await params;
     const { title, slug, description, published, coverPhotoId, photoIds } = await request.json();
@@ -51,7 +54,9 @@ export async function PATCH(request, { params }) {
   }
 }
 
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const { id } = await params;
     const supabase = createAdminClient();

@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/admin-guard';
 
 export async function PATCH(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   const { name } = await params;
   const { newName } = await request.json();
   if (!newName?.trim()) return NextResponse.json({ error: 'Name required' }, { status: 400 });
@@ -17,7 +20,9 @@ export async function PATCH(request, { params }) {
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   const { name } = await params;
   const supabase = createAdminClient();
   const { error } = await supabase.from('moods').delete().eq('name', name);
