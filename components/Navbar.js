@@ -13,7 +13,8 @@ export default function Navbar({ locale, collections = [] }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [desktopCollectionsOpen, setDesktopCollectionsOpen] = useState(false);
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [favCount, setFavCount] = useState(0);
   const [basketCount, setBasketCount] = useState(0);
@@ -27,8 +28,10 @@ export default function Navbar({ locale, collections = [] }) {
   useEffect(() => {
     const readCounts = () => {
       try {
-        setFavCount(JSON.parse(localStorage.getItem('davejavu_favorites') || '[]').length);
-        setBasketCount(JSON.parse(localStorage.getItem('davejavu_basket') || '[]').length);
+        const fav = JSON.parse(localStorage.getItem('davejavu_favorites') || '[]').length;
+        const basket = JSON.parse(localStorage.getItem('davejavu_basket') || '[]').length;
+        setFavCount(prev => prev === fav ? prev : fav);
+        setBasketCount(prev => prev === basket ? prev : basket);
       } catch { /* ignore */ }
     };
     readCounts();
@@ -56,7 +59,6 @@ export default function Navbar({ locale, collections = [] }) {
       >
         <div className="max-w-[1800px] mx-auto px-6 h-full flex items-center">
 
-          {/* Left nav — all text links */}
           <nav className="hidden md:flex items-center gap-8 flex-1">
             <Link href={link('/')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">
               {t('portfolio')}
@@ -65,21 +67,21 @@ export default function Navbar({ locale, collections = [] }) {
             {/* Collections dropdown */}
             <div className="relative">
               <button
-                onClick={() => { setCollectionsOpen(o => !o); setLangOpen(false); }}
+                onClick={() => { setDesktopCollectionsOpen(o => !o); setLangOpen(false); }}
                 className="flex items-center gap-1 text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors"
               >
                 {t('collections')}
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={`transition-transform ${collectionsOpen ? 'rotate-180' : ''}`}>
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={`transition-transform ${desktopCollectionsOpen ? 'rotate-180' : ''}`}>
                   <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
-              {collectionsOpen && (
+              {desktopCollectionsOpen && (
                 <div className="absolute top-full left-0 mt-3 w-48 bg-[#FAF9F6] border border-[#d1d1d1] shadow-lg rounded py-2 z-50">
                   {collections.map((c) => (
                     <Link
                       key={c.slug}
                       href={link(`/collections/${c.slug}`)}
-                      onClick={() => setCollectionsOpen(false)}
+                      onClick={() => setDesktopCollectionsOpen(false)}
                       className="block px-4 py-2 text-xs uppercase tracking-wider text-charcoal hover:text-orange hover:bg-[#f4f3ef] transition-colors"
                     >
                       {c.name}
@@ -94,7 +96,6 @@ export default function Navbar({ locale, collections = [] }) {
             <Link href={link('/contact')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('contact')}</Link>
           </nav>
 
-          {/* Logo — centered */}
           <Link href={link('/')} className="flex items-center shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2">
             <Image
               src="/logo.png"
@@ -105,10 +106,8 @@ export default function Navbar({ locale, collections = [] }) {
             />
           </Link>
 
-          {/* Right side — language, favorites, basket */}
           <div className="hidden md:flex items-center gap-5 flex-1 justify-end">
 
-            {/* Language switcher */}
             <div className="relative">
               <button
                 onClick={() => { setLangOpen(o => !o); setCollectionsOpen(false); }}
@@ -137,7 +136,6 @@ export default function Navbar({ locale, collections = [] }) {
               )}
             </div>
 
-            {/* Favorites */}
             <Link href={link('/favorites')} className="relative text-charcoal hover:text-orange transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -149,7 +147,6 @@ export default function Navbar({ locale, collections = [] }) {
               )}
             </Link>
 
-            {/* Basket */}
             <Link href={link('/basket')} className="relative text-charcoal hover:text-orange transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
@@ -163,7 +160,6 @@ export default function Navbar({ locale, collections = [] }) {
 
           </div>
 
-          {/* Mobile hamburger */}
           <button
             className="md:hidden text-charcoal ml-auto p-3 -mr-3 touch-manipulation"
             onClick={() => setMenuOpen(o => !o)}
@@ -214,19 +210,18 @@ export default function Navbar({ locale, collections = [] }) {
               </Link>
             ))}
 
-            {/* Collections — collapsible */}
             <div>
               <button
                 type="button"
-                onClick={() => setCollectionsOpen(o => !o)}
+                onClick={() => setMobileCollectionsOpen(o => !o)}
                 className="flex items-center gap-2 text-xl font-700 uppercase tracking-widest text-charcoal hover:text-orange transition-colors py-1 w-full text-left"
               >
                 {t('collections')}
-                <svg width="12" height="7" viewBox="0 0 10 6" fill="none" className={`transition-transform mt-0.5 ${collectionsOpen ? 'rotate-180' : ''}`}>
+                <svg width="12" height="7" viewBox="0 0 10 6" fill="none" className={`transition-transform mt-0.5 ${mobileCollectionsOpen ? 'rotate-180' : ''}`}>
                   <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
-              {collectionsOpen && (
+              {mobileCollectionsOpen && (
                 <div className="flex flex-col gap-1 mt-2 pl-1">
                   {collections.map((c) => (
                     <Link
@@ -242,7 +237,6 @@ export default function Navbar({ locale, collections = [] }) {
               )}
             </div>
 
-            {/* Language + basket */}
             <div className="pb-8 pt-2 border-t border-[#e8e8e8] mt-2">
               <div className="flex items-center justify-between">
                 <div className="flex gap-3 flex-wrap">
@@ -278,9 +272,8 @@ export default function Navbar({ locale, collections = [] }) {
         </div>
       )}
 
-      {/* Click outside to close dropdowns */}
-      {(collectionsOpen || langOpen) && (
-        <div className="fixed inset-0 z-40" onClick={() => { setCollectionsOpen(false); setLangOpen(false); }} />
+      {(desktopCollectionsOpen || langOpen) && (
+        <div className="fixed inset-0 z-40" onClick={() => { setDesktopCollectionsOpen(false); setLangOpen(false); }} />
       )}
     </>
   );
