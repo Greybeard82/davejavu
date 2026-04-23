@@ -202,7 +202,6 @@ export default function Navbar({ locale, collections = [] }) {
               { href: '/about', label: t('about') },
               { href: '/pricing', label: t('pricing') },
               { href: '/contact', label: t('contact') },
-              { href: '/basket', label: `${t('basket')}${basketCount > 0 ? ` (${basketCount})` : ''}` },
               { href: '/favorites', label: `${t('favorites')}${favCount > 0 ? ` (${favCount})` : ''}` },
             ].map(({ href, label }) => (
               <Link
@@ -215,35 +214,64 @@ export default function Navbar({ locale, collections = [] }) {
               </Link>
             ))}
 
+            {/* Collections — collapsible */}
             <div>
-              <p className="text-xs uppercase tracking-widest text-mid-gray mb-3">Collections</p>
-              <div className="flex flex-col gap-2">
-                {collections.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={link(`/collections/${c.slug}`)}
-                    onClick={() => setMenuOpen(false)}
-                    className="text-sm font-400 uppercase tracking-wider text-charcoal hover:text-orange transition-colors py-1"
-                  >
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
+              <button
+                type="button"
+                onClick={() => setCollectionsOpen(o => !o)}
+                className="flex items-center gap-2 text-xl font-700 uppercase tracking-widest text-charcoal hover:text-orange transition-colors py-1 w-full text-left"
+              >
+                {t('collections')}
+                <svg width="12" height="7" viewBox="0 0 10 6" fill="none" className={`transition-transform mt-0.5 ${collectionsOpen ? 'rotate-180' : ''}`}>
+                  <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+              {collectionsOpen && (
+                <div className="flex flex-col gap-1 mt-2 pl-1">
+                  {collections.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={link(`/collections/${c.slug}`)}
+                      onClick={() => setMenuOpen(false)}
+                      className="text-sm font-400 uppercase tracking-wider text-mid-gray hover:text-orange transition-colors py-1"
+                    >
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="pb-8">
-              <p className="text-xs uppercase tracking-widest text-mid-gray mb-3">Language</p>
-              <div className="flex gap-3 flex-wrap">
-                {LOCALES.map((l) => (
-                  <Link
-                    key={l}
-                    href={switchLocalePath(l)}
-                    onClick={() => setMenuOpen(false)}
-                    className={`text-sm uppercase tracking-widest font-600 py-1 px-2 ${l === locale ? 'text-orange' : 'text-charcoal hover:text-orange'}`}
-                  >
-                    {l}
-                  </Link>
-                ))}
+            {/* Language + basket */}
+            <div className="pb-8 pt-2 border-t border-[#e8e8e8] mt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex gap-3 flex-wrap">
+                  {LOCALES.map((l) => (
+                    <Link
+                      key={l}
+                      href={switchLocalePath(l)}
+                      onClick={() => setMenuOpen(false)}
+                      className={`text-sm uppercase tracking-widest font-600 py-1 px-2 ${l === locale ? 'text-orange' : 'text-charcoal hover:text-orange'}`}
+                    >
+                      {l}
+                    </Link>
+                  ))}
+                </div>
+                <Link
+                  href={link('/basket')}
+                  onClick={() => setMenuOpen(false)}
+                  className="relative text-orange"
+                  aria-label={t('basket')}
+                >
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+                  </svg>
+                  {basketCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-orange text-white text-[9px] font-700 rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                      {basketCount}
+                    </span>
+                  )}
+                </Link>
               </div>
             </div>
           </nav>
