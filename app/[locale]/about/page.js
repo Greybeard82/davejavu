@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createAdminClient } from '@/lib/supabase-admin';
 
 export async function generateMetadata({ params }) {
