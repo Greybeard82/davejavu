@@ -18,11 +18,13 @@ function shapePhoto(photo, locale) {
     isNew: new Date(photo.created_at).getTime() > thirtyDaysAgo,
     licensed: photo.available_for_license ?? false,
     featured: photo.featured ?? false,
+    width: photo.width || null,
+    height: photo.height || null,
     blurhash: null,
   };
 }
 
-const PHOTO_SELECT = `id, cloudinary_id, featured, available_for_license, created_at,
+const PHOTO_SELECT = `id, cloudinary_id, featured, available_for_license, created_at, width, height,
   photo_translations ( locale, title, location ),
   photo_moods ( mood )`;
 
