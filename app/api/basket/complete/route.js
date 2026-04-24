@@ -6,16 +6,25 @@ import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
 import { Resend } from 'resend';
 import sharp from 'sharp';
 
-async function stampAndStore(supabase, { cloudinaryId, tier, orderId, buyerEmail, photoTitle, purchaseDate }) {
+async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderId, buyerEmail, photoTitle, purchaseDate }) {
   try {
-    const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const srcUrl = tier === 'full_res'
-      ? `https://res.cloudinary.com/${CLOUD}/image/upload/${cloudinaryId}`
-      : `https://res.cloudinary.com/${CLOUD}/image/upload/w_2000,c_limit/${cloudinaryId}`;
+    let buffer;
 
-    const res = await fetch(srcUrl);
-    if (!res.ok) throw new Error(`Cloudinary fetch failed: ${res.status}`);
-    const buffer = Buffer.from(await res.arrayBuffer());
+    if (tier === 'full_res' && storagePath) {
+      // Serve original master from Supabase Storage — highest quality, untouched file
+      const { data: signed } = await supabase.storage.from('photos').createSignedUrl(storagePath, 120);
+      if (!signed?.signedUrl) throw new Error('Could not get signed URL for original');
+      const res = await fetch(signed.signedUrl);
+      if (!res.ok) throw new Error(`Supabase Storage fetch failed: ${res.status}`);
+      buffer = Buffer.from(await res.arrayBuffer());
+    } else {
+      // web_small tier — 2000px from Cloudinary is fine
+      const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const srcUrl = `https://res.cloudinary.com/${CLOUD}/image/upload/w_2000,c_limit/${cloudinaryId}`;
+      const res = await fetch(srcUrl);
+      if (!res.ok) throw new Error(`Cloudinary fetch failed: ${res.status}`);
+      buffer = Buffer.from(await res.arrayBuffer());
+    }
 
     const stamped = await sharp(buffer)
       .withMetadata({
@@ -109,7 +118,7 @@ export async function POST(request) {
       console.log('processing item', JSON.stringify(item));
       const { data: photo, error: photoErr } = await supabase
         .from('photos')
-        .select('id, cloudinary_id, photo_translations(locale, title)')
+        .select('id, cloudinary_id, storage_path, photo_translations(locale, title)')
         .eq('id', item.photoId)
         .single();
       console.log('photo lookup result', photo, photoErr);
@@ -136,6 +145,7 @@ export async function POST(request) {
 
       // Stamp EXIF metadata and store in Supabase — non-blocking best-effort
       const stamped = await stampAndStore(supabase, {
+        storagePath: photo.storage_path,
         cloudinaryId: photo.cloudinary_id,
         tier: item.tier,
         orderId,

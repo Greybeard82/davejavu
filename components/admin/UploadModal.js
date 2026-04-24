@@ -158,10 +158,19 @@ export default function UploadModal({ onClose, onSuccess }) {
 
       const { photoId, storagePath, supabaseUploadUrl, cloudinary: cld } = initData;
 
-      // 1b. Compress to ≤1920px JPEG so it fits within Cloudinary's free-plan 10 MB limit
+      // 1b. Read true dimensions from the original file before compressing
+      const originalDims = await new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(item.file);
+        img.onload = () => { URL.revokeObjectURL(url); resolve({ width: img.width, height: img.height }); };
+        img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+        img.src = url;
+      });
+
+      // 1c. Compress to ≤1920px JPEG so it fits within Cloudinary's free-plan 10 MB limit
       const compressed = await compressForUpload(item.file);
 
-      // 1c. Upload display copy directly to Cloudinary from the browser
+      // 1d. Upload display copy directly to Cloudinary from the browser
       const cldForm = new FormData();
       cldForm.append('file', compressed);
       cldForm.append('api_key', cld.apiKey);
@@ -177,7 +186,7 @@ export default function UploadModal({ onClose, onSuccess }) {
       const cldData = await cldRes.json();
       if (!cldRes.ok) throw new Error(cldData.error?.message || 'Cloudinary upload failed');
 
-      // 1d. Upload original master copy directly to Supabase Storage from the browser
+      // 1e. Upload original master copy directly to Supabase Storage from the browser
       const storageRes = await fetch(supabaseUploadUrl, {
         method: 'PUT',
         body: item.file,
@@ -191,8 +200,8 @@ export default function UploadModal({ onClose, onSuccess }) {
         storagePath,
         displayUrl: cldData.secure_url,
         tags: cldData.tags || [],
-        width: cldData.width,
-        height: cldData.height,
+        width: originalDims?.width || cldData.width,
+        height: originalDims?.height || cldData.height,
       };
       updateItem(item.id, { uploadResult });
     } catch (err) {
@@ -257,6 +266,8 @@ export default function UploadModal({ onClose, onSuccess }) {
           photoId: item.uploadResult.photoId,
           cloudinaryId: item.uploadResult.cloudinaryId,
           storagePath: item.uploadResult.storagePath,
+          width: item.uploadResult.width,
+          height: item.uploadResult.height,
           translations: item.translations,
           moods: item.moods,
           camera: item.camera,

@@ -8,6 +8,15 @@ import { getBasket, removeFromBasket, updateTier, clearBasket } from '@/lib/bask
 import { useTranslations } from 'next-intl';
 
 const PRICES = { web_small: 19, full_res: 49 };
+
+function printSize(width, height) {
+  if (!width || !height) return null;
+  const long = Math.max(width, height);
+  const short = Math.min(width, height);
+  const cmW = Math.floor(long / 300 * 2.54 * 10) / 10;
+  const cmH = Math.floor(short / 300 * 2.54 * 10) / 10;
+  return `Up to ${cmW} × ${cmH} cm at print quality`;
+}
 const PAYPAL_INIT = { clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID, currency: 'EUR' };
 
 export default function BasketPage() {
@@ -88,17 +97,22 @@ export default function BasketPage() {
                 <p className="font-600 text-charcoal text-sm mb-3">{item.title}</p>
                 <div className="flex flex-col gap-2">
                   {[['web_small', 'smallLabel'], ['full_res', 'fullResLabel']].map(([key, labelKey]) => (
-                    <label key={key} className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`tier-${item.photoId}`}
-                        value={key}
-                        checked={item.tier === key}
-                        onChange={() => handleTier(item.photoId, key)}
-                        className="accent-orange"
-                      />
-                      <span className="text-xs text-charcoal">{t(labelKey)}</span>
-                    </label>
+                    <div key={key}>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name={`tier-${item.photoId}`}
+                          value={key}
+                          checked={item.tier === key}
+                          onChange={() => handleTier(item.photoId, key)}
+                          className="accent-orange"
+                        />
+                        <span className="text-xs text-charcoal">{t(labelKey)}</span>
+                      </label>
+                      {key === 'full_res' && item.tier === 'full_res' && item.width && (
+                        <p className="text-[10px] text-mid-gray ml-6 mt-1">{printSize(item.width, item.height)}</p>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>

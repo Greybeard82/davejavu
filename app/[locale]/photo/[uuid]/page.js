@@ -13,7 +13,7 @@ const getPhotoDetail = cache(async (uuid, locale) => {
   const { data, error } = await supabase
     .from('photos')
     .select(`
-      id, cloudinary_id, available_for_license, created_at,
+      id, cloudinary_id, available_for_license, created_at, width, height,
       photo_translations ( locale, title, location, description, alt_text, behind_lens ),
       photo_moods ( mood ),
       photo_metadata ( camera_body, lens, focal_length, aperture, iso, shutter_speed )
@@ -41,6 +41,8 @@ const getPhotoDetail = cache(async (uuid, locale) => {
     altText: t.alt_text || t.title || '',
     moods: data.photo_moods?.map((m) => m.mood) || [],
     licensed: data.available_for_license ?? false,
+    width: data.width || null,
+    height: data.height || null,
     meta: {
       cameraBody: meta.camera_body || '',
       lens: meta.lens || '',
@@ -170,7 +172,7 @@ export default async function PhotoDetailPage({ params }) {
           <>
             <hr className="border-[#d1d1d1] my-8" />
             <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-5">Get this photo</h2>
-            <AddToBasketButton photo={{ id: photo.id, title: photo.title, image: photo.image }} />
+            <AddToBasketButton photo={{ id: photo.id, title: photo.title, image: photo.image, width: photo.width, height: photo.height }} />
             <p className="text-[10px] text-mid-gray mt-3">Choose your size and pay in the basket</p>
           </>
         )}

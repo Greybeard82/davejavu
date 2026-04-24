@@ -19,7 +19,7 @@ export default function AddToBasketButton({ photo }) {
 
   const handleClick = () => {
     if (inBasket) return;
-    const added = addToBasket({ photoId: photo.id, title: photo.title, image: photo.image });
+    const added = addToBasket({ photoId: photo.id, title: photo.title, image: photo.image, width: photo.width, height: photo.height });
     if (added) {
       setInBasket(true);
       setFlash(true);
