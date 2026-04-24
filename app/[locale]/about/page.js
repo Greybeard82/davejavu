@@ -73,7 +73,7 @@ function AboutContent({ locale, photos }) {
           src="https://res.cloudinary.com/graybeard/image/upload/v1777031393/IMG_8681_2_rccnpa.jpg"
           alt=""
           fill
-          className="object-cover opacity-10" style={{ objectPosition: '25% 25%' }}
+          className="object-cover opacity-10" style={{ objectPosition: '95% 20%' }}
           priority
         />
       </div>
