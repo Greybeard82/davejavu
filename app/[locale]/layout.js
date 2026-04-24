@@ -33,11 +33,13 @@ export default async function LocaleLayout({ children, params }) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <Navbar locale={locale} collections={collections} />
-      <main>
-        {children}
-      </main>
-      <Footer locale={locale} />
+      <div className="flex flex-col min-h-screen">
+        <Navbar locale={locale} collections={collections} />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer locale={locale} />
+      </div>
     </NextIntlClientProvider>
   );
 }
