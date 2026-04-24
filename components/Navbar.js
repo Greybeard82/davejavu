@@ -60,7 +60,7 @@ export default function Navbar({ locale, collections = [] }) {
         <div className="max-w-[1800px] mx-auto px-6 h-full flex items-center">
 
           <nav className="hidden md:flex items-center gap-8 flex-1">
-            <Link href={link('/')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">
+            <Link href={link('/')} className={`text-xs font-400 uppercase tracking-widest transition-colors hover:text-orange ${pathWithoutLocale === '/' ? 'text-orange' : 'text-charcoal'}`}>
               {t('portfolio')}
             </Link>
 
@@ -91,9 +91,9 @@ export default function Navbar({ locale, collections = [] }) {
               )}
             </div>
 
-            <Link href={link('/about')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('about')}</Link>
-            <Link href={link('/pricing')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('pricing')}</Link>
-            <Link href={link('/contact')} className="text-xs font-400 uppercase tracking-widest text-charcoal hover:text-orange transition-colors">{t('contact')}</Link>
+            <Link href={link('/about')} className={`text-xs font-400 uppercase tracking-widest transition-colors hover:text-orange ${pathWithoutLocale === '/about' ? 'text-orange' : 'text-charcoal'}`}>{t('about')}</Link>
+            <Link href={link('/pricing')} className={`text-xs font-400 uppercase tracking-widest transition-colors hover:text-orange ${pathWithoutLocale === '/pricing' ? 'text-orange' : 'text-charcoal'}`}>{t('pricing')}</Link>
+            <Link href={link('/contact')} className={`text-xs font-400 uppercase tracking-widest transition-colors hover:text-orange ${pathWithoutLocale === '/contact' ? 'text-orange' : 'text-charcoal'}`}>{t('contact')}</Link>
           </nav>
 
           <Link href={link('/')} className="flex items-center shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2">
@@ -204,7 +204,7 @@ export default function Navbar({ locale, collections = [] }) {
                 key={href}
                 href={link(href)}
                 onClick={() => setMenuOpen(false)}
-                className="text-xl font-700 uppercase tracking-widest text-charcoal hover:text-orange transition-colors py-1"
+                className={`text-xl font-700 uppercase tracking-widest transition-colors hover:text-orange py-1 ${pathWithoutLocale === href ? 'text-orange' : 'text-charcoal'}`}
               >
                 {label}
               </Link>

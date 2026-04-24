@@ -9,7 +9,7 @@ export default function Footer({ locale }) {
   const link = (path) => `/${locale}${path}`;
 
   return (
-    <footer className="bg-[#f4f3ef] border-t border-[#d1d1d1] mt-24">
+    <footer className="bg-[#f4f3ef] border-t border-[#d1d1d1]">
       <div className="max-w-[1800px] mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="text-center md:text-left">
           <p className="font-700 text-xs uppercase tracking-widest text-charcoal">DAVEJAVU</p>
