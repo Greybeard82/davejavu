@@ -7,7 +7,6 @@ import { decode } from 'blurhash';
 import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 import { getFavorites, saveFavorites } from '@/lib/favorites';
 import { addToBasket, isInBasket } from '@/lib/basket';
-import { getGridUrl } from '@/lib/cloudinary';
 import { useTranslations } from 'next-intl';
 
 function BlurHashPlaceholder({ hash }) {
@@ -51,7 +50,7 @@ function Lightbox({ photo, locale, onClose }) {
   const handleBasket = (e) => {
     e.stopPropagation();
     if (!inBasket) {
-      addToBasket({ photoId: photo.id, title: photo.title, image: getGridUrl(photo.cloudinary_id), width: photo.width, height: photo.height, tier: 'web_small' });
+      addToBasket({ photoId: photo.id, title: photo.title, image: photo.image, width: photo.width, height: photo.height, tier: 'web_small' });
       setInBasket(true);
     }
   };
