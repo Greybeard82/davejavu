@@ -1,7 +1,48 @@
+export const maxDuration = 60; // seconds — needed for image stamp+upload per item
+
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
 import { Resend } from 'resend';
+import sharp from 'sharp';
+
+async function stampAndStore(supabase, { cloudinaryId, tier, orderId, buyerEmail, photoTitle, purchaseDate }) {
+  try {
+    const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const srcUrl = tier === 'full_res'
+      ? `https://res.cloudinary.com/${CLOUD}/image/upload/${cloudinaryId}`
+      : `https://res.cloudinary.com/${CLOUD}/image/upload/w_2000,c_limit/${cloudinaryId}`;
+
+    const res = await fetch(srcUrl);
+    if (!res.ok) throw new Error(`Cloudinary fetch failed: ${res.status}`);
+    const buffer = Buffer.from(await res.arrayBuffer());
+
+    const stamped = await sharp(buffer)
+      .withMetadata({
+        exif: {
+          IFD0: {
+            Copyright: `© ${new Date(purchaseDate).getFullYear()} David Martins / DAVEJAVU — davejavuphoto.com`,
+            Artist: 'David Martins / DAVEJAVU',
+            ImageDescription: `Licensed to: ${buyerEmail} | Order: ${orderId} | Personal use only`,
+            Software: 'DAVEJAVU',
+          },
+        },
+      })
+      .jpeg({ quality: 95 })
+      .toBuffer();
+
+    const storagePath = `stamped/${orderId}_${tier}.jpg`;
+    const { error } = await supabase.storage.from('photos').upload(storagePath, stamped, {
+      contentType: 'image/jpeg',
+      upsert: true,
+    });
+    if (error) throw new Error(error.message);
+    return storagePath;
+  } catch (err) {
+    console.error('stampAndStore failed (non-fatal):', err.message);
+    return null;
+  }
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -68,7 +109,7 @@ export async function POST(request) {
       console.log('processing item', JSON.stringify(item));
       const { data: photo, error: photoErr } = await supabase
         .from('photos')
-        .select('id, photo_translations(locale, title)')
+        .select('id, cloudinary_id, photo_translations(locale, title)')
         .eq('id', item.photoId)
         .single();
       console.log('photo lookup result', photo, photoErr);
@@ -92,6 +133,19 @@ export async function POST(request) {
       }).select().single();
 
       if (purchaseErr) { console.error('purchase insert error', JSON.stringify(purchaseErr)); continue; }
+
+      // Stamp EXIF metadata and store in Supabase — non-blocking best-effort
+      const stamped = await stampAndStore(supabase, {
+        cloudinaryId: photo.cloudinary_id,
+        tier: item.tier,
+        orderId,
+        buyerEmail,
+        photoTitle,
+        purchaseDate,
+      });
+      if (stamped) {
+        await supabase.from('purchases').update({ exif_stamped: true }).eq('id', purchase.id);
+      }
 
       const { data: tokenRow, error: tokenErr } = await supabase.from('download_tokens').insert({
         purchase_id: purchase.id,
