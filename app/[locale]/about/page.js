@@ -57,7 +57,7 @@ function AboutContent({ locale, photos }) {
 
         {/* Story */}
         <section className="grid md:grid-cols-[160px_1fr] gap-8 md:gap-16">
-          <h2 className="text-[10px] uppercase tracking-[4px] text-mid-gray pt-1">{t('storyHeading')}</h2>
+          <h2 className="text-xl font-700 text-charcoal">{t('storyHeading')}</h2>
           <p className="text-lg md:text-xl text-charcoal leading-relaxed font-400">
             {t('storyBody')}
           </p>
@@ -67,8 +67,8 @@ function AboutContent({ locale, photos }) {
 
         {/* Philosophy */}
         <section className="grid md:grid-cols-[160px_1fr] gap-8 md:gap-16">
-          <h2 className="text-[10px] uppercase tracking-[4px] text-mid-gray pt-1">{t('philosophyHeading')}</h2>
-          <p className="text-base text-charcoal leading-relaxed">
+          <h2 className="text-xl font-700 text-charcoal">{t('philosophyHeading')}</h2>
+          <p className="text-lg md:text-xl text-charcoal leading-relaxed font-400">
             {t('philosophyBody')}
           </p>
         </section>
@@ -78,7 +78,7 @@ function AboutContent({ locale, photos }) {
           <>
             <div className="h-px bg-[#e8e8e8]" />
             <section>
-              <h2 className="text-[10px] uppercase tracking-[4px] text-mid-gray mb-8">{t('signaturesHeading')}</h2>
+              <h2 className="text-xl font-700 text-charcoal mb-8">{t('signaturesHeading')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {photos.map((photo) => (
                   <Link
@@ -103,8 +103,8 @@ function AboutContent({ locale, photos }) {
 
         {/* Gear / process */}
         <section className="grid md:grid-cols-[160px_1fr] gap-8 md:gap-16">
-          <h2 className="text-[10px] uppercase tracking-[4px] text-mid-gray pt-1">{t('gearHeading')}</h2>
-          <p className="text-base text-charcoal leading-relaxed">
+          <h2 className="text-xl font-700 text-charcoal">{t('gearHeading')}</h2>
+          <p className="text-lg md:text-xl text-charcoal leading-relaxed font-400">
             {t('gearBody')}
           </p>
         </section>
