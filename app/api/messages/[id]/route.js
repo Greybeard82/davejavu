@@ -10,8 +10,12 @@ export async function PATCH(request, { params }) {
   if (deny) return deny;
   const { id } = await params;
   const body = await request.json();
+  const allowed = ['read', 'replied'];
+  const update = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
+  if (Object.keys(update).length === 0)
+    return NextResponse.json({ error: 'No valid fields' }, { status: 400 });
   const supabase = createAdminClient();
-  const { error } = await supabase.from('messages').update(body).eq('id', id);
+  const { error } = await supabase.from('messages').update(update).eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

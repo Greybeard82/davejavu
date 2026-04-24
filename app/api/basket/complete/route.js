@@ -4,6 +4,7 @@ import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export async function POST(request) {
   try {
@@ -116,8 +117,8 @@ export async function POST(request) {
     const linkRows = links.map((l) => `
       <tr>
         <td style="padding:12px 0;border-bottom:1px solid #e8e8e8">
-          <p style="margin:0 0 4px;font-weight:700;font-size:14px;color:#1a1a1a">${l.title}</p>
-          <p style="margin:0;font-size:12px;color:#888">${l.tier} · €${l.price}</p>
+          <p style="margin:0 0 4px;font-weight:700;font-size:14px;color:#1a1a1a">${esc(l.title)}</p>
+          <p style="margin:0;font-size:12px;color:#888">${esc(l.tier)} · €${esc(l.price)}</p>
         </td>
         <td style="padding:12px 0 12px 16px;border-bottom:1px solid #e8e8e8;white-space:nowrap">
           <a href="${l.url}" style="background:#1a1a1a;color:#fff;text-decoration:none;padding:8px 16px;font-size:12px;font-weight:600">Download</a>
@@ -131,7 +132,7 @@ export async function POST(request) {
       subject: 'Your DAVEJAVU downloads are ready',
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;padding:32px 0">
-          <h2 style="font-size:22px;margin-bottom:8px">Thanks for buying, ${buyerName || 'friend'}!</h2>
+          <h2 style="font-size:22px;margin-bottom:8px">Thanks for buying, ${esc(buyerName || 'friend')}!</h2>
           <p style="color:#555;margin-bottom:24px">Your download links are valid for <strong>14 days</strong>.</p>
           <table style="width:100%;border-collapse:collapse">${linkRows}</table>
           <p style="color:#555;font-size:13px;line-height:1.6;margin-top:24px">

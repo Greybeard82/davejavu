@@ -15,8 +15,21 @@ export async function POST(request) {
         return NextResponse.json({ error: `Invalid item: ${item.photoId}` }, { status: 400 });
     }
 
-    // Store basket in Supabase to survive the PayPal redirect
+    // Verify all photos exist, are published and available for license
     const supabase = createAdminClient();
+    const photoIds = items.map((i) => i.photoId);
+    const { data: photos } = await supabase
+      .from('photos')
+      .select('id, published, available_for_license')
+      .in('id', photoIds);
+
+    for (const item of items) {
+      const photo = photos?.find((p) => p.id === item.photoId);
+      if (!photo || !photo.published || !photo.available_for_license)
+        return NextResponse.json({ error: `Photo not available: ${item.photoId}` }, { status: 400 });
+    }
+
+    // Store basket in Supabase to survive the PayPal redirect
     const { data: basket, error: basketErr } = await supabase
       .from('baskets')
       .insert({ items, status: 'pending' })
