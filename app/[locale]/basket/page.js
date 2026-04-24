@@ -15,7 +15,7 @@ function printSize(width, height) {
   const short = Math.min(width, height);
   const cmW = Math.floor(long / 300 * 2.54 * 10) / 10;
   const cmH = Math.floor(short / 300 * 2.54 * 10) / 10;
-  return `Up to ${cmW} × ${cmH} cm at print quality`;
+  return `${width} × ${height} px — up to ${cmW} × ${cmH} cm at print quality`;
 }
 const PAYPAL_INIT = { clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID, currency: 'EUR' };
 
