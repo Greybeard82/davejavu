@@ -41,13 +41,13 @@ function AboutContent({ locale, photos }) {
   return (
     <div className="pt-[72px]">
 
-      {/* Hero — replace the gradient div with your own photo once ready */}
-      <div className="relative w-full overflow-hidden" style={{ height: 'min(80vh, 680px)' }}>
+      {/* Hero — desktop only */}
+      <div className="relative w-full overflow-hidden hidden md:block" style={{ height: 'min(80vh, 680px)' }}>
         <Image
           src="https://res.cloudinary.com/graybeard/image/upload/v1777031393/IMG_8681_2_rccnpa.jpg"
           alt={t('heroAlt')}
           fill
-          className="object-cover object-center"
+          className="object-cover object-top"
           priority
         />
         <div className="absolute inset-0 bg-black/40" />
@@ -59,6 +59,23 @@ function AboutContent({ locale, photos }) {
             </h1>
           </div>
         </div>
+      </div>
+
+      {/* Mobile: page title */}
+      <div className="md:hidden px-6 pt-10 pb-2">
+        <p className="text-[10px] uppercase tracking-[4px] text-mid-gray mb-2">DAVEJAVU</p>
+        <h1 className="text-4xl font-700 text-charcoal tracking-tight">{t('title')}</h1>
+      </div>
+
+      {/* Mobile background photo — very low opacity, fixed behind content */}
+      <div className="md:hidden fixed inset-0 -z-10 pointer-events-none">
+        <Image
+          src="https://res.cloudinary.com/graybeard/image/upload/v1777031393/IMG_8681_2_rccnpa.jpg"
+          alt=""
+          fill
+          className="object-cover object-top opacity-10"
+          priority
+        />
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-20 flex flex-col gap-20">
