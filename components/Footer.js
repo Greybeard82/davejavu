@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function Footer({ locale }) {
+  const t = useTranslations('footer');
   const year = new Date().getFullYear();
   const link = (path) => `/${locale}${path}`;
 
@@ -9,7 +13,7 @@ export default function Footer({ locale }) {
       <div className="max-w-[1800px] mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="text-center md:text-left">
           <p className="font-700 text-xs uppercase tracking-widest text-charcoal">DAVEJAVU</p>
-          <p className="text-xs text-mid-gray mt-1 tracking-wide">Landscape & Cityscape Photography</p>
+          <p className="text-xs text-mid-gray mt-1 tracking-wide">{t('tagline')}</p>
         </div>
 
         <div className="flex items-center gap-6 text-xs uppercase tracking-widest">
@@ -21,16 +25,16 @@ export default function Footer({ locale }) {
           >
             Instagram
           </a>
-          <Link href={link('/privacy')} className="text-charcoal hover:text-orange transition-colors">
-            Privacy
+          <Link href={link('/license')} className="text-charcoal hover:text-orange transition-colors">
+            {t('terms')}
           </Link>
           <Link href={link('/contact')} className="text-charcoal hover:text-orange transition-colors">
-            Contact
+            {t('contact')}
           </Link>
         </div>
 
         <p className="text-xs text-mid-gray tracking-wide">
-          © {year} DAVEJAVU. All rights reserved.
+          © {year} DAVEJAVU. {t('rights')}
         </p>
       </div>
     </footer>

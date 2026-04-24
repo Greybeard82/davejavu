@@ -144,10 +144,10 @@
     "reject": "Reject"
   },
   "footer": {
+    "terms": "Terms",
+    "contact": "Contact",
     "tagline": "Landscape & Cityscape Photography",
-    "copyright": "© {year} DAVEJAVU. All rights reserved.",
-    "instagram": "Instagram",
-    "privacy": "Privacy Policy"
+    "rights": "All rights reserved."
   },
   "lightbox": {
     "close": "Close",

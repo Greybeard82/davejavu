@@ -144,10 +144,10 @@
     "reject": "Refuser"
   },
   "footer": {
+    "terms": "Conditions",
+    "contact": "Contact",
     "tagline": "Photographie de paysages et de villes",
-    "copyright": "© {year} DAVEJAVU. Tous droits réservés.",
-    "instagram": "Instagram",
-    "privacy": "Politique de confidentialité"
+    "rights": "Tous droits réservés."
   },
   "lightbox": {
     "close": "Fermer",

@@ -144,10 +144,10 @@
     "reject": "Ablehnen"
   },
   "footer": {
-    "tagline": "Landschafts- & Stadtfotografie",
-    "copyright": "© {year} DAVEJAVU. Alle Rechte vorbehalten.",
-    "instagram": "Instagram",
-    "privacy": "Datenschutzrichtlinie"
+    "terms": "Bedingungen",
+    "contact": "Kontakt",
+    "tagline": "Landschafts- und Stadtfotografie",
+    "rights": "Alle Rechte vorbehalten."
   },
   "lightbox": {
     "close": "Schließen",
