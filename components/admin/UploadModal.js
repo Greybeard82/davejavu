@@ -117,16 +117,54 @@ export default function UploadModal({ onClose, onSuccess }) {
 
   // ── Upload + AI pipeline ──────────────────────────────────────
   const processItem = async (item) => {
-    // 1. Upload
+    // 1. Get upload credentials from server
     updateItem(item.id, { status: 'uploading', error: null });
     let uploadResult;
     try {
-      const formData = new FormData();
-      formData.append('file', item.file);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
-      uploadResult = data;
+      // 1a. Init — get Cloudinary signature + Supabase signed URL
+      const initRes = await fetch('/api/upload-init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: item.file.name, contentType: item.file.type, size: item.file.size }),
+      });
+      const initData = await initRes.json();
+      if (!initRes.ok) throw new Error(initData.error || 'Failed to initialise upload');
+
+      const { photoId, storagePath, supabaseUploadUrl, cloudinary: cld } = initData;
+
+      // 1b. Upload display copy directly to Cloudinary from the browser
+      const cldForm = new FormData();
+      cldForm.append('file', item.file);
+      cldForm.append('api_key', cld.apiKey);
+      cldForm.append('timestamp', String(cld.timestamp));
+      cldForm.append('signature', cld.signature);
+      cldForm.append('public_id', cld.publicId);
+      cldForm.append('transformation', 'c_limit,w_1920,h_1920,q_65,f_jpg');
+
+      const cldRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${cld.cloudName}/image/upload`,
+        { method: 'POST', body: cldForm },
+      );
+      const cldData = await cldRes.json();
+      if (!cldRes.ok) throw new Error(cldData.error?.message || 'Cloudinary upload failed');
+
+      // 1c. Upload master copy directly to Supabase Storage from the browser
+      const storageRes = await fetch(supabaseUploadUrl, {
+        method: 'PUT',
+        body: item.file,
+        headers: { 'Content-Type': item.file.type },
+      });
+      if (!storageRes.ok) throw new Error('Master storage upload failed');
+
+      uploadResult = {
+        photoId,
+        cloudinaryId: cldData.public_id,
+        storagePath,
+        displayUrl: cldData.secure_url,
+        tags: cldData.tags || [],
+        width: cldData.width,
+        height: cldData.height,
+      };
       updateItem(item.id, { uploadResult });
     } catch (err) {
       updateItem(item.id, { status: 'error', error: err.message });
