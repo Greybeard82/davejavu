@@ -139,7 +139,7 @@ export default function UploadModal({ onClose, onSuccess }) {
       cldForm.append('timestamp', String(cld.timestamp));
       cldForm.append('signature', cld.signature);
       cldForm.append('public_id', cld.publicId);
-      cldForm.append('transformation', 'c_limit,w_1920,h_1920,q_65,f_jpg');
+      cldForm.append('transformation', cld.transformation);
 
       const cldRes = await fetch(
         `https://api.cloudinary.com/v1_1/${cld.cloudName}/image/upload`,

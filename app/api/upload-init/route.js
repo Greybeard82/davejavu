@@ -35,8 +35,9 @@ export async function POST(request) {
     // Cloudinary signed upload params
     const timestamp = Math.round(Date.now() / 1000);
     const cloudinaryPublicId = `davejavu/display/${photoId}`;
+    const transformation = 'c_limit,w_1920,h_1920,q_65,f_jpg';
     const signature = cloudinary.utils.api_sign_request(
-      { timestamp, public_id: cloudinaryPublicId },
+      { timestamp, public_id: cloudinaryPublicId, transformation },
       process.env.CLOUDINARY_API_SECRET,
     );
 
@@ -56,6 +57,7 @@ export async function POST(request) {
         signature,
         timestamp,
         publicId: cloudinaryPublicId,
+        transformation,
         apiKey: process.env.CLOUDINARY_API_KEY,
         cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
       },
