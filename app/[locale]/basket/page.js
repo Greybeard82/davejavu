@@ -16,6 +16,7 @@ export default function BasketPage() {
   const router = useRouter();
   const [items, setItems] = useState([]);
   const [error, setError] = useState('');
+  const [agreed, setAgreed] = useState(false);
 
   useEffect(() => { setItems(getBasket()); }, []);
 
@@ -132,15 +133,30 @@ export default function BasketPage() {
 
           {error && <p className="text-xs text-red-500 mb-4">{error}</p>}
 
+          <label className="flex items-start gap-2 mb-5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 accent-orange shrink-0"
+            />
+            <span className="text-[11px] text-mid-gray leading-relaxed">
+              {t('agreeTerms')}{' '}
+              <Link href={`/${locale}/license`} target="_blank" className="underline hover:text-orange transition-colors">
+                {t('viewTerms')}
+              </Link>
+            </span>
+          </label>
+
           <PayPalScriptProvider options={PAYPAL_INIT}>
-            <PayPalButtons
+            {agreed && <PayPalButtons
               key={`${items.map(i => i.photoId + i.tier).join('-')}`}
               forceReRender={[items, total]}
               style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', height: 44 }}
               createOrder={createOrder}
               onApprove={onApprove}
               onError={(err) => setError(err.message || 'PayPal error')}
-            />
+            />}
           </PayPalScriptProvider>
 
           <p className="text-[10px] text-mid-gray text-center mt-4 leading-relaxed">

@@ -14,6 +14,7 @@ const PAYPAL_INIT = { clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID, curren
 
 function PayPalModal({ photo, tier, locale, onClose, onSuccess, onError }) {
   const t = useTranslations('buy');
+  const [agreed, setAgreed] = useState(false);
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -35,6 +36,22 @@ function PayPalModal({ photo, tier, locale, onClose, onSuccess, onError }) {
         <h2 className="font-display text-xl text-charcoal mb-1">{tier.label}</h2>
         <p className="text-xs text-mid-gray mb-6">{tier.size} · <strong className="text-orange">€{tier.price}</strong></p>
 
+        <label className="flex items-start gap-2 mb-5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 accent-orange shrink-0"
+          />
+          <span className="text-[11px] text-mid-gray leading-relaxed">
+            {t('agreeTerms')}{' '}
+            <Link href={`/${locale}/license`} target="_blank" className="underline hover:text-orange transition-colors">
+              {t('licenseTerms')}
+            </Link>
+          </span>
+        </label>
+
+        {agreed && (
         <PayPalButtons
           style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', height: 44 }}
           createOrder={async () => {
@@ -65,6 +82,7 @@ function PayPalModal({ photo, tier, locale, onClose, onSuccess, onError }) {
             onError(t('paypalError'));
           }}
         />
+        )}
 
         <p className="text-[10px] text-mid-gray text-center mt-4">
           Personal use only.{' '}

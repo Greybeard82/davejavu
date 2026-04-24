@@ -170,7 +170,8 @@
     "paymentConfirmedDesc": "Vérifiez votre boîte mail — votre lien de téléchargement arrivera dans un instant.",
     "licenseTerms": "Conditions de licence",
     "commercialCta": "Usage commercial ? Contactez-moi.",
-    "paypalError": "PayPal a rencontré une erreur. Veuillez réessayer."
+    "paypalError": "PayPal a rencontré une erreur. Veuillez réessayer.",
+    "agreeTerms": "J'ai lu et j'accepte les conditions de licence et renonce à mon droit de rétractation pour cet achat numérique."
   },
   "license": {
     "title": "Conditions de Licence",
@@ -187,7 +188,9 @@
     "total": "Total",
     "emailNote": "Liens de téléchargement envoyés par e-mail · valables 14 jours",
     "smallLabel": "Petit  ·  2000px  ·  €19",
-    "fullResLabel": "Pleine résolution  ·  Native  ·  €49"
+    "fullResLabel": "Pleine résolution  ·  Native  ·  €49",
+    "agreeTerms": "J'ai lu et j'accepte les conditions de licence et renonce à mon droit de rétractation pour cet achat numérique.",
+    "viewTerms": "Voir les conditions complètes"
   },
   "thankYou": {
     "title": "Paiement confirmé",
