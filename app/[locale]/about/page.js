@@ -42,7 +42,14 @@ function AboutContent({ locale, photos }) {
 
       {/* Hero — replace the gradient div with your own photo once ready */}
       <div className="relative w-full overflow-hidden" style={{ height: 'min(80vh, 680px)' }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] via-[#1a1a1a] to-[#0d0d0d]" />
+        <Image
+          src="https://res.cloudinary.com/graybeard/image/upload/v1777031393/IMG_8681_2_rccnpa.jpg"
+          alt={t('heroAlt')}
+          fill
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 flex items-end justify-start p-10 md:p-16 z-10">
           <div className="text-white">
             <p className="text-[10px] uppercase tracking-[4px] text-white/50 mb-3">DAVEJAVU</p>
