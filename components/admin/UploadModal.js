@@ -4,6 +4,32 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 
 const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
+
+// Resize image to max 1920px on longest side and re-encode as JPEG before upload.
+// Keeps file well under Cloudinary's free-plan 10 MB limit regardless of source size.
+async function compressForUpload(file, maxPx = 1920, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(
+        (blob) => blob ? resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' })) : reject(new Error('Canvas compression failed')),
+        'image/jpeg',
+        quality,
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not load image')); };
+    img.src = url;
+  });
+}
 const LOCALE_LABELS = { en: 'English', pt: 'Português', es: 'Español', fr: 'Français', it: 'Italiano', de: 'Deutsch' };
 
 const emptyTranslation = () => ({ title: '', description: '', alt_text: '', behind_lens: '', location: '' });
@@ -132,9 +158,12 @@ export default function UploadModal({ onClose, onSuccess }) {
 
       const { photoId, storagePath, supabaseUploadUrl, cloudinary: cld } = initData;
 
-      // 1b. Upload display copy directly to Cloudinary from the browser
+      // 1b. Compress to ≤1920px JPEG so it fits within Cloudinary's free-plan 10 MB limit
+      const compressed = await compressForUpload(item.file);
+
+      // 1c. Upload display copy directly to Cloudinary from the browser
       const cldForm = new FormData();
-      cldForm.append('file', item.file);
+      cldForm.append('file', compressed);
       cldForm.append('api_key', cld.apiKey);
       cldForm.append('timestamp', String(cld.timestamp));
       cldForm.append('signature', cld.signature);
@@ -148,7 +177,7 @@ export default function UploadModal({ onClose, onSuccess }) {
       const cldData = await cldRes.json();
       if (!cldRes.ok) throw new Error(cldData.error?.message || 'Cloudinary upload failed');
 
-      // 1c. Upload master copy directly to Supabase Storage from the browser
+      // 1d. Upload original master copy directly to Supabase Storage from the browser
       const storageRes = await fetch(supabaseUploadUrl, {
         method: 'PUT',
         body: item.file,
