@@ -165,7 +165,7 @@ export default async function PhotoDetailPage({ params }) {
 
         {/* Wall mockup */}
         <hr className="border-[#d1d1d1] my-8" />
-        <WallMockup src={photo.image} title={photo.title} />
+        <WallMockup src={photo.image} title={photo.title} locale={locale} />
 
         {/* Buy section */}
         {photo.licensed && (

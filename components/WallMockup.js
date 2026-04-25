@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 const WALLS = [
   { key: 'warm',  label: 'Warm White', bg: '#f0ede8', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px),repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(0,0,0,0.008) 2px,rgba(0,0,0,0.008) 4px)' },
@@ -14,7 +16,10 @@ const SIZES = [
   { key: 'lg', label: 'A2',  desc: '42×60 cm', width: '48%' },
 ];
 
-export default function WallMockup({ src, title }) {
+const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
+
+export default function WallMockup({ src, title, locale }) {
+  const t = useTranslations('photo');
   const [open, setOpen] = useState(false);
   const [wall, setWall] = useState('warm');
   const [size, setSize] = useState('md');
@@ -37,7 +42,7 @@ export default function WallMockup({ src, title }) {
           <rect x="2" y="3" width="20" height="14" rx="1"/>
           <path d="M8 21h8M12 17v4"/>
         </svg>
-        See it on your wall
+        {t('wallMockup')}
       </button>
 
       {/* Full-screen mockup */}
@@ -46,9 +51,9 @@ export default function WallMockup({ src, title }) {
           className="fixed inset-0 z-[100] flex flex-col"
           style={{ background: currentWall.bg, backgroundImage: currentWall.texture }}
         >
-          {/* Controls bar — solid background so it's always visible */}
+          {/* Controls bar */}
           <div
-            className="flex items-center justify-between gap-6 px-6 py-4 flex-wrap shrink-0"
+            className="flex items-center justify-between gap-4 px-6 py-4 flex-wrap shrink-0"
             style={{ background: isDark ? '#1a1a1a' : '#ffffff', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}
           >
             {/* Photo title */}
@@ -56,7 +61,7 @@ export default function WallMockup({ src, title }) {
               {title}
             </span>
 
-            <div className="flex items-center gap-8 flex-wrap">
+            <div className="flex items-center gap-6 flex-wrap">
               {/* Wall swatches */}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Wall</span>
@@ -94,6 +99,27 @@ export default function WallMockup({ src, title }) {
                   </button>
                 ))}
               </div>
+
+              {/* Language switcher */}
+              {locale && (
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Lang</span>
+                  {LOCALES.map((l) => (
+                    <Link
+                      key={l}
+                      href={`/${l}${typeof window !== 'undefined' ? window.location.pathname.replace(/^\/[a-z]{2}/, '') : ''}`}
+                      className="px-2 py-1 text-[10px] uppercase tracking-widest transition-colors"
+                      style={{
+                        background: locale === l ? '#F07E2F' : 'transparent',
+                        color: locale === l ? '#ffffff' : mutedColor,
+                        border: `1px solid ${locale === l ? '#F07E2F' : isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'}`,
+                      }}
+                    >
+                      {l}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Close button */}
@@ -115,8 +141,6 @@ export default function WallMockup({ src, title }) {
           {/* Wall scene */}
           <div className="flex-1 flex items-center justify-center overflow-hidden px-8">
             <div className="flex flex-col items-center" style={{ width: currentSize.width, minWidth: '200px', maxWidth: '90vw' }}>
-
-              {/* Framed photo */}
               <div
                 style={{
                   width: '100%',
@@ -127,7 +151,6 @@ export default function WallMockup({ src, title }) {
                     : '0 30px 80px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.15)',
                 }}
               >
-                {/* White mat */}
                 <div style={{ background: '#faf9f7', padding: '8%' }}>
                   <img
                     src={src}
@@ -138,8 +161,6 @@ export default function WallMockup({ src, title }) {
                   />
                 </div>
               </div>
-
-              {/* Size label */}
               <p className="mt-5 text-[10px] uppercase tracking-[3px]" style={{ color: mutedColor }}>
                 {currentSize.desc} print
               </p>
