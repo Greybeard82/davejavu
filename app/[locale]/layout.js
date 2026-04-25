@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createAdminClient } from '@/lib/supabase-admin';
@@ -26,6 +26,7 @@ async function getPublishedCollections(locale) {
 
 export default async function LocaleLayout({ children, params }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const [messages, collections] = await Promise.all([
     getMessages({ locale }),
     getPublishedCollections(locale),
