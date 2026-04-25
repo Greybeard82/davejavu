@@ -11,6 +11,25 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Fetch full photo detail for edit modal
+export async function GET(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
+  const { id } = await params;
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from('photos')
+    .select(`
+      id, cloudinary_id,
+      photo_translations ( locale, title, description, alt_text, behind_lens, location ),
+      photo_metadata ( camera_body, lens, focal_length, aperture, iso, shutter_speed )
+    `)
+    .eq('id', id)
+    .single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
 // Toggle published / featured / available_for_license
 export async function PATCH(request, { params }) {
   const deny = await requireAdmin(request);
@@ -48,6 +67,45 @@ export async function PATCH(request, { params }) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+// Save full edits from edit modal
+export async function PUT(request, { params }) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
+  const { id } = await params;
+  const { translations, camera } = await request.json();
+  const supabase = createAdminClient();
+
+  // Upsert all translation locales
+  const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
+  for (const locale of LOCALES) {
+    const t = translations?.[locale];
+    if (!t?.title?.trim()) continue;
+    await supabase.from('photo_translations').upsert({
+      photo_id: id, locale,
+      title: t.title.trim(),
+      description: t.description?.trim() || null,
+      alt_text: t.alt_text?.trim() || null,
+      behind_lens: t.behind_lens?.trim() || null,
+      location: t.location?.trim() || null,
+    }, { onConflict: 'photo_id,locale', ignoreDuplicates: false });
+  }
+
+  // Upsert camera metadata
+  if (camera) {
+    await supabase.from('photo_metadata').upsert({
+      photo_id: id,
+      camera_body: camera.camera_body?.trim() || null,
+      lens: camera.lens?.trim() || null,
+      focal_length: camera.focal_length?.trim() || null,
+      aperture: camera.aperture?.trim() || null,
+      iso: camera.iso ? parseInt(camera.iso) : null,
+      shutter_speed: camera.shutter_speed?.trim() || null,
+    }, { onConflict: 'photo_id', ignoreDuplicates: false });
+  }
+
+  return NextResponse.json({ ok: true });
 }
 
 // Delete photo — removes from Cloudinary + Supabase Storage + DB

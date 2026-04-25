@@ -63,10 +63,156 @@ function MoodsModal({ photo, onClose, onSaved }) {
   );
 }
 
+const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
+const LOCALE_LABELS = { en: 'English', pt: 'Português', es: 'Español', fr: 'Français', it: 'Italiano', de: 'Deutsch' };
+const emptyT = () => ({ title: '', description: '', alt_text: '', behind_lens: '', location: '' });
+const emptyCamera = () => ({ camera_body: '', lens: '', focal_length: '', aperture: '', iso: '', shutter_speed: '' });
+
+function EditModal({ photoId, onClose, onSaved }) {
+  const [activeLocale, setActiveLocale] = useState('en');
+  const [translations, setTranslations] = useState(() => Object.fromEntries(LOCALES.map(l => [l, emptyT()])));
+  const [camera, setCamera] = useState(emptyCamera());
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/photos/${photoId}`).then(r => r.json()).then(data => {
+      const t = Object.fromEntries(LOCALES.map(l => [l, emptyT()]));
+      (data.photo_translations || []).forEach(row => {
+        if (t[row.locale]) t[row.locale] = {
+          title: row.title || '',
+          description: row.description || '',
+          alt_text: row.alt_text || '',
+          behind_lens: row.behind_lens || '',
+          location: row.location || '',
+        };
+      });
+      setTranslations(t);
+      const meta = data.photo_metadata?.[0];
+      if (meta) setCamera({
+        camera_body: meta.camera_body || '',
+        lens: meta.lens || '',
+        focal_length: meta.focal_length || '',
+        aperture: meta.aperture || '',
+        iso: meta.iso ? String(meta.iso) : '',
+        shutter_speed: meta.shutter_speed || '',
+      });
+      setLoading(false);
+    });
+  }, [photoId]);
+
+  const setField = (locale, field, value) =>
+    setTranslations(prev => ({ ...prev, [locale]: { ...prev[locale], [field]: value } }));
+
+  const save = async () => {
+    setSaving(true);
+    await fetch(`/api/photos/${photoId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ translations, camera }),
+    });
+    setSaving(false);
+    onSaved();
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/60" />
+      <div className="relative bg-[#FAF9F6] rounded shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 bg-[#FAF9F6] border-b border-[#e8e8e8] px-6 py-4 flex items-center justify-between">
+          <h3 className="text-sm font-700 text-charcoal">Edit Photo</h3>
+          <button onClick={onClose} className="text-mid-gray hover:text-charcoal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="p-10 text-center text-mid-gray text-sm">Loading…</div>
+        ) : (
+          <div className="p-6 flex flex-col gap-6">
+            {/* Locale tabs */}
+            <div className="flex gap-1 flex-wrap">
+              {LOCALES.map(l => (
+                <button key={l} onClick={() => setActiveLocale(l)}
+                  className={`text-[10px] uppercase tracking-widest px-3 py-1.5 rounded font-600 transition-colors ${activeLocale === l ? 'bg-orange text-white' : 'bg-[#f4f3ef] text-charcoal hover:bg-orange/10'}`}>
+                  {LOCALE_LABELS[l]}
+                </button>
+              ))}
+            </div>
+
+            {/* Translation fields */}
+            {[
+              { field: 'title', label: 'Title', rows: 1 },
+              { field: 'location', label: 'Location', rows: 1 },
+              { field: 'description', label: 'Description (SEO)', rows: 2 },
+              { field: 'alt_text', label: 'Alt text', rows: 2 },
+              { field: 'behind_lens', label: 'Behind the lens', rows: 4 },
+            ].map(({ field, label, rows }) => (
+              <div key={field}>
+                <label className="block text-[10px] uppercase tracking-widest text-mid-gray mb-1">{label}</label>
+                {rows === 1 ? (
+                  <input
+                    className="w-full border border-[#d1d1d1] rounded px-3 py-2 text-sm text-charcoal focus:outline-none focus:border-orange"
+                    value={translations[activeLocale][field]}
+                    onChange={e => setField(activeLocale, field, e.target.value)}
+                  />
+                ) : (
+                  <textarea
+                    rows={rows}
+                    className="w-full border border-[#d1d1d1] rounded px-3 py-2 text-sm text-charcoal focus:outline-none focus:border-orange resize-y"
+                    value={translations[activeLocale][field]}
+                    onChange={e => setField(activeLocale, field, e.target.value)}
+                  />
+                )}
+              </div>
+            ))}
+
+            {/* Camera metadata */}
+            <div>
+              <p className="text-[10px] uppercase tracking-widest text-mid-gray mb-3">Camera Metadata</p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { key: 'camera_body', label: 'Camera body' },
+                  { key: 'lens', label: 'Lens' },
+                  { key: 'focal_length', label: 'Focal length' },
+                  { key: 'aperture', label: 'Aperture' },
+                  { key: 'iso', label: 'ISO' },
+                  { key: 'shutter_speed', label: 'Shutter speed' },
+                ].map(({ key, label }) => (
+                  <div key={key}>
+                    <label className="block text-[10px] text-mid-gray mb-1">{label}</label>
+                    <input
+                      className="w-full border border-[#d1d1d1] rounded px-3 py-2 text-sm text-charcoal focus:outline-none focus:border-orange"
+                      value={camera[key]}
+                      onChange={e => setCamera(prev => ({ ...prev, [key]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <button onClick={onClose} className="flex-1 py-2.5 border border-[#d1d1d1] text-xs uppercase tracking-widest text-mid-gray hover:border-charcoal transition-colors">
+                Cancel
+              </button>
+              <button onClick={save} disabled={saving} className="flex-1 py-2.5 bg-orange text-white text-xs uppercase tracking-widest font-600 hover:bg-orange-dark transition-colors disabled:opacity-50">
+                {saving ? 'Saving…' : 'Save changes'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [showUpload, setShowUpload] = useState(false);
   const [moodsPhoto, setMoodsPhoto] = useState(null);
+  const [editPhoto, setEditPhoto] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, published: 0, drafts: 0 });
@@ -245,17 +391,15 @@ export default function AdminDashboard() {
                       {photo.featured ? '★ Featured' : 'Feature'}
                     </button>
                   </div>
-                  {/* Moods */}
+                  {/* Moods + edit */}
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <p className="text-[9px] text-mid-gray truncate">
                       {(photo.photo_moods || []).map(m => m.mood).join(', ') || 'No moods'}
                     </p>
-                    <button
-                      onClick={() => setMoodsPhoto(photo)}
-                      className="text-[9px] uppercase tracking-wider text-orange hover:underline shrink-0"
-                    >
-                      Edit
-                    </button>
+                    <div className="flex gap-2 shrink-0">
+                      <button onClick={() => setMoodsPhoto(photo)} className="text-[9px] uppercase tracking-wider text-mid-gray hover:text-orange transition-colors">Moods</button>
+                      <button onClick={() => setEditPhoto(photo.id)} className="text-[9px] uppercase tracking-wider text-orange hover:underline">Edit</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -275,6 +419,14 @@ export default function AdminDashboard() {
         <MoodsModal
           photo={moodsPhoto}
           onClose={() => setMoodsPhoto(null)}
+          onSaved={fetchPhotos}
+        />
+      )}
+
+      {editPhoto && (
+        <EditModal
+          photoId={editPhoto}
+          onClose={() => setEditPhoto(null)}
           onSaved={fetchPhotos}
         />
       )}
