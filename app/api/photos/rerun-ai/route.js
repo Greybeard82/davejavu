@@ -14,6 +14,13 @@ export async function POST(request) {
     const { photoId, imageUrl } = await request.json();
     if (!photoId || !imageUrl) return NextResponse.json({ error: 'Missing photoId or imageUrl' }, { status: 400 });
 
+    // Fetch image server-side and send as base64 so Claude can always access it
+    const imgRes = await fetch(imageUrl);
+    if (!imgRes.ok) throw new Error(`Failed to fetch image: ${imgRes.status}`);
+    const imgBuffer = await imgRes.arrayBuffer();
+    const imgBase64 = Buffer.from(imgBuffer).toString('base64');
+    const imgMediaType = imgRes.headers.get('content-type') || 'image/jpeg';
+
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const prompt = `You are an SEO assistant for a landscape and cityscape photography portfolio called DAVEJAVU.
@@ -39,7 +46,7 @@ Rules:
       messages: [{
         role: 'user',
         content: [
-          { type: 'image', source: { type: 'url', url: imageUrl } },
+          { type: 'image', source: { type: 'base64', media_type: imgMediaType, data: imgBase64 } },
           { type: 'text', text: prompt },
         ],
       }],
