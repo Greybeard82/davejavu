@@ -243,8 +243,8 @@ function PhotoCard({ photo, onSelect }) {
           <h3 className="text-white text-lg font-700 leading-tight">{photo.title}</h3>
           <div className="flex flex-wrap gap-1 mt-2">
             {photo.moods.map((mood) => (
-              <span key={mood} className="text-white/70 text-[10px] uppercase tracking-wider border border-white/30 px-2 py-0.5 rounded-full">
-                {mood}
+              <span key={mood_t(mood)} className="text-white/70 text-[10px] uppercase tracking-wider border border-white/30 px-2 py-0.5 rounded-full">
+                {mood_t(mood)}
               </span>
             ))}
           </div>
@@ -283,6 +283,8 @@ function PhotoCard({ photo, onSelect }) {
 
 export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK }) {
   const t = useTranslations('gallery');
+  const tMoods = useTranslations('moods');
+  const mood_t = (mood) => { try { return tMoods(mood); } catch { return mood; } };
   const [activeFilters, setActiveFilters] = useState([]);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
@@ -309,7 +311,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
           <div className="flex flex-wrap gap-2">
             {moods.map((mood) => (
               <button
-                key={mood}
+                key={mood_t(mood)}
                 onClick={() => toggleFilter(mood)}
                 className={`text-[10px] uppercase tracking-widest font-600 px-3 py-1.5 rounded-full border transition-all duration-200 ${
                   activeFilters.includes(mood)
@@ -317,7 +319,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
                     : 'border-[#d1d1d1] text-charcoal hover:border-orange hover:text-orange'
                 }`}
               >
-                {mood}
+                {mood_t(mood)}
               </button>
             ))}
             {activeFilters.length > 0 && (
