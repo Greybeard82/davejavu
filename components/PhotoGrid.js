@@ -7,7 +7,7 @@ import { decode } from 'blurhash';
 import { MOODS as MOODS_FALLBACK } from '@/lib/moods';
 import { getFavorites, saveFavorites } from '@/lib/favorites';
 import { addToBasket, isInBasket } from '@/lib/basket';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useMessages } from 'next-intl';
 
 function BlurHashPlaceholder({ hash }) {
   const canvasRef = useRef(null);
@@ -283,8 +283,8 @@ function PhotoCard({ photo, onSelect }) {
 
 export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK }) {
   const t = useTranslations('gallery');
-  const tMoods = useTranslations('moods');
-  const mood_t = (mood) => { try { return tMoods(mood); } catch { return mood; } };
+  const messages = useMessages();
+  const mood_t = (mood) => messages?.moods?.[mood] || mood;
   const [activeFilters, setActiveFilters] = useState([]);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
