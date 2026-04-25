@@ -74,7 +74,7 @@ export async function DELETE(request, { params }) {
 
     // Delete from Supabase Storage
     if (photo.storage_path) {
-      await supabase.storage.from('photo-masters').remove([photo.storage_path]).catch(console.error);
+      await supabase.storage.from('photos').remove([photo.storage_path]).catch(console.error);
     }
 
     // Delete DB record (cascades to translations, metadata, moods)

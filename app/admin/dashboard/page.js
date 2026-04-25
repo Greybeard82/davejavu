@@ -109,7 +109,12 @@ export default function AdminDashboard() {
 
   const deletePhoto = async (photoId) => {
     if (!confirm('Delete this photo? This cannot be undone.')) return;
-    await fetch(`/api/photos/${photoId}`, { method: 'DELETE' });
+    const res = await fetch(`/api/photos/${photoId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      alert(`Delete failed: ${data.error || res.status}`);
+      return;
+    }
     fetchPhotos();
   };
 
