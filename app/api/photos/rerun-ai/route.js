@@ -23,17 +23,19 @@ Analyse this photo and return ONLY a valid JSON object — no markdown, no pream
   "titles": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
   "descriptions": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
   "alt_text": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "behind_lens": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
   "location": ""
 }
 Rules:
 - Titles: evocative, emotional, under 60 characters, in each language
 - Descriptions: SEO meta description, under 155 characters, in each language
 - Alt text: descriptive for accessibility, in each language
+- behind_lens: 2-3 sentences about the moment, light, or technique — personal and vivid, in each language
 - location: "City, Country" if identifiable, otherwise empty string`;
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1500,
+      max_tokens: 2500,
       messages: [{
         role: 'user',
         content: [
@@ -61,6 +63,7 @@ Rules:
         title,
         description: description || null,
         alt_text: alt_text || null,
+        behind_lens: data.behind_lens?.[locale] || null,
       }, { onConflict: 'photo_id,locale', ignoreDuplicates: false });
     }
 

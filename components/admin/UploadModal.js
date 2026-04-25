@@ -228,6 +228,7 @@ export default function UploadModal({ onClose, onSuccess }) {
             title: data.titles?.[l] || '',
             description: data.descriptions?.[l] || '',
             alt_text: data.alt_text?.[l] || '',
+            behind_lens: data.behind_lens?.[l] || '',
             location: data.location || '',
           };
         });
