@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/admin-guard';
 
-const LOCALES = ['en', 'pt', 'es', 'fr', 'it', 'de'];
+const LOCALES = ['pt', 'es', 'fr', 'it', 'de']; // EN is preserved — user edits it manually
 const MOODS = ['Golden Hour', 'Blue Hour', 'Storm', 'Solitude', 'Urban Chaos', 'Mist', 'Silence', 'Neon', 'Vast', 'Intimate'];
 
 export async function POST(request) {
@@ -20,10 +20,10 @@ export async function POST(request) {
 
 Analyse this photo and return ONLY a valid JSON object — no markdown, no preamble, no trailing text. Structure:
 {
-  "titles": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
-  "descriptions": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
-  "alt_text": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
-  "behind_lens": { "en": "", "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "titles": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "descriptions": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "alt_text": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "behind_lens": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
   "location": ""
 }
 Rules:
