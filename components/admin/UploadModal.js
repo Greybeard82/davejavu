@@ -80,8 +80,6 @@ export default function UploadModal({ onClose, onSuccess }) {
   const [dragging, setDragging] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [reviewIndex, setReviewIndex] = useState(0);
-  const [activeLocale, setActiveLocale] = useState('en');
-  const [useAI, setUseAI] = useState(true);
   const [collections, setCollections] = useState([]);
   const [moods, setMoods] = useState(MOODS_FALLBACK);
   const fileInputRef = useRef(null);
@@ -209,39 +207,7 @@ export default function UploadModal({ onClose, onSuccess }) {
       return;
     }
 
-    // 2. AI suggest (only if opted in)
-    if (useAI) {
-      updateItem(item.id, { status: 'suggesting' });
-      try {
-        const res = await fetch('/api/seo-suggest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageUrl: uploadResult.displayUrl, tags: uploadResult.tags }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'AI suggestion failed');
-
-        const translations = initialTranslations();
-        LOCALES.forEach(l => {
-          translations[l] = {
-            ...translations[l],
-            title: data.titles?.[l] || '',
-            description: data.descriptions?.[l] || '',
-            alt_text: data.alt_text?.[l] || '',
-            behind_lens: data.behind_lens?.[l] || '',
-            location: data.location || '',
-          };
-        });
-
-        const moods = (data.suggested_moods || []).filter(m => MOODS_FALLBACK.includes(m));
-        updateItem(item.id, { status: 'ready', translations, moods });
-      } catch (err) {
-        // AI failed — still mark ready so admin can fill manually
-        updateItem(item.id, { status: 'ready', error: `AI suggestion failed: ${err.message}` });
-      }
-    } else {
-      updateItem(item.id, { status: 'ready' });
-    }
+    updateItem(item.id, { status: 'ready' });
   };
 
   const startProcessing = async () => {
@@ -257,9 +223,32 @@ export default function UploadModal({ onClose, onSuccess }) {
 
   // ── Save ──────────────────────────────────────────────────────
   const saveItem = async (item) => {
-    if (!item.translations.en.title.trim()) return { error: 'English title is required.' };
+    const en = item.translations.en;
+    if (!en.title.trim()) return { error: 'English title is required.' };
     updateItem(item.id, { status: 'saving' });
     try {
+      // Translate EN into the other 5 languages
+      const translateRes = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ en }),
+      });
+      const translateData = await translateRes.json();
+
+      // Build full translations object — EN stays as typed, others from Claude
+      const translations = { ...item.translations };
+      if (translateRes.ok) {
+        ['pt', 'es', 'fr', 'it', 'de'].forEach(l => {
+          translations[l] = {
+            title: translateData.titles?.[l] || '',
+            description: translateData.descriptions?.[l] || '',
+            alt_text: translateData.alt_text?.[l] || '',
+            behind_lens: translateData.behind_lens?.[l] || '',
+            location: translateData.location || en.location || '',
+          };
+        });
+      }
+
       const res = await fetch('/api/photos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -269,7 +258,7 @@ export default function UploadModal({ onClose, onSuccess }) {
           storagePath: item.uploadResult.storagePath,
           width: item.uploadResult.width,
           height: item.uploadResult.height,
-          translations: item.translations,
+          translations,
           moods: item.moods,
           camera: item.camera,
           availableForLicense: item.availableForLicense,
@@ -299,7 +288,6 @@ export default function UploadModal({ onClose, onSuccess }) {
       setStep('done');
     } else {
       setReviewIndex(nextIndex);
-      setActiveLocale('en');
     }
   };
 
@@ -309,7 +297,6 @@ export default function UploadModal({ onClose, onSuccess }) {
       setStep('done');
     } else {
       setReviewIndex(nextIndex);
-      setActiveLocale('en');
     }
   };
 
@@ -379,27 +366,12 @@ export default function UploadModal({ onClose, onSuccess }) {
             )}
 
             {items.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <label className="flex items-start gap-3 p-3 border border-[#d1d1d1] rounded cursor-pointer hover:border-orange transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={useAI}
-                    onChange={e => setUseAI(e.target.checked)}
-                    className="accent-orange w-4 h-4 mt-0.5 shrink-0"
-                  />
-                  <div>
-                    <p className="text-xs font-600 text-charcoal">Auto-fill metadata with AI</p>
-                    <p className="text-[10px] text-mid-gray mt-0.5">Claude Vision will analyse each photo and suggest titles, descriptions and alt text in all 6 languages. Uses API tokens — leave unchecked to fill manually.</p>
-                  </div>
-                </label>
-                <button
-                  onClick={startProcessing}
-                  className="w-full py-3 bg-orange text-white text-xs uppercase tracking-[3px] font-600 hover:bg-orange-dark transition-colors"
-                >
-                  Upload {items.length} Photo{items.length !== 1 ? 's' : ''}
-                  {useAI ? ' + Auto-fill with AI' : ''}
-                </button>
-              </div>
+              <button
+                onClick={startProcessing}
+                className="w-full py-3 bg-orange text-white text-xs uppercase tracking-[3px] font-600 hover:bg-orange-dark transition-colors"
+              >
+                Upload {items.length} Photo{items.length !== 1 ? 's' : ''}
+              </button>
             )}
           </div>
         )}
@@ -470,46 +442,33 @@ export default function UploadModal({ onClose, onSuccess }) {
                 {/* Only show form when ready */}
                 {currentItem.status === 'ready' && (
                   <>
-                    {/* Language tabs */}
+                    {/* English-only fields — other languages translated automatically on save */}
                     <div>
-                      <div className="flex gap-0 border-b border-[#d1d1d1] mb-4 overflow-x-auto">
-                        {LOCALES.map(l => (
-                          <button
-                            key={l}
-                            onClick={() => setActiveLocale(l)}
-                            className={`px-4 py-3 text-[11px] uppercase tracking-widest font-600 border-b-2 -mb-px transition-colors shrink-0 ${
-                              activeLocale === l ? 'border-orange text-orange' : 'border-transparent text-mid-gray hover:text-charcoal'
-                            }`}
-                          >
-                            {l.toUpperCase()}
-                            {l === 'en' && <span className="ml-1 text-red-400">*</span>}
-                          </button>
-                        ))}
-                      </div>
+                      <p className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">
+                        Fill in English — other languages will be translated automatically on save
+                      </p>
                       <div className="flex flex-col gap-3">
                         {[
-                          { field: 'title', label: 'Title', required: activeLocale === 'en' },
+                          { field: 'title', label: 'Title *' },
                           { field: 'location', label: 'Location (city, country)' },
                           { field: 'description', label: 'Description', multiline: true },
                           { field: 'alt_text', label: 'Alt text' },
                           { field: 'behind_lens', label: 'Behind the lens', multiline: true },
-                        ].map(({ field, label, required, multiline }) => (
+                        ].map(({ field, label, multiline }) => (
                           <div key={field}>
-                            <label className="block text-[11px] uppercase tracking-widest text-mid-gray mb-1">
-                              {label}{required && <span className="text-red-400 ml-1">*</span>}
-                            </label>
+                            <label className="block text-[11px] uppercase tracking-widest text-mid-gray mb-1">{label}</label>
                             {multiline ? (
                               <textarea
                                 rows={3}
-                                value={currentItem.translations[activeLocale][field]}
-                                onChange={e => updateTranslation(currentItem.id, activeLocale, field, e.target.value)}
+                                value={currentItem.translations.en[field]}
+                                onChange={e => updateTranslation(currentItem.id, 'en', field, e.target.value)}
                                 className="w-full px-3 py-2 border border-[#d1d1d1] text-sm text-charcoal focus:outline-none focus:border-orange resize-none"
                               />
                             ) : (
                               <input
                                 type="text"
-                                value={currentItem.translations[activeLocale][field]}
-                                onChange={e => updateTranslation(currentItem.id, activeLocale, field, e.target.value)}
+                                value={currentItem.translations.en[field]}
+                                onChange={e => updateTranslation(currentItem.id, 'en', field, e.target.value)}
                                 className="w-full px-3 py-2 border border-[#d1d1d1] text-sm text-charcoal focus:outline-none focus:border-orange"
                               />
                             )}
@@ -622,7 +581,7 @@ export default function UploadModal({ onClose, onSuccess }) {
                         onClick={handleSaveAndNext}
                         className="flex-1 py-3 bg-orange text-white text-xs uppercase tracking-[3px] font-600 hover:bg-orange-dark transition-colors"
                       >
-                        {reviewIndex === items.length - 1 ? 'Save & Finish' : 'Save & Next'}
+                        {reviewIndex === items.length - 1 ? 'Translate & Save' : 'Translate, Save & Next'}
                       </button>
                       <button
                         onClick={handleSkip}
@@ -634,12 +593,11 @@ export default function UploadModal({ onClose, onSuccess }) {
                   </>
                 )}
 
-                {/* Waiting for upload/AI */}
-                {['uploading', 'suggesting', 'queued'].includes(currentItem.status) && (
+                {/* Waiting for upload */}
+                {['uploading', 'queued'].includes(currentItem.status) && (
                   <div className="py-8 text-center text-xs text-mid-gray uppercase tracking-widest">
                     {currentItem.status === 'queued' && 'Waiting…'}
                     {currentItem.status === 'uploading' && 'Uploading photo…'}
-                    {currentItem.status === 'suggesting' && 'Claude is analysing the photo…'}
                   </div>
                 )}
 
@@ -680,7 +638,7 @@ export default function UploadModal({ onClose, onSuccess }) {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => { setStep('select'); setItems([]); setReviewIndex(0); setActiveLocale('en'); }}
+                onClick={() => { setStep('select'); setItems([]); setReviewIndex(0); }}
                 className="px-6 py-2.5 bg-orange text-white text-xs uppercase tracking-[3px] font-600 hover:bg-orange-dark transition-colors"
               >
                 Upload more

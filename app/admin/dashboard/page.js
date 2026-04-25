@@ -253,12 +253,11 @@ export default function AdminDashboard() {
     fetchPhotos();
   };
 
-  const rerunAI = async (photoId, cloudinaryId) => {
-    const imageUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/w_1920,c_limit/${cloudinaryId}.jpg`;
+  const rerunAI = async (photoId) => {
     const res = await fetch('/api/photos/rerun-ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ photoId, imageUrl }),
+      body: JSON.stringify({ photoId }),
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -345,7 +344,7 @@ export default function AdminDashboard() {
                   {/* Quick actions overlay */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
-                      onClick={() => rerunAI(photo.id, photo.cloudinary_id)}
+                      onClick={() => rerunAI(photo.id)}
                       className="w-11 h-11 rounded-full bg-orange text-white flex items-center justify-center hover:bg-orange-dark transition-colors"
                       title="Re-run AI translations"
                     >
