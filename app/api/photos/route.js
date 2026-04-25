@@ -1,8 +1,49 @@
 import { NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
+
+const TRANSLATE_LOCALES = ['pt', 'es', 'fr', 'it', 'de'];
+
+async function translateFromEnglish(en) {
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const prompt = `You are a professional translator for a fine-art photography portfolio called DAVEJAVU.
+
+Translate the following English photography metadata into Portuguese (pt), Spanish (es), French (fr), Italian (it), and German (de).
+Preserve the tone — evocative, personal, artistic. Do not add or remove information.
+
+English source:
+- title: ${en.title}
+- description: ${en.description || ''}
+- alt_text: ${en.alt_text || ''}
+- behind_lens: ${en.behind_lens || ''}
+- location: ${en.location || ''}
+
+Return ONLY a valid JSON object — no markdown, no preamble:
+{
+  "titles": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "descriptions": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "alt_text": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "behind_lens": { "pt": "", "es": "", "fr": "", "it": "", "de": "" },
+  "location": ""
+}
+
+Rules:
+- location: translate city/country names only if a local equivalent exists, otherwise keep as-is
+- If a field is empty in English, return an empty string for all languages
+- Titles: keep under 60 characters`;
+
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 2000,
+    messages: [{ role: 'user', content: prompt }],
+  });
+  let text = response.content[0].text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+  return JSON.parse(text);
+}
 
 export async function POST(request) {
   const deny = await requireAdmin(request);
@@ -33,6 +74,19 @@ export async function POST(request) {
 
     const supabase = createAdminClient();
 
+    // Translate EN into the other 5 languages server-side
+    const translated = await translateFromEnglish(translations.en);
+    const allTranslations = { ...translations };
+    TRANSLATE_LOCALES.forEach(l => {
+      allTranslations[l] = {
+        title: translated.titles?.[l] || '',
+        description: translated.descriptions?.[l] || '',
+        alt_text: translated.alt_text?.[l] || '',
+        behind_lens: translated.behind_lens?.[l] || '',
+        location: translated.location || translations.en.location || '',
+      };
+    });
+
     const { error: photoError } = await supabase.from('photos').insert({
       id: photoId,
       cloudinary_id: cloudinaryId,
@@ -45,7 +99,7 @@ export async function POST(request) {
     });
     if (photoError) throw new Error(`photos: ${photoError.message}`);
 
-    const translationRows = Object.entries(translations)
+    const translationRows = Object.entries(allTranslations)
       .filter(([, t]) => t?.title?.trim())
       .map(([locale, t]) => ({
         photo_id: photoId,

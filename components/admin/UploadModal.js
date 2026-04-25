@@ -227,30 +227,8 @@ export default function UploadModal({ onClose, onSuccess }) {
   const saveItem = async (item) => {
     const en = item.translations.en;
     if (!en.title.trim()) return { error: 'English title is required.' };
-    updateItem(item.id, { status: 'translating' });
+    updateItem(item.id, { status: 'saving' });
     try {
-      // Translate EN into the other 5 languages
-      const translateRes = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ en }),
-      });
-      const translateData = await translateRes.json();
-      if (!translateRes.ok) throw new Error(`Translation failed: ${translateData.error || translateRes.status}`);
-
-      // Build full translations object — EN stays as typed, others from Claude
-      const translations = { ...item.translations };
-      ['pt', 'es', 'fr', 'it', 'de'].forEach(l => {
-        translations[l] = {
-          title: translateData.titles?.[l] || '',
-          description: translateData.descriptions?.[l] || '',
-          alt_text: translateData.alt_text?.[l] || '',
-          behind_lens: translateData.behind_lens?.[l] || '',
-          location: translateData.location || en.location || '',
-        };
-      });
-
-      updateItem(item.id, { status: 'saving' });
 
       const res = await fetch('/api/photos', {
         method: 'POST',
@@ -261,7 +239,7 @@ export default function UploadModal({ onClose, onSuccess }) {
           storagePath: item.uploadResult.storagePath,
           width: item.uploadResult.width,
           height: item.uploadResult.height,
-          translations,
+          translations: item.translations,
           moods: item.moods,
           camera: item.camera,
           availableForLicense: item.availableForLicense,

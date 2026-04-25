@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cache } from 'react';
+import { getTranslations } from 'next-intl/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getHeroUrl } from '@/lib/cloudinary';
 import ProtectedImage from '@/components/ProtectedImage';
@@ -67,7 +68,10 @@ export async function generateMetadata({ params }) {
 
 export default async function PhotoDetailPage({ params }) {
   const { uuid, locale } = await params;
-  const photo = await getPhotoDetail(uuid, locale);
+  const [photo, t] = await Promise.all([
+    getPhotoDetail(uuid, locale),
+    getTranslations({ locale, namespace: 'photo' }),
+  ]);
 
   if (!photo) notFound();
 
@@ -103,7 +107,7 @@ export default async function PhotoDetailPage({ params }) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
           </svg>
-          Portfolio
+          {t('portfolio')}
         </Link>
 
         {/* Title + location */}
