@@ -10,20 +10,19 @@ async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderI
   try {
     let buffer;
 
-    if (tier === 'full_res' && storagePath) {
-      // Serve original master from Supabase Storage — highest quality, untouched file
-      const { data: signed } = await supabase.storage.from('photos').createSignedUrl(storagePath, 120);
-      if (!signed?.signedUrl) throw new Error('Could not get signed URL for original');
-      const res = await fetch(signed.signedUrl);
-      if (!res.ok) throw new Error(`Supabase Storage fetch failed: ${res.status}`);
-      buffer = Buffer.from(await res.arrayBuffer());
-    } else {
-      // web_small tier — 2000px from Cloudinary is fine
-      const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const srcUrl = `https://res.cloudinary.com/${CLOUD}/image/upload/w_2000,h_2000,c_limit/${cloudinaryId}`;
-      const res = await fetch(srcUrl);
-      if (!res.ok) throw new Error(`Cloudinary fetch failed: ${res.status}`);
-      buffer = Buffer.from(await res.arrayBuffer());
+    // Always fetch from Supabase Storage original for best quality
+    if (!storagePath) throw new Error('No storage path — cannot generate download');
+    const { data: signed } = await supabase.storage.from('photos').createSignedUrl(storagePath, 120);
+    if (!signed?.signedUrl) throw new Error('Could not get signed URL for original');
+    const res = await fetch(signed.signedUrl);
+    if (!res.ok) throw new Error(`Supabase Storage fetch failed: ${res.status}`);
+    buffer = Buffer.from(await res.arrayBuffer());
+
+    // For web_small: resize so shortest side = 2000px, preserving aspect ratio
+    if (tier === 'web_small') {
+      buffer = await sharp(buffer)
+        .resize(2000, 2000, { fit: 'outside', withoutEnlargement: true })
+        .toBuffer();
     }
 
     const stamped = await sharp(buffer)

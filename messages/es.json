@@ -97,7 +97,7 @@
     "title": "Licencias",
     "subtitle": "Cada foto está disponible para descarga instantánea vía PayPal. Todos los precios en EUR.",
     "smallTitle": "Pequeño",
-    "smallSize": "hasta 2000px lado largo",
+    "smallSize": "2000px lado corto",
     "smallUse": "Perfecto para uso digital, redes sociales e impresiones pequeñas hasta A4.",
     "smallPrice": "€19",
     "fullTitle": "Resolución total",
@@ -165,7 +165,7 @@
   "buy": {
     "getThisPhoto": "Obtener esta foto",
     "webSmall": "Web / Impresión Pequeña",
-    "webSmallSize": "hasta 2000px lado largo · Uso personal",
+    "webSmallSize": "2000px lado corto · Personal use",
     "fullRes": "Resolución Total",
     "fullResSize": "Resolución nativa · Uso personal",
     "paymentConfirmed": "Pago confirmado",
