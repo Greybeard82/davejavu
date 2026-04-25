@@ -215,6 +215,7 @@ export default function AdminDashboard() {
   const [editPhoto, setEditPhoto] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [rerunningId, setRerunningId] = useState(null);
   const [stats, setStats] = useState({ total: 0, published: 0, drafts: 0 });
 
   const fetchPhotos = useCallback(async () => {
@@ -254,18 +255,20 @@ export default function AdminDashboard() {
   };
 
   const rerunAI = async (photoId) => {
-    const res = await fetch('/api/photos/rerun-ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ photoId }),
-    });
-    if (!res.ok) {
+    setRerunningId(photoId);
+    try {
+      const res = await fetch('/api/photos/rerun-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photoId }),
+      });
       const data = await res.json().catch(() => ({}));
-      alert(`AI re-run failed: ${data.error || res.status}`);
-      return;
+      if (!res.ok) { alert(`AI re-run failed: ${data.error || res.status}`); return; }
+      fetchPhotos();
+      alert('AI translations updated!');
+    } finally {
+      setRerunningId(null);
     }
-    fetchPhotos();
-    alert('AI translations updated!');
   };
 
   const deletePhoto = async (photoId) => {
@@ -345,10 +348,12 @@ export default function AdminDashboard() {
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                     <button
                       onClick={() => rerunAI(photo.id)}
-                      className="w-11 h-11 rounded-full bg-orange text-white flex items-center justify-center hover:bg-orange-dark transition-colors"
+                      disabled={rerunningId === photo.id}
+                      className="w-11 h-11 rounded-full bg-orange text-white flex items-center justify-center hover:bg-orange-dark transition-colors disabled:opacity-60"
                       title="Re-run AI translations"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        className={rerunningId === photo.id ? 'animate-spin' : ''}>
                         <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                       </svg>
                     </button>
