@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 // Ken Burns variants — 6 distinct motions, one per slide in rotation.
 // Safety rule: scale 1.1 gives 5% overhang each side; translations stay within ±3%.
@@ -27,6 +28,7 @@ const PLACEHOLDER_SLIDES = [
 ];
 
 export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
+  const t = useTranslations('hero');
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -106,7 +108,7 @@ export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
           onClick={scrollToPortfolio}
           className="bg-white/10 backdrop-blur-sm border border-white/40 text-white text-xs uppercase tracking-[3px] font-600 px-8 py-3 hover:bg-orange hover:border-orange transition-all duration-300"
         >
-          View Portfolio
+          {t('cta')}
         </button>
       </div>
 
