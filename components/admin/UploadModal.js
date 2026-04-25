@@ -81,7 +81,7 @@ export default function UploadModal({ onClose, onSuccess }) {
   const [processing, setProcessing] = useState(false);
   const [reviewIndex, setReviewIndex] = useState(0);
   const [activeLocale, setActiveLocale] = useState('en');
-  const [useAI, setUseAI] = useState(false);
+  const [useAI, setUseAI] = useState(true);
   const [collections, setCollections] = useState([]);
   const [moods, setMoods] = useState(MOODS_FALLBACK);
   const fileInputRef = useRef(null);
