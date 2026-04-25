@@ -97,7 +97,7 @@
     "title": "Licensing",
     "subtitle": "Every photo is available to download instantly via PayPal. All prices in EUR.",
     "smallTitle": "Small",
-    "smallSize": "2000px long edge",
+    "smallSize": "up to 2000px long edge",
     "smallUse": "Perfect for digital use, social media, and small prints up to A4.",
     "smallPrice": "€19",
     "fullTitle": "Full Resolution",
@@ -165,7 +165,7 @@
   "buy": {
     "getThisPhoto": "Get this photo",
     "webSmall": "Web / Small Print",
-    "webSmallSize": "2000px long edge · Personal use",
+    "webSmallSize": "up to 2000px long edge · Personal use",
     "fullRes": "Full Resolution",
     "fullResSize": "Native resolution · Personal use",
     "paymentConfirmed": "Payment confirmed",

@@ -20,7 +20,7 @@ async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderI
     } else {
       // web_small tier — 2000px from Cloudinary is fine
       const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const srcUrl = `https://res.cloudinary.com/${CLOUD}/image/upload/w_2000,c_limit/${cloudinaryId}`;
+      const srcUrl = `https://res.cloudinary.com/${CLOUD}/image/upload/w_2000,h_2000,c_limit/${cloudinaryId}`;
       const res = await fetch(srcUrl);
       if (!res.ok) throw new Error(`Cloudinary fetch failed: ${res.status}`);
       buffer = Buffer.from(await res.arrayBuffer());
