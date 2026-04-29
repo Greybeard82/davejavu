@@ -13,7 +13,6 @@ const getCollection = cache(async (slug, locale) => {
     .from('collections')
     .select('id, slug, collection_translations ( locale, title, description )')
     .eq('slug', slug)
-    .eq('published', true)
     .single();
 
   if (error || !data) return null;
