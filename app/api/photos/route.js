@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/admin-guard';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 const TRANSLATE_LOCALES = ['pt', 'es', 'fr', 'it', 'de'];
 
@@ -74,10 +74,15 @@ export async function POST(request) {
 
     const supabase = createAdminClient();
 
-    // Translate EN into the other 5 languages server-side
-    const translated = await translateFromEnglish(translations.en);
+    // Translate EN into the other 5 languages server-side (non-fatal)
+    let translated = null;
+    try {
+      translated = await translateFromEnglish(translations.en);
+    } catch (err) {
+      console.error('Translation failed, saving EN only:', err.message);
+    }
     const allTranslations = { ...translations };
-    TRANSLATE_LOCALES.forEach(l => {
+    if (translated) TRANSLATE_LOCALES.forEach(l => {
       allTranslations[l] = {
         title: translated.titles?.[l] || '',
         description: translated.descriptions?.[l] || '',

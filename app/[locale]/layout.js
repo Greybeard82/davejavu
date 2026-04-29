@@ -4,13 +4,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createAdminClient } from '@/lib/supabase-admin';
 
-async function getPublishedCollections(locale) {
+async function getCollections(locale) {
   try {
     const supabase = createAdminClient();
     const { data } = await supabase
       .from('collections')
       .select('slug, collection_translations ( locale, title )')
-      .eq('published', true)
       .order('created_at', { ascending: true });
 
     return (data || []).map((c) => {
@@ -29,7 +28,7 @@ export default async function LocaleLayout({ children, params }) {
   setRequestLocale(locale);
   const [messages, collections] = await Promise.all([
     getMessages({ locale }),
-    getPublishedCollections(locale),
+    getCollections(locale),
   ]);
 
   return (
