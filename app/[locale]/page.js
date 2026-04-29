@@ -39,7 +39,7 @@ async function getPageData(locale) {
   if (featErr) console.error('featured query error:', featErr);
   return {
     photos: (published || []).map((p) => shapePhoto(p, locale)),
-    heroSlides: (featured || []).map((p) => ({ ...shapePhoto(p, locale), image: getHeroUrl(p.cloudinary_id) })),
+    heroSlides: (featured || []).sort(() => Math.random() - 0.5).map((p) => ({ ...shapePhoto(p, locale), image: getHeroUrl(p.cloudinary_id) })),
     moods: (moodsData || []).map((r) => r.name),
   };
 }
