@@ -58,7 +58,7 @@ A personal photography portfolio website for landscape and cityscape photographe
 
 **Core goals:**
 
-* High visual impact, dark editorial aesthetic, minimal UI (reference: https://davejavu.netlify.app)
+* High visual impact, dark editorial aesthetic, minimal UI (reference: https://www.davejavuphoto.com)
 * Emotional buyer focus: someone who sees a photo, feels something, and wants it on their wall
 * Deter casual photo theft through layered technical measures (see Section 7)
 * Full multilingual support across 6 languages
@@ -81,7 +81,7 @@ A personal photography portfolio website for landscape and cityscape photographe
 |Styling|Tailwind CSS|Dark-first design system|
 |Animation|Framer Motion|Photo expand/collapse, page transitions, hero carousel|
 |CAPTCHA|hCaptcha|GDPR-friendly, EU-appropriate, contact form protection|
-|Deployment|Netlify|Via @netlify/plugin-nextjs|
+|Deployment|Vercel|Auto-deploy from GitHub main|
 
 \---
 
