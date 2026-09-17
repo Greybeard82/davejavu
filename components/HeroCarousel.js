@@ -18,16 +18,7 @@ const KB_VARIANTS = [
 
 const SLIDE_INTERVAL = 6500;
 
-// Placeholder slides — replaced with DB-driven featured photos once photos are uploaded
-const PLACEHOLDER_SLIDES = [
-  { id: 1, image: 'https://picsum.photos/seed/dj-hero1/1920/1080', title: 'Into the Mist', location: 'Zhangjiajie, China' },
-  { id: 2, image: 'https://picsum.photos/seed/dj-hero2/1920/1080', title: 'Golden Hour', location: 'Kyoto, Japan' },
-  { id: 3, image: 'https://picsum.photos/seed/dj-hero3/1920/1080', title: 'Urban Silence', location: 'Seoul, South Korea' },
-  { id: 4, image: 'https://picsum.photos/seed/dj-hero4/1920/1080', title: 'River of Light', location: 'Hanoi, Vietnam' },
-  { id: 5, image: 'https://picsum.photos/seed/dj-hero5/1920/1080', title: 'Vast', location: 'Banff, Canada' },
-];
-
-export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
+export default function HeroCarousel({ slides = [] }) {
   const t = useTranslations('hero');
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -40,6 +31,8 @@ export default function HeroCarousel({ slides = PLACEHOLDER_SLIDES }) {
     const timer = setInterval(next, SLIDE_INTERVAL);
     return () => clearInterval(timer);
   }, [next, paused]);
+
+  if (slides.length === 0) return null;
 
   const scrollToPortfolio = () => {
     document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });

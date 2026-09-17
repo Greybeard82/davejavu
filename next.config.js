@@ -6,7 +6,6 @@ const nextConfig = {
   allowedDevOrigins: ['192.168.68.107'],
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'picsum.photos' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
