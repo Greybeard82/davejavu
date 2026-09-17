@@ -10,9 +10,6 @@ out/
 .env.local
 .env.*.local
 
-# Netlify
-.netlify/
-
 # OS
 .DS_Store
 Thumbs.db

@@ -26,7 +26,6 @@
     "resend": "*"
   },
   "devDependencies": {
-    "@netlify/plugin-nextjs": "^5.15.9",
     "@types/react": "19.2.14",
     "autoprefixer": "^10.4.20",
     "eslint": "*",
