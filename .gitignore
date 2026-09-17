@@ -20,6 +20,7 @@ npm-debug.log*
 
 # Local IDE / tool config
 .claude/
+.vscode/
 
 # Downloads / archives
 *.zip
