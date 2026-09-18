@@ -3,6 +3,7 @@ export const maxDuration = 60; // seconds — needed for image stamp+upload per 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
+import { MASTERS_BUCKET } from '@/lib/storage';
 import { Resend } from 'resend';
 import sharp from 'sharp';
 
@@ -12,7 +13,7 @@ async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderI
 
     // Always fetch from Supabase Storage original for best quality
     if (!storagePath) throw new Error('No storage path — cannot generate download');
-    const { data: signed } = await supabase.storage.from('photos').createSignedUrl(storagePath, 120);
+    const { data: signed } = await supabase.storage.from(MASTERS_BUCKET).createSignedUrl(storagePath, 120);
     if (!signed?.signedUrl) throw new Error('Could not get signed URL for original');
     const res = await fetch(signed.signedUrl);
     if (!res.ok) throw new Error(`Supabase Storage fetch failed: ${res.status}`);
@@ -40,7 +41,7 @@ async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderI
       .toBuffer();
 
     const stampedPath = `stamped/${orderId}_${tier}.jpg`;
-    const { error } = await supabase.storage.from('photos').upload(stampedPath, stamped, {
+    const { error } = await supabase.storage.from(MASTERS_BUCKET).upload(stampedPath, stamped, {
       contentType: 'image/jpeg',
       upsert: true,
     });

@@ -8,6 +8,7 @@ import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
 import { getDownloadUrl } from '@/lib/cloudinary';
+import { MASTERS_BUCKET } from '@/lib/storage';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -133,13 +134,13 @@ export async function POST(request) {
 
     // EXIF stamp — attempt, fall back gracefully on any failure
     let stampedPath = null;
-    const { data: fileData } = await supabase.storage.from('photos').download(photo.storage_path);
+    const { data: fileData } = await supabase.storage.from(MASTERS_BUCKET).download(photo.storage_path);
     if (fileData) {
       try {
         const fileBuffer = Buffer.from(await fileData.arrayBuffer());
         const stamped = await stampExif(fileBuffer, { buyerEmail, captureId, orderId, tier, purchaseDate });
         stampedPath = `stamped/${orderId}_${tier}.jpg`;
-        await supabase.storage.from('photos').upload(stampedPath, stamped, {
+        await supabase.storage.from(MASTERS_BUCKET).upload(stampedPath, stamped, {
           contentType: 'image/jpeg',
           upsert: true,
         });
