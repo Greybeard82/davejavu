@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # Test and build still run when lint fails, so a red run shows their
+      # result too — but a failure in either still fails the job. `if: !cancelled()`
+      # runs them regardless of the previous step's outcome.
+      - name: Test
+        if: ${{ !cancelled() }}
+        run: npm test
+
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: npm run build
+        env:
+          # Placeholder only. Resend's constructor requires a non-empty key at
+          # module load; no network call happens during build (.send() is never
+          # invoked). Not a secret and reaches no live service.
+          RESEND_API_KEY: re_ci_build_placeholder
