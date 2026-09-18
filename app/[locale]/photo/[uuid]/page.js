@@ -5,7 +5,6 @@ import { getTranslations } from 'next-intl/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getHeroUrl } from '@/lib/cloudinary';
 import ProtectedImage from '@/components/ProtectedImage';
-import BuyButtons from '@/components/BuyButtons';
 import WallMockup from '@/components/WallMockup';
 import AddToBasketButton from '@/components/AddToBasketButton';
 
