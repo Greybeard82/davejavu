@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { createAdminClient } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/admin-guard';
 import { randomUUID } from 'crypto';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,8 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/tiff', 'image/heic', 'i
 const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request) {
+  const deny = await requireAdmin(request);
+  if (deny) return deny;
   try {
     const formData = await request.formData();
     const file = formData.get('file');
