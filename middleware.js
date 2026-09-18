@@ -1,6 +1,6 @@
 import createIntlMiddleware from 'next-intl/middleware';
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
+import { verifyAdmin } from '@/lib/admin-auth';
 
 const locales = ['en', 'pt', 'es', 'fr', 'it', 'de'];
 
@@ -13,29 +13,19 @@ const intlMiddleware = createIntlMiddleware({
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Protect admin sub-pages (not the login page itself)
+  // Protect admin sub-pages (not the login page itself). getUser() runs only
+  // inside this branch, so no public request makes the Auth-server round trip.
   if (pathname.startsWith('/admin/')) {
     let response = NextResponse.next({ request });
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll: () => request.cookies.getAll(),
-          setAll: (cookiesToSet) => {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
-            });
-          },
-        },
-      }
-    );
+    const { ok } = await verifyAdmin(request, (cookiesToSet) => {
+      cookiesToSet.forEach(({ name, value, options }) => {
+        response.cookies.set(name, value, options);
+      });
+    });
 
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session) {
-      return NextResponse.redirect(new URL('/admin', request.url));
+    if (!ok) {
+      return NextResponse.redirect(new URL('/admin?e=1', request.url));
     }
 
     return response;
