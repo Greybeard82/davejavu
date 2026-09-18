@@ -108,7 +108,11 @@
       "messageTooShort": "Die Nachricht muss mindestens 20 Zeichen lang sein",
       "gdprRequired": "Sie müssen den Datenschutzbedingungen zustimmen",
       "captchaRequired": "Bitte vervollständigen Sie das Captcha"
-    }
+    },
+    "metaDescription": "Fragen Sie nach der Lizenzierung eines Fotos oder nehmen Sie Kontakt auf.",
+    "namePlaceholder": "Max Mustermann",
+    "removeAria": "Entfernen",
+    "noPhotosSelected": "Keine Fotos ausgewählt — speichern Sie Fotos aus der Galerie mit der ♡ Schaltfläche, und sie erscheinen hier automatisch."
   },
   "pricing": {
     "title": "Lizenzierung",

@@ -108,7 +108,11 @@
       "messageTooShort": "Le message doit comporter au moins 20 caractères",
       "gdprRequired": "Vous devez accepter les conditions de traitement des données",
       "captchaRequired": "Veuillez compléter le captcha"
-    }
+    },
+    "metaDescription": "Renseignez-vous sur la licence d'une photo ou contactez-moi.",
+    "namePlaceholder": "Jean Dupont",
+    "removeAria": "Retirer",
+    "noPhotosSelected": "Aucune photo sélectionnée — enregistrez des photos depuis la galerie avec le bouton ♡ et elles apparaîtront ici automatiquement."
   },
   "pricing": {
     "title": "Licences",

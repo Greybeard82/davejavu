@@ -108,7 +108,11 @@
       "messageTooShort": "Message must be at least 20 characters",
       "gdprRequired": "You must agree to the data processing terms",
       "captchaRequired": "Please complete the captcha"
-    }
+    },
+    "metaDescription": "Inquire about licensing a photo or get in touch.",
+    "namePlaceholder": "John Doe",
+    "removeAria": "Remove",
+    "noPhotosSelected": "No photos selected — save photos from the gallery using the ♡ button and they'll appear here automatically."
   },
   "pricing": {
     "title": "Licensing",

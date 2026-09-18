@@ -108,7 +108,11 @@
       "messageTooShort": "El mensaje debe tener al menos 20 caracteres",
       "gdprRequired": "Debes aceptar los términos de tratamiento de datos",
       "captchaRequired": "Por favor completa el captcha"
-    }
+    },
+    "metaDescription": "Consulta sobre la licencia de una foto o ponte en contacto.",
+    "namePlaceholder": "Juan Pérez",
+    "removeAria": "Quitar",
+    "noPhotosSelected": "Ninguna foto seleccionada — guarda fotos de la galería con el botón ♡ y aparecerán aquí automáticamente."
   },
   "pricing": {
     "title": "Licencias",

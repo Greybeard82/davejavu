@@ -108,7 +108,11 @@
       "messageTooShort": "A mensagem deve ter pelo menos 20 caracteres",
       "gdprRequired": "Deve aceitar os termos de tratamento de dados",
       "captchaRequired": "Por favor complete o captcha"
-    }
+    },
+    "metaDescription": "Peça informações sobre o licenciamento de uma foto ou entre em contacto.",
+    "namePlaceholder": "João Silva",
+    "removeAria": "Remover",
+    "noPhotosSelected": "Nenhuma foto selecionada — guarde fotos da galeria com o botão ♡ e aparecerão aqui automaticamente."
   },
   "pricing": {
     "title": "Licenças",

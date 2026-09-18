@@ -108,7 +108,11 @@
       "messageTooShort": "Il messaggio deve essere di almeno 20 caratteri",
       "gdprRequired": "Devi accettare i termini di trattamento dei dati",
       "captchaRequired": "Per favore completa il captcha"
-    }
+    },
+    "metaDescription": "Richiedi informazioni sulla licenza di una foto o contattami.",
+    "namePlaceholder": "Mario Rossi",
+    "removeAria": "Rimuovi",
+    "noPhotosSelected": "Nessuna foto selezionata — salva le foto dalla galleria con il pulsante ♡ e appariranno qui automaticamente."
   },
   "pricing": {
     "title": "Licenze",
