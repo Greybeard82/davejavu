@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase-admin';
+import ProtectedImage from '@/components/ProtectedImage';
 
 async function getCollections(locale) {
   const supabase = createAdminClient();
@@ -60,12 +61,10 @@ export default async function CollectionsPage({ params }) {
             <Link key={c.id} href={`/${locale}/collections/${c.slug}`} className="group block">
               <div className="relative overflow-hidden aspect-[4/3] bg-[#e8e6e1] rounded">
                 {c.coverUrl ? (
-                  <img
+                  <ProtectedImage
                     src={c.coverUrl}
                     alt={c.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    draggable="false"
-                    onContextMenu={(e) => e.preventDefault()}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
