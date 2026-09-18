@@ -91,25 +91,45 @@ export async function POST(request) {
       return NextResponse.json({ links });
     }
 
-    // Verify PayPal order is COMPLETED
+    // Load the basket first — needed to recompute the total and check binding
+    const { data: basket } = await supabase.from('baskets').select('*').eq('id', basketId).single();
+    if (!basket) return NextResponse.json({ error: 'Basket not found' }, { status: 404 });
+
+    // Fetch the PayPal order server-side
     const token = await getPayPalToken();
     const orderRes = await fetch(`${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const order = await orderRes.json();
-    if (order.status !== 'COMPLETED')
-      return NextResponse.json({ error: 'Payment not completed' }, { status: 402 });
 
-    // Load basket
-    const { data: basket, error: basketErr } = await supabase.from('baskets').select('*').eq('id', basketId).single();
-    console.log('basket loaded', basket, basketErr);
-    if (!basket) return NextResponse.json({ error: 'Basket not found' }, { status: 404 });
+    // ---- Bind payment to THIS basket before creating anything (PAY-04) ----
+    // The total is recomputed from basket.items via server-side PRICES — never
+    // taken from the request. Any mismatch aborts: no purchase rows, no tokens,
+    // no email. Basket ids in the request body are never trusted on their own.
+    const unit = order?.purchase_units?.[0];
+    const capture = unit?.payments?.captures?.[0];
+    const expectedTotal = basket.items.reduce((sum, i) => sum + (PRICES[i.tier] ?? NaN), 0);
+    const amountPaid = Number(capture?.amount?.value);
+    const bindingErrors = [];
+    if (order?.status !== 'COMPLETED') bindingErrors.push(`order status=${order?.status}`);
+    if (capture?.status !== 'COMPLETED') bindingErrors.push(`capture status=${capture?.status}`);
+    if (unit?.custom_id !== `basket:${basketId}`) bindingErrors.push(`custom_id=${unit?.custom_id}`);
+    if (basket.paypal_order_id !== orderId) bindingErrors.push(`basket.paypal_order_id=${basket.paypal_order_id}`);
+    if (!Number.isFinite(expectedTotal)) bindingErrors.push('basket has an unknown tier');
+    if (capture?.amount?.currency_code !== 'EUR') bindingErrors.push(`currency=${capture?.amount?.currency_code}`);
+    if (!Number.isFinite(amountPaid) || amountPaid !== Number(expectedTotal.toFixed(2)))
+      bindingErrors.push(`amount=${capture?.amount?.value} expected=${Number.isFinite(expectedTotal) ? expectedTotal.toFixed(2) : '?'}`);
+
+    if (bindingErrors.length) {
+      console.error('basket/complete: payment binding REJECTED', { orderId, basketId, bindingErrors });
+      return NextResponse.json({ error: 'Payment could not be verified against this order.' }, { status: 402 });
+    }
 
     const payer = order.payer;
     const buyerEmail = payer?.email_address || '';
     const buyerName = `${payer?.name?.given_name || ''} ${payer?.name?.surname || ''}`.trim();
     const purchaseDate = new Date().toISOString();
-    const captureId = order.purchase_units?.[0]?.payments?.captures?.[0]?.id || '';
+    const captureId = capture?.id || '';
     const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
     const links = [];
