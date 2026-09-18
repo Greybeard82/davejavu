@@ -24,8 +24,34 @@ function AdminLoginForm() {
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState(null);
+  const [lockoutMinutes, setLockoutMinutes] = useState(0);
 
-  const isLocked = lockedUntil && Date.now() < lockedUntil;
+  // Render must not read Date.now(). React makes no guarantee about when or
+  // how often a component renders, so a control that decides whether the form
+  // is usable cannot depend on the clock at render time. The comparison
+  // happens here instead, once per lock, and render reads only state.
+  //
+  // The timeout also clears the lock when it actually expires. Previously the
+  // expiry was only noticed on the next render, and since every input is
+  // disabled while locked, nothing triggered one: the lock effectively held
+  // until the page was reloaded. Duration, attempt count and the error
+  // message are unchanged.
+  useEffect(() => {
+    if (lockedUntil === null) {
+      setLockoutMinutes(0);
+      return;
+    }
+    const remaining = lockedUntil - Date.now();
+    if (remaining <= 0) {
+      setLockedUntil(null);
+      return;
+    }
+    setLockoutMinutes(Math.ceil(remaining / 60000));
+    const timer = setTimeout(() => setLockedUntil(null), remaining);
+    return () => clearTimeout(timer);
+  }, [lockedUntil]);
+
+  const isLocked = lockedUntil !== null;
 
   // Bounced back from an admin route (forged/expired cookie, or a signed-in
   // non-admin). Show the generic message and clear the stale session so it
@@ -107,10 +133,6 @@ function AdminLoginForm() {
 
     router.push('/admin/dashboard');
   };
-
-  const lockoutMinutes = lockedUntil
-    ? Math.ceil((lockedUntil - Date.now()) / 60000)
-    : 0;
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center px-6">
