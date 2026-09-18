@@ -7,50 +7,45 @@ import { MASTERS_BUCKET } from '@/lib/storage';
 import { Resend } from 'resend';
 import sharp from 'sharp';
 
-async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderId, buyerEmail, photoTitle, purchaseDate }) {
-  try {
-    let buffer;
+// Produce the licensed, EXIF-stamped derivative from the master and store it
+// under stamped/. THROWS on any failure — stamping is mandatory; the caller must
+// never substitute a display copy for a paid file (PAY-03).
+async function stampAndStore(supabase, { storagePath, tier, orderId, buyerEmail, purchaseDate }) {
+  if (!storagePath) throw new Error('no storage_path on photo');
+  const { data: signed } = await supabase.storage.from(MASTERS_BUCKET).createSignedUrl(storagePath, 120);
+  if (!signed?.signedUrl) throw new Error('could not sign master URL');
+  const res = await fetch(signed.signedUrl);
+  if (!res.ok) throw new Error(`master fetch failed: ${res.status}`);
+  let buffer = Buffer.from(await res.arrayBuffer());
 
-    // Always fetch from Supabase Storage original for best quality
-    if (!storagePath) throw new Error('No storage path — cannot generate download');
-    const { data: signed } = await supabase.storage.from(MASTERS_BUCKET).createSignedUrl(storagePath, 120);
-    if (!signed?.signedUrl) throw new Error('Could not get signed URL for original');
-    const res = await fetch(signed.signedUrl);
-    if (!res.ok) throw new Error(`Supabase Storage fetch failed: ${res.status}`);
-    buffer = Buffer.from(await res.arrayBuffer());
-
-    // For web_small: resize so shortest side = 2000px, preserving aspect ratio
-    if (tier === 'web_small') {
-      buffer = await sharp(buffer)
-        .resize(2000, 2000, { fit: 'outside', withoutEnlargement: true })
-        .toBuffer();
-    }
-
-    const stamped = await sharp(buffer)
-      .withMetadata({
-        exif: {
-          IFD0: {
-            Copyright: `© ${new Date(purchaseDate).getFullYear()} David Martins / DAVEJAVU — davejavuphoto.com`,
-            Artist: 'David Martins / DAVEJAVU',
-            ImageDescription: `Licensed to: ${buyerEmail} | Order: ${orderId} | Personal use only`,
-            Software: 'DAVEJAVU',
-          },
-        },
-      })
-      .jpeg({ quality: 95 })
+  // web_small: shortest side = 2000px, preserving aspect ratio (never upscaled).
+  if (tier === 'web_small') {
+    buffer = await sharp(buffer)
+      .resize(2000, 2000, { fit: 'outside', withoutEnlargement: true })
       .toBuffer();
-
-    const stampedPath = `stamped/${orderId}_${tier}.jpg`;
-    const { error } = await supabase.storage.from(MASTERS_BUCKET).upload(stampedPath, stamped, {
-      contentType: 'image/jpeg',
-      upsert: true,
-    });
-    if (error) throw new Error(error.message);
-    return stampedPath;
-  } catch (err) {
-    console.error('stampAndStore failed (non-fatal):', err.message);
-    return null;
   }
+
+  const stamped = await sharp(buffer)
+    .withMetadata({
+      exif: {
+        IFD0: {
+          Copyright: `© ${new Date(purchaseDate).getFullYear()} David Martins / DAVEJAVU — davejavuphoto.com`,
+          Artist: 'David Martins / DAVEJAVU',
+          ImageDescription: `Licensed to: ${buyerEmail} | Order: ${orderId} | Personal use only`,
+          Software: 'DAVEJAVU',
+        },
+      },
+    })
+    .jpeg({ quality: 95 })
+    .toBuffer();
+
+  const stampedPath = `stamped/${orderId}_${tier}.jpg`;
+  const { error } = await supabase.storage.from(MASTERS_BUCKET).upload(stampedPath, stamped, {
+    contentType: 'image/jpeg',
+    upsert: true,
+  });
+  if (error) throw new Error(`stamped upload failed: ${error.message}`);
+  return stampedPath;
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -90,6 +85,35 @@ function preparingResponse(orderId) {
     },
     { status: 503 }
   );
+}
+
+// A paid order could not be fulfilled (the master could not be stamped/stored).
+// Mark the basket 'failed' so a retry finds it and the buyer is never given a
+// display copy; send a separate, minimal "being prepared" email so a charged
+// buyer is never left with nothing and no message; and return the preparing
+// response. Purchase rows already inserted are left in place — payment is real
+// and they are the record a manual reissue works from.
+async function failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason }) {
+  console.error('basket/complete: FULFILMENT FAILED — buyer charged, delivery deferred', { orderId, basketId, reason });
+  await supabase.from('baskets').update({ status: 'failed' }).eq('id', basketId);
+  if (buyerEmail) {
+    try {
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL,
+        to: buyerEmail,
+        subject: 'Your DAVEJAVU order — download being prepared',
+        html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;color:#36454F;font-size:14px;line-height:1.6">
+  <p>Hi ${esc(buyerName || 'there')},</p>
+  <p>Thank you — your payment was received. Your download couldn't be generated automatically, so I've been notified and will email your file shortly.</p>
+  <p>If you don't hear back soon, email <a href="mailto:contact@davejavuphoto.com">contact@davejavuphoto.com</a> and quote your order reference: <strong>${esc(orderId)}</strong>.</p>
+  <p>— DAVEJAVU</p>
+</div>`,
+      });
+    } catch (mailErr) {
+      console.error('basket/complete: being-prepared email failed to send', { orderId, error: mailErr.message });
+    }
+  }
+  return preparingResponse(orderId);
 }
 
 export async function POST(request) {
@@ -170,22 +194,22 @@ export async function POST(request) {
       return NextResponse.json({ status: 'processing', message: 'This order is already being processed.' }, { status: 202 });
     }
 
-    const links = [];
-
+    // Record a purchase row per item first — payment is real, so this is the
+    // record that they paid (and what a manual reissue works from).
+    const prepared = [];
     for (const item of basket.items) {
-      console.log('processing item', JSON.stringify(item));
-      const { data: photo, error: photoErr } = await supabase
+      const { data: photo } = await supabase
         .from('photos')
         .select('id, cloudinary_id, storage_path, photo_translations(locale, title)')
         .eq('id', item.photoId)
         .single();
-      console.log('photo lookup result', photo, photoErr);
-      if (!photo) continue;
+      if (!photo) {
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `photo ${item.photoId} not found` });
+      }
       const photoTitle = photo.photo_translations?.find((t) => t.locale === 'en')?.title
         || photo.photo_translations?.[0]?.title
         || item.title;
 
-      console.log('inserting purchase for photo', photo.id, photoTitle);
       const { data: purchase, error: purchaseErr } = await supabase.from('purchases').insert({
         buyer_email: buyerEmail,
         buyer_name: buyerName,
@@ -198,41 +222,54 @@ export async function POST(request) {
         purchase_date: purchaseDate,
         exif_stamped: false,
       }).select().single();
+      if (purchaseErr || !purchase) {
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `purchase insert failed: ${purchaseErr?.message}` });
+      }
+      prepared.push({ item, photo, photoTitle, purchase });
+    }
 
-      if (purchaseErr) { console.error('purchase insert error', JSON.stringify(purchaseErr)); continue; }
-
-      // Stamp EXIF metadata and store in Supabase — non-blocking best-effort
-      const stamped = await stampAndStore(supabase, {
-        storagePath: photo.storage_path,
-        cloudinaryId: photo.cloudinary_id,
-        tier: item.tier,
-        orderId,
-        buyerEmail,
-        photoTitle,
-        purchaseDate,
-      });
-      if (stamped) {
-        await supabase.from('purchases').update({ exif_stamped: true }).eq('id', purchase.id);
+    // Stamp every item from the master. Stamping is mandatory: if ANY item
+    // fails, fail the whole basket — never deliver a display copy (PAY-03).
+    const links = [];
+    for (const p of prepared) {
+      let stampedPath;
+      try {
+        stampedPath = await stampAndStore(supabase, {
+          storagePath: p.photo.storage_path,
+          tier: p.item.tier,
+          orderId,
+          buyerEmail,
+          purchaseDate,
+        });
+      } catch (err) {
+        console.error('basket/complete: STAMP FAILED — no fallback served', {
+          orderId, captureId, buyerEmail, photoId: p.photo.id, tier: p.item.tier, error: err.message,
+        });
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `stamp failed for ${p.photo.id}/${p.item.tier}: ${err.message}` });
       }
 
+      await supabase.from('purchases').update({ exif_stamped: true }).eq('id', p.purchase.id);
+
       const { data: tokenRow, error: tokenErr } = await supabase.from('download_tokens').insert({
-        purchase_id: purchase.id,
-        photo_id: photo.id,
+        purchase_id: p.purchase.id,
+        photo_id: p.photo.id,
         email: buyerEmail,
         expires_at: expiresAt,
         basket_id: basketId,
       }).select().single();
-
-      if (tokenErr) { console.error('token insert error', JSON.stringify(tokenErr)); continue; }
+      if (tokenErr || !tokenRow) {
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `token insert failed: ${tokenErr?.message}` });
+      }
 
       links.push({
-        title: photoTitle,
-        tier: TIER_LABELS[item.tier] || item.tier,
-        price: PRICES[item.tier],
+        title: p.photoTitle,
+        tier: TIER_LABELS[p.item.tier] || p.item.tier,
+        price: PRICES[p.item.tier],
         url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
       });
     }
 
+    // Every item stamped and tokenised — only now is the order complete.
     await supabase.from('baskets').update({ status: 'completed' }).eq('id', basketId);
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
