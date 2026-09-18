@@ -42,6 +42,10 @@ function BlurHashPlaceholder({ hash }) {
 
 function Lightbox({ photo, locale, onClose }) {
   const t = useTranslations('lightboxActions');
+  // Separate namespace from `lightboxActions` above: `lightbox` holds the
+  // chrome of the overlay itself (close, and prev/next once those controls
+  // exist), `lightboxActions` holds the buttons on the action bar.
+  const tChrome = useTranslations('lightbox');
   const [favorited, setFavorited] = useState(() =>
     getFavorites().some((f) => f.id === photo.id)
   );
@@ -186,7 +190,7 @@ function Lightbox({ photo, locale, onClose }) {
         transition={{ delay: 0.1 }}
         className="absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
         onClick={onClose}
-        aria-label="Close"
+        aria-label={tChrome('close')}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
           <path d="M18 6L6 18M6 6l12 12"/>
