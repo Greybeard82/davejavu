@@ -89,7 +89,7 @@ export default function FavoritesPage({ params }) {
                 <Link
                   href={`/${locale}/contact?photo=${encodeURIComponent(photo.title)}`}
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 text-charcoal hover:text-orange transition-colors opacity-0 group-hover:opacity-100"
-                  title="Inquire about this photo"
+                  title={t('inquireOne')}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -97,7 +97,7 @@ export default function FavoritesPage({ params }) {
                 </Link>
                 <button
                   onClick={() => remove(photo.id)}
-                  aria-label="Remove from favorites"
+                  aria-label={t('removeAria')}
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-white/90 text-orange hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -11,6 +11,7 @@ import AddToBasketButton from '@/components/AddToBasketButton';
 
 const getPhotoDetail = cache(async (uuid, locale) => {
   const supabase = createAdminClient();
+  const tp = await getTranslations({ locale, namespace: 'photo' });
   const { data, error } = await supabase
     .from('photos')
     .select(`
@@ -35,7 +36,7 @@ const getPhotoDetail = cache(async (uuid, locale) => {
     id: data.id,
     cloudinaryId: data.cloudinary_id,
     image: getHeroUrl(data.cloudinary_id),
-    title: t.title || '(untitled)',
+    title: t.title || tp('untitled'),
     location: t.location || '',
     description: t.description || '',
     behindLens: t.behind_lens || '',
@@ -59,30 +60,32 @@ export async function generateMetadata({ params }) {
   const { uuid, locale } = await params;
   const photo = await getPhotoDetail(uuid, locale);
   if (!photo) return {};
+  const t = await getTranslations({ locale, namespace: 'photo' });
   return {
     title: `${photo.title} — DAVEJAVU`,
-    description: photo.description || `${photo.title} — Fine art photography by DAVEJAVU`,
+    description: photo.description || t('metaDescription', { title: photo.title }),
     openGraph: { images: [{ url: photo.image }] },
   };
 }
 
 export default async function PhotoDetailPage({ params }) {
   const { uuid, locale } = await params;
-  const [photo, t, tm] = await Promise.all([
+  const [photo, t, tm, tb] = await Promise.all([
     getPhotoDetail(uuid, locale),
     getTranslations({ locale, namespace: 'photo' }),
     getTranslations({ locale, namespace: 'moods' }),
+    getTranslations({ locale, namespace: 'buy' }),
   ]);
 
   if (!photo) notFound();
 
   const metaRows = [
-    { label: 'Camera', value: photo.meta.cameraBody },
-    { label: 'Lens', value: photo.meta.lens },
-    { label: 'Focal length', value: photo.meta.focalLength },
-    { label: 'Aperture', value: photo.meta.aperture },
-    { label: 'ISO', value: photo.meta.iso },
-    { label: 'Shutter speed', value: photo.meta.shutterSpeed },
+    { label: t('cameraBody'), value: photo.meta.cameraBody },
+    { label: t('lens'), value: photo.meta.lens },
+    { label: t('focalLength'), value: photo.meta.focalLength },
+    { label: t('aperture'), value: photo.meta.aperture },
+    { label: t('iso'), value: photo.meta.iso },
+    { label: t('shutterSpeed'), value: photo.meta.shutterSpeed },
   ].filter((r) => r.value);
 
   return (
@@ -145,7 +148,7 @@ export default async function PhotoDetailPage({ params }) {
         {photo.behindLens && (
           <>
             <hr className="border-[#d1d1d1] my-8" />
-            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">Behind the lens</h2>
+            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">{t('behindTheLens')}</h2>
             <p className="text-sm text-charcoal leading-relaxed">{photo.behindLens}</p>
           </>
         )}
@@ -154,7 +157,7 @@ export default async function PhotoDetailPage({ params }) {
         {metaRows.length > 0 && (
           <>
             <hr className="border-[#d1d1d1] my-8" />
-            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">Camera</h2>
+            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">{t('cameraBody')}</h2>
             <table className="w-full">
               <tbody>
                 {metaRows.map(({ label, value }) => (
@@ -176,9 +179,9 @@ export default async function PhotoDetailPage({ params }) {
         {photo.licensed && (
           <>
             <hr className="border-[#d1d1d1] my-8" />
-            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-5">Get this photo</h2>
+            <h2 className="text-[10px] uppercase tracking-widest text-mid-gray mb-5">{tb('getThisPhoto')}</h2>
             <AddToBasketButton photo={{ id: photo.id, title: photo.title, image: photo.image, width: photo.width, height: photo.height }} />
-            <p className="text-[10px] text-mid-gray mt-3">Choose your size and pay in the basket</p>
+            <p className="text-[10px] text-mid-gray mt-3">{t('chooseSize')}</p>
           </>
         )}
 

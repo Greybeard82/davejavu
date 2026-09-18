@@ -12,7 +12,9 @@
   },
   "hero": {
     "cta": "View Portfolio",
-    "scrollHint": "Scroll to explore"
+    "scrollHint": "Scroll to explore",
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide"
   },
   "gallery": {
     "title": "Portfolio",
@@ -23,7 +25,9 @@
     "editions": "{sold} of {max} remaining",
     "openEdition": "Open edition",
     "noPhotos": "No photos yet — check back soon.",
-    "page": "Page {current} of {total}"
+    "page": "Page {current} of {total}",
+    "clearFilters": "Clear",
+    "noMatches": "No photos match the selected filters."
   },
   "moods": {
     "Golden Hour": "Golden Hour",
@@ -52,14 +56,27 @@
     "shutterSpeed": "Shutter speed",
     "edition": "Edition {sold} of {max}",
     "openEdition": "Open edition",
-    "availableForLicense": "Available for license"
+    "availableForLicense": "Available for license",
+    "untitled": "(untitled)",
+    "chooseSize": "Choose your size and pay in the basket",
+    "metaDescription": "{title} — Fine art photography by DAVEJAVU",
+    "wall": "Wall",
+    "wallWarm": "Warm White",
+    "wallStone": "Stone",
+    "wallDark": "Charcoal",
+    "size": "Size",
+    "lang": "Lang",
+    "close": "Close"
   },
   "favorites": {
     "title": "Your Favorites",
     "empty": "You haven't saved any favorites yet.",
     "browseCta": "Browse the portfolio",
     "inquireAll": "Inquire about all favorites",
-    "count": "{count} saved"
+    "count": "{count} saved",
+    "addAria": "Add to favorites",
+    "removeAria": "Remove from favorites",
+    "inquireOne": "Inquire about this photo"
   },
   "contact": {
     "title": "Get in Touch",
@@ -132,7 +149,8 @@
     "ctaHeading": "Like what you see?",
     "ctaBody": "Browse the portfolio or get in touch about a license.",
     "ctaPortfolio": "View portfolio",
-    "ctaContact": "Get in touch"
+    "ctaContact": "Get in touch",
+    "metaDescription": "Landscape and cityscape photographer."
   },
   "collections": {
     "title": "Collections",
@@ -175,7 +193,8 @@
     "licenseTerms": "License terms",
     "commercialCta": "Commercial use? Contact me.",
     "paypalError": "PayPal encountered an error. Please try again.",
-    "agreeTerms": "I have read and agree to the license terms and waive my right to withdrawal for this digital purchase."
+    "agreeTerms": "I have read and agree to the license terms and waive my right to withdrawal for this digital purchase.",
+    "close": "Close"
   },
   "license": {
     "title": "Terms & Conditions",
@@ -252,6 +271,16 @@
     "save": "Save",
     "saved": "Saved",
     "basket": "Basket",
-    "inBasket": "In basket"
+    "inBasket": "In basket",
+    "addToBasket": "Add to basket"
+  },
+  "meta": {
+    "title": "DAVEJAVU — Landscape & Cityscape Photography",
+    "description": "Fine art landscape and cityscape photography. Browse and license images."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "That page does not exist, or it has moved.",
+    "cta": "Back to portfolio"
   }
 }

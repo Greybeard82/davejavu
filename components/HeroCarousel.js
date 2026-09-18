@@ -108,7 +108,7 @@ export default function HeroCarousel({ slides = [] }) {
       {/* Prev / Next arrows */}
       <button
         onClick={prev}
-        aria-label="Previous slide"
+        aria-label={t('prevSlide')}
         className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -117,7 +117,7 @@ export default function HeroCarousel({ slides = [] }) {
       </button>
       <button
         onClick={next}
-        aria-label="Next slide"
+        aria-label={t('nextSlide')}
         className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white transition-colors"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

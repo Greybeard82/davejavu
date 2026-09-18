@@ -25,7 +25,7 @@ function PayPalModal({ photo, tier, locale, onClose, onSuccess, onError }) {
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-[#888] hover:text-charcoal transition-colors"
-          aria-label="Close"
+          aria-label={t('close')}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
             <path d="M18 6L6 18M6 6l12 12"/>

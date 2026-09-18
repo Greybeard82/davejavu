@@ -9,6 +9,7 @@ import PhotoGrid from '@/components/PhotoGrid';
 const getCollection = cache(async (slug, locale) => {
   const supabase = createAdminClient();
   const tc = await getTranslations({ locale, namespace: 'collections' });
+  const tp = await getTranslations({ locale, namespace: 'photo' });
 
   // Fetch collection metadata
   const { data, error } = await supabase
@@ -53,7 +54,7 @@ const getCollection = cache(async (slug, locale) => {
         id: photo.id,
         image: getGridUrl(photo.cloudinary_id),
         heroImage: getHeroUrl(photo.cloudinary_id),
-        title: t.title || '(untitled)',
+        title: t.title || tp('untitled'),
         location: t.location || '',
         moods: photo.photo_moods?.map((m) => m.mood) || [],
         isNew: new Date(photo.created_at).getTime() > thirtyDaysAgo,

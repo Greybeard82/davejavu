@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 const WALLS = [
-  { key: 'warm',  label: 'Warm White', bg: '#f0ede8', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px),repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(0,0,0,0.008) 2px,rgba(0,0,0,0.008) 4px)' },
-  { key: 'stone', label: 'Stone',      bg: '#d6d2cc', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px)' },
-  { key: 'dark',  label: 'Charcoal',   bg: '#2a2a2a', texture: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.015) 3px,rgba(255,255,255,0.015) 6px)' },
+  { key: 'warm',  labelKey: 'wallWarm', bg: '#f0ede8', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.012) 2px,rgba(0,0,0,0.012) 4px),repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(0,0,0,0.008) 2px,rgba(0,0,0,0.008) 4px)' },
+  { key: 'stone', labelKey: 'wallStone', bg: '#d6d2cc', texture: 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px)' },
+  { key: 'dark',  labelKey: 'wallDark',  bg: '#2a2a2a', texture: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.015) 3px,rgba(255,255,255,0.015) 6px)' },
 ];
 
 const SIZES = [
@@ -64,12 +64,12 @@ export default function WallMockup({ src, title, locale }) {
             <div className="flex items-center gap-6 flex-wrap">
               {/* Wall swatches */}
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Wall</span>
+                <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>{t('wall')}</span>
                 {WALLS.map((w) => (
                   <button
                     key={w.key}
                     onClick={() => setWall(w.key)}
-                    title={w.label}
+                    title={t(w.labelKey)}
                     className="w-6 h-6 rounded-full transition-transform hover:scale-110"
                     style={{
                       background: w.bg,
@@ -83,7 +83,7 @@ export default function WallMockup({ src, title, locale }) {
 
               {/* Size buttons */}
               <div className="flex items-center gap-1">
-                <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Size</span>
+                <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>{t('size')}</span>
                 {SIZES.map((s) => (
                   <button
                     key={s.key}
@@ -103,7 +103,7 @@ export default function WallMockup({ src, title, locale }) {
               {/* Language switcher */}
               {locale && (
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>Lang</span>
+                  <span className="text-[10px] uppercase tracking-widest mr-2" style={{ color: mutedColor }}>{t('lang')}</span>
                   {LOCALES.map((l) => (
                     <Link
                       key={l}
@@ -134,7 +134,7 @@ export default function WallMockup({ src, title, locale }) {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M18 6L6 18M6 6l12 12"/>
               </svg>
-              Close
+              {t('close')}
             </button>
           </div>
 

@@ -12,7 +12,9 @@
   },
   "hero": {
     "cta": "Ver portfólio",
-    "scrollHint": "Role para explorar"
+    "scrollHint": "Role para explorar",
+    "prevSlide": "Imagem anterior",
+    "nextSlide": "Imagem seguinte"
   },
   "gallery": {
     "title": "Portfólio",
@@ -23,7 +25,9 @@
     "editions": "{sold} de {max} restantes",
     "openEdition": "Edição aberta",
     "noPhotos": "Ainda sem fotos — volte em breve.",
-    "page": "Página {current} de {total}"
+    "page": "Página {current} de {total}",
+    "clearFilters": "Limpar",
+    "noMatches": "Nenhuma foto corresponde aos filtros selecionados."
   },
   "moods": {
     "Golden Hour": "Hora dourada",
@@ -52,14 +56,27 @@
     "shutterSpeed": "Velocidade do obturador",
     "edition": "Edição {sold} de {max}",
     "openEdition": "Edição aberta",
-    "availableForLicense": "Disponível para licença"
+    "availableForLicense": "Disponível para licença",
+    "untitled": "(sem título)",
+    "chooseSize": "Escolha o tamanho e pague no cesto",
+    "metaDescription": "{title} — Fotografia de arte por DAVEJAVU",
+    "wall": "Parede",
+    "wallWarm": "Branco quente",
+    "wallStone": "Pedra",
+    "wallDark": "Carvão",
+    "size": "Tamanho",
+    "lang": "Idioma",
+    "close": "Fechar"
   },
   "favorites": {
     "title": "Os seus favoritos",
     "empty": "Ainda não guardou nenhum favorito.",
     "browseCta": "Explorar o portfólio",
     "inquireAll": "Solicitar informações sobre todos os favoritos",
-    "count": "{count} guardados"
+    "count": "{count} guardados",
+    "addAria": "Adicionar aos favoritos",
+    "removeAria": "Remover dos favoritos",
+    "inquireOne": "Pedir informações sobre esta foto"
   },
   "contact": {
     "title": "Entre em contacto",
@@ -132,7 +149,8 @@
     "ctaHeading": "Gosta do que vê?",
     "ctaBody": "Explore o portfólio ou entre em contacto sobre uma licença.",
     "ctaPortfolio": "Ver portfólio",
-    "ctaContact": "Entrar em contacto"
+    "ctaContact": "Entrar em contacto",
+    "metaDescription": "Fotógrafo de paisagens e cidades."
   },
   "collections": {
     "title": "Coleções",
@@ -175,7 +193,8 @@
     "licenseTerms": "Termos de licença",
     "commercialCta": "Uso comercial? Contacte-me.",
     "paypalError": "O PayPal encontrou um erro. Por favor tente novamente.",
-    "agreeTerms": "Li e aceito os termos da licença e renuncio ao meu direito de arrependimento para esta compra digital."
+    "agreeTerms": "Li e aceito os termos da licença e renuncio ao meu direito de arrependimento para esta compra digital.",
+    "close": "Fechar"
   },
   "license": {
     "title": "Termos e Condições",
@@ -252,6 +271,16 @@
     "save": "Guardar",
     "saved": "Guardado",
     "basket": "Cesto",
-    "inBasket": "No cesto"
+    "inBasket": "No cesto",
+    "addToBasket": "Adicionar ao cesto"
+  },
+  "meta": {
+    "title": "DAVEJAVU — Fotografia de paisagens e cidades",
+    "description": "Fotografia de arte de paisagens e cidades. Explore o portfólio e adquira uma licença."
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "body": "Essa página não existe ou foi movida.",
+    "cta": "Voltar ao portfólio"
   }
 }

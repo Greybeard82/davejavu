@@ -12,7 +12,9 @@
   },
   "hero": {
     "cta": "Portfolio ansehen",
-    "scrollHint": "Scrollen zum Erkunden"
+    "scrollHint": "Scrollen zum Erkunden",
+    "prevSlide": "Vorheriges Bild",
+    "nextSlide": "Nächstes Bild"
   },
   "gallery": {
     "title": "Portfolio",
@@ -23,7 +25,9 @@
     "editions": "{sold} von {max} verbleibend",
     "openEdition": "Offene Auflage",
     "noPhotos": "Noch keine Fotos — schau bald wieder vorbei.",
-    "page": "Seite {current} von {total}"
+    "page": "Seite {current} von {total}",
+    "clearFilters": "Zurücksetzen",
+    "noMatches": "Keine Fotos entsprechen den gewählten Filtern."
   },
   "moods": {
     "Golden Hour": "Goldene Stunde",
@@ -52,14 +56,27 @@
     "shutterSpeed": "Verschlusszeit",
     "edition": "Auflage {sold} von {max}",
     "openEdition": "Offene Auflage",
-    "availableForLicense": "Zur Lizenzierung verfügbar"
+    "availableForLicense": "Zur Lizenzierung verfügbar",
+    "untitled": "(ohne Titel)",
+    "chooseSize": "Wählen Sie Ihr Format und zahlen Sie im Warenkorb",
+    "metaDescription": "{title} — Kunstfotografie von DAVEJAVU",
+    "wall": "Wand",
+    "wallWarm": "Warmweiß",
+    "wallStone": "Stein",
+    "wallDark": "Anthrazit",
+    "size": "Format",
+    "lang": "Sprache",
+    "close": "Schließen"
   },
   "favorites": {
     "title": "Ihre Favoriten",
     "empty": "Sie haben noch keine Favoriten gespeichert.",
     "browseCta": "Portfolio durchsuchen",
     "inquireAll": "Alle Favoriten anfragen",
-    "count": "{count} gespeichert"
+    "count": "{count} gespeichert",
+    "addAria": "Zu Favoriten hinzufügen",
+    "removeAria": "Aus Favoriten entfernen",
+    "inquireOne": "Anfrage zu diesem Foto"
   },
   "contact": {
     "title": "Kontakt aufnehmen",
@@ -132,7 +149,8 @@
     "ctaHeading": "Gefällt Ihnen was Sie sehen?",
     "ctaBody": "Durchsuchen Sie das Portfolio oder kontaktieren Sie mich wegen einer Lizenz.",
     "ctaPortfolio": "Portfolio ansehen",
-    "ctaContact": "Kontakt aufnehmen"
+    "ctaContact": "Kontakt aufnehmen",
+    "metaDescription": "Landschafts- und Stadtfotograf."
   },
   "collections": {
     "title": "Kollektionen",
@@ -175,7 +193,8 @@
     "licenseTerms": "Lizenzbedingungen",
     "commercialCta": "Kommerzielle Nutzung? Kontaktieren Sie mich.",
     "paypalError": "PayPal hat einen Fehler festgestellt. Bitte versuchen Sie es erneut.",
-    "agreeTerms": "Ich habe die Lizenzbedingungen gelesen und akzeptiere sie und verzichte auf mein Widerrufsrecht für diesen digitalen Kauf."
+    "agreeTerms": "Ich habe die Lizenzbedingungen gelesen und akzeptiere sie und verzichte auf mein Widerrufsrecht für diesen digitalen Kauf.",
+    "close": "Schließen"
   },
   "license": {
     "title": "Allgemeine Geschäftsbedingungen",
@@ -252,6 +271,16 @@
     "save": "Speichern",
     "saved": "Gespeichert",
     "basket": "Warenkorb",
-    "inBasket": "Im Warenkorb"
+    "inBasket": "Im Warenkorb",
+    "addToBasket": "In den Warenkorb"
+  },
+  "meta": {
+    "title": "DAVEJAVU — Landschafts- und Stadtfotografie",
+    "description": "Kunstfotografie von Landschaften und Städten. Portfolio durchsuchen und Lizenz erwerben."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "body": "Diese Seite existiert nicht oder wurde verschoben.",
+    "cta": "Zurück zum Portfolio"
   }
 }

@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createAdminClient } from '@/lib/supabase-admin';
@@ -21,6 +21,14 @@ async function getCollections(locale) {
   } catch {
     return [];
   }
+}
+
+// Overrides the root layout's English title and description per locale, so the
+// browser tab and search snippet are not English on every language.
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'meta' });
+  return { title: t('title'), description: t('description') };
 }
 
 export default async function LocaleLayout({ children, params }) {
