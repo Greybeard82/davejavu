@@ -163,7 +163,7 @@ export default function Navbar({ locale, collections = [] }) {
           <button
             className="md:hidden text-charcoal ml-auto p-3 -mr-3 touch-manipulation"
             onClick={() => setMenuOpen(o => !o)}
-            aria-label="Open menu"
+            aria-label={t('openMenu')}
             type="button"
           >
             {menuOpen ? (
@@ -185,7 +185,7 @@ export default function Navbar({ locale, collections = [] }) {
           <button
             type="button"
             onClick={() => setMenuOpen(false)}
-            aria-label="Close menu"
+            aria-label={t('closeMenu')}
             className="absolute top-0 right-0 h-[72px] w-[72px] flex items-center justify-center text-charcoal touch-manipulation"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">

@@ -127,7 +127,7 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
         <div>
           <label className={labelClass}>{t('name')} <span className="text-orange">*</span></label>
           <input type="text" value={fields.name} onChange={(e) => set('name', e.target.value)}
-            placeholder="John Doe" className={inputClass} autoComplete="name" />
+            placeholder={t('namePlaceholder')} className={inputClass} autoComplete="name" />
           {errors.name && <p className="text-[11px] text-red-500 mt-1">{errors.name}</p>}
         </div>
         <div>
@@ -168,13 +168,13 @@ export default function ContactForm({ locale, prefilledPhoto = '' }) {
                 <span className="text-sm text-charcoal flex-1 leading-snug">{photo.title}</span>
                 <button type="button" onClick={() => removePhoto(photo.id)}
                   className="text-mid-gray hover:text-red-400 transition-colors text-lg leading-none px-1"
-                  aria-label="Remove">×</button>
+                  aria-label={t('removeAria')}>×</button>
               </div>
             ))}
           </div>
         ) : (
           <p className="text-xs text-mid-gray py-3">
-            No photos selected — save photos from the gallery using the ♡ button and they'll appear here automatically.
+            {t('noPhotosSelected')}
           </p>
         )}
       </div>

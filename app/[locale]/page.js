@@ -1,9 +1,10 @@
+import { getTranslations } from 'next-intl/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import HeroCarousel from '@/components/HeroCarousel';
 import PhotoGrid from '@/components/PhotoGrid';
 import { getGridUrl, getHeroUrl } from '@/lib/cloudinary';
 
-function shapePhoto(photo, locale) {
+function shapePhoto(photo, locale, untitled) {
   const thirtyDaysAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
   const t = photo.photo_translations?.find((x) => x.locale === locale)
          || photo.photo_translations?.find((x) => x.locale === 'en')
@@ -12,7 +13,7 @@ function shapePhoto(photo, locale) {
     id: photo.id,
     image: getGridUrl(photo.cloudinary_id),
     heroImage: getHeroUrl(photo.cloudinary_id),
-    title: t.title || '(untitled)',
+    title: t.title || untitled,
     location: t.location || '',
     moods: photo.photo_moods?.map((m) => m.mood) || [],
     isNew: new Date(photo.created_at).getTime() > thirtyDaysAgo,
@@ -30,6 +31,8 @@ const PHOTO_SELECT = `id, cloudinary_id, featured, available_for_license, create
 
 async function getPageData(locale) {
   const supabase = createAdminClient();
+  const tp = await getTranslations({ locale, namespace: 'photo' });
+  const untitled = tp('untitled');
   const [{ data: published, error: pubErr }, { data: featured, error: featErr }, { data: moodsData }] = await Promise.all([
     supabase.from('photos').select(PHOTO_SELECT).eq('published', true).order('created_at', { ascending: false }),
     supabase.from('photos').select(PHOTO_SELECT).eq('featured', true).limit(6),
@@ -38,8 +41,8 @@ async function getPageData(locale) {
   if (pubErr) console.error('published query error:', pubErr);
   if (featErr) console.error('featured query error:', featErr);
   return {
-    photos: (published || []).map((p) => shapePhoto(p, locale)),
-    heroSlides: (featured || []).sort(() => Math.random() - 0.5).map((p) => ({ ...shapePhoto(p, locale), image: getHeroUrl(p.cloudinary_id) })),
+    photos: (published || []).map((p) => shapePhoto(p, locale, untitled)),
+    heroSlides: (featured || []).sort(() => Math.random() - 0.5).map((p) => ({ ...shapePhoto(p, locale, untitled), image: getHeroUrl(p.cloudinary_id) })),
     moods: (moodsData || []).map((r) => r.name),
   };
 }

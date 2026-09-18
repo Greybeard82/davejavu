@@ -12,7 +12,9 @@
   },
   "hero": {
     "cta": "Ver portafolio",
-    "scrollHint": "Desplázate para explorar"
+    "scrollHint": "Desplázate para explorar",
+    "prevSlide": "Imagen anterior",
+    "nextSlide": "Imagen siguiente"
   },
   "gallery": {
     "title": "Portafolio",
@@ -23,7 +25,9 @@
     "editions": "{sold} de {max} restantes",
     "openEdition": "Edición abierta",
     "noPhotos": "Aún no hay fotos — vuelve pronto.",
-    "page": "Página {current} de {total}"
+    "page": "Página {current} de {total}",
+    "clearFilters": "Borrar",
+    "noMatches": "Ninguna foto coincide con los filtros seleccionados."
   },
   "moods": {
     "Golden Hour": "Hora dorada",
@@ -52,14 +56,27 @@
     "shutterSpeed": "Velocidad de obturación",
     "edition": "Edición {sold} de {max}",
     "openEdition": "Edición abierta",
-    "availableForLicense": "Disponible para licencia"
+    "availableForLicense": "Disponible para licencia",
+    "untitled": "(sin título)",
+    "chooseSize": "Elige el tamaño y paga en la cesta",
+    "metaDescription": "{title} — Fotografía artística de DAVEJAVU",
+    "wall": "Pared",
+    "wallWarm": "Blanco cálido",
+    "wallStone": "Piedra",
+    "wallDark": "Carbón",
+    "size": "Tamaño",
+    "lang": "Idioma",
+    "close": "Cerrar"
   },
   "favorites": {
     "title": "Tus favoritos",
     "empty": "Aún no has guardado ningún favorito.",
     "browseCta": "Explorar el portafolio",
     "inquireAll": "Consultar sobre todos los favoritos",
-    "count": "{count} guardados"
+    "count": "{count} guardados",
+    "addAria": "Añadir a favoritos",
+    "removeAria": "Quitar de favoritos",
+    "inquireOne": "Consultar sobre esta foto"
   },
   "contact": {
     "title": "Ponte en contacto",
@@ -91,7 +108,11 @@
       "messageTooShort": "El mensaje debe tener al menos 20 caracteres",
       "gdprRequired": "Debes aceptar los términos de tratamiento de datos",
       "captchaRequired": "Por favor completa el captcha"
-    }
+    },
+    "metaDescription": "Consulta sobre la licencia de una foto o ponte en contacto.",
+    "namePlaceholder": "Juan Pérez",
+    "removeAria": "Quitar",
+    "noPhotosSelected": "Ninguna foto seleccionada — guarda fotos de la galería con el botón ♡ y aparecerán aquí automáticamente."
   },
   "pricing": {
     "title": "Licencias",
@@ -132,13 +153,16 @@
     "ctaHeading": "¿Te gusta lo que ves?",
     "ctaBody": "Explora el portafolio o ponte en contacto sobre una licencia.",
     "ctaPortfolio": "Ver portafolio",
-    "ctaContact": "Contactar"
+    "ctaContact": "Contactar",
+    "metaDescription": "Fotógrafo de paisajes y ciudades."
   },
   "collections": {
     "title": "Colecciones",
     "subtitle": "Series de fotografías agrupadas por lugar y atmósfera.",
     "viewCollection": "Ver colección",
-    "photos": "{count} fotos"
+    "photos": "{count, plural, one {# foto} other {# fotos}}",
+    "empty": "Aún no hay colecciones — vuelve pronto.",
+    "untitled": "(sin título)"
   },
   "cookie": {
     "message": "Este sitio usa cookies para mejorar tu experiencia.",
@@ -173,11 +197,55 @@
     "licenseTerms": "Términos de licencia",
     "commercialCta": "¿Uso comercial? Contáctame.",
     "paypalError": "PayPal encontró un error. Por favor inténtalo de nuevo.",
-    "agreeTerms": "He leído y acepto los términos de la licencia y renuncio a mi derecho de desistimiento para esta compra digital."
+    "agreeTerms": "He leído y acepto los términos de la licencia y renuncio a mi derecho de desistimiento para esta compra digital.",
+    "close": "Cerrar"
   },
   "license": {
-    "title": "Términos de Licencia",
-    "back": "Volver al portafolio"
+    "title": "Términos y Condiciones",
+    "back": "Volver al portafolio",
+    "lastUpdated": "Última actualización: abril de 2026",
+    "sections": [
+      {
+        "heading": "1. Qué estás comprando",
+        "body": "Estás adquiriendo una licencia digital para usar una fotografía con fines personales y no comerciales. No estás comprando una impresión física. No adquieres derechos de autor, propiedad ni ningún derecho de propiedad intelectual sobre la fotografía."
+      },
+      {
+        "heading": "2. Concesión de licencia",
+        "body": "Tras el pago, DAVEJAVU te otorga una licencia mundial no exclusiva e intransferible para usar la fotografía licenciada únicamente para uso personal, incluyendo: impresión para uso decorativo en casa u oficina privada; uso como salvapantallas o fondo de escritorio; y compartir con familiares y amigos en contextos no comerciales."
+      },
+      {
+        "heading": "3. Usos prohibidos",
+        "body": "La licencia no permite: ningún uso comercial (publicidad, editorial, colocación de productos, merchandising); reventa o sublicencia del archivo o copias derivadas; redistribución pública del archivo digital; uso en conjuntos de datos de entrenamiento de IA o modelos de aprendizaje automático; uso en NFTs o aplicaciones de blockchain; eliminación o alteración de los metadatos de derechos de autor incrustados."
+      },
+      {
+        "heading": "4. Derechos de autor",
+        "body": "El fotógrafo conserva en todo momento el copyright completo y exclusivo de todas las fotografías. Una compra otorga únicamente una licencia de uso personal y no transfiere derechos de autor, derechos morales ni ningún otro derecho de propiedad intelectual."
+      },
+      {
+        "heading": "5. Entrega",
+        "body": "Los archivos se entregan como archivos JPEG de alta calidad mediante un enlace de descarga con tiempo limitado enviado al correo electrónico proporcionado en el momento de la compra. Los enlaces de descarga son válidos durante 14 días. Si tu enlace caduca antes de descargar, contacta a contact@davejavuphoto.com y se emitirá un reemplazo."
+      },
+      {
+        "heading": "6. Política de no reembolso",
+        "body": "De conformidad con el artículo 16(m) de la Directiva de la UE sobre derechos de los consumidores (2011/83/UE), el derecho de desistimiento no se aplica al contenido digital puesto a disposición inmediatamente después de la compra. Al marcar la casilla en el proceso de pago y proceder con el pago, consientes expresamente el suministro inmediato de contenido digital y reconoces que renuncias a tu derecho de desistimiento. No se emitirán reembolsos una vez generado un enlace de descarga."
+      },
+      {
+        "heading": "7. Metadatos incrustados",
+        "body": "Cada archivo comprado contiene metadatos EXIF e IPTC incrustados que identifican el correo electrónico del comprador y el ID de pedido de PayPal. Estos metadatos se utilizan únicamente para hacer cumplir los derechos de autor y no se comparten con terceros."
+      },
+      {
+        "heading": "8. Protección de datos (RGPD)",
+        "body": "Responsable: David Martins / DAVEJAVU — contact@davejavuphoto.com.\n\nDatos recopilados: tu nombre y dirección de correo electrónico, recibidos de PayPal en el momento de la compra.\n\nFinalidad y base legal: cumplimiento del pedido y entrega de la descarga (Art. 6(1)(b) RGPD); cumplimiento de obligaciones contables y fiscales (Art. 6(1)(c) RGPD).\n\nConservación: los registros de compras se conservan durante 7 años según la legislación contable española (Ley 58/2003 General Tributaria).\n\nTus derechos: tienes derecho a acceder, rectificar, limitar el tratamiento o solicitar la supresión de tus datos personales. Escribe a contact@davejavuphoto.com."
+      },
+      {
+        "heading": "9. Ley aplicable",
+        "body": "Estos términos se rigen por la legislación española. Cualquier disputa estará sujeta a la jurisdicción exclusiva de los tribunales de Barcelona, España, sin perjuicio de tus derechos como consumidor según la legislación de tu país de residencia en la Unión Europea."
+      },
+      {
+        "heading": "10. Contacto",
+        "body": "Para cualquier pregunta sobre estos términos o tu compra, contacta a contact@davejavuphoto.com."
+      }
+    ]
   },
   "basket": {
     "title": "Cesta",
@@ -207,6 +275,16 @@
     "save": "Guardar",
     "saved": "Guardado",
     "basket": "Cesta",
-    "inBasket": "En cesta"
+    "inBasket": "En cesta",
+    "addToBasket": "Añadir a la cesta"
+  },
+  "meta": {
+    "title": "DAVEJAVU — Fotografía de paisajes y ciudades",
+    "description": "Fotografía artística de paisajes y ciudades. Explora el portafolio y adquiere una licencia."
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "body": "Esa página no existe o se ha movido.",
+    "cta": "Volver al portafolio"
   }
 }

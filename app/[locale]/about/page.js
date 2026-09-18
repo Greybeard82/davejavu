@@ -9,7 +9,7 @@ export async function generateMetadata({ params }) {
   const t = await getTranslations({ locale, namespace: 'about' });
   return {
     title: `${t('title')} — DAVEJAVU`,
-    description: 'Landscape and cityscape photographer.',
+    description: t('metaDescription'),
   };
 }
 

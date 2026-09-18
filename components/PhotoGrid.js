@@ -42,6 +42,11 @@ function BlurHashPlaceholder({ hash }) {
 
 function Lightbox({ photo, locale, onClose }) {
   const t = useTranslations('lightboxActions');
+  // Separate namespace from `lightboxActions` above: `lightbox` holds the
+  // chrome of the overlay itself (close, and prev/next once those controls
+  // exist), `lightboxActions` holds the buttons on the action bar.
+  const tChrome = useTranslations('lightbox');
+  const tf = useTranslations('favorites');
   const [favorited, setFavorited] = useState(() =>
     getFavorites().some((f) => f.id === photo.id)
   );
@@ -140,7 +145,7 @@ function Lightbox({ photo, locale, onClose }) {
 
               <button
                 onClick={toggleFavorite}
-                aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+                aria-label={favorited ? tf('removeAria') : tf('addAria')}
                 className="flex flex-col items-center gap-1 group"
               >
                 <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200 ${
@@ -157,7 +162,7 @@ function Lightbox({ photo, locale, onClose }) {
 
               <button
                 onClick={handleBasket}
-                aria-label={inBasket ? 'In basket' : 'Add to basket'}
+                aria-label={inBasket ? t('inBasket') : t('addToBasket')}
                 className="flex flex-col items-center gap-1 group"
               >
                 <div className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200 ${
@@ -186,7 +191,7 @@ function Lightbox({ photo, locale, onClose }) {
         transition={{ delay: 0.1 }}
         className="absolute top-5 right-5 z-20 w-10 h-10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
         onClick={onClose}
-        aria-label="Close"
+        aria-label={tChrome('close')}
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
           <path d="M18 6L6 18M6 6l12 12"/>
@@ -197,6 +202,9 @@ function Lightbox({ photo, locale, onClose }) {
 }
 
 function PhotoCard({ photo, onSelect }) {
+  const tm = useTranslations('moods');
+  const tg = useTranslations('gallery');
+  const tf = useTranslations('favorites');
   const [hovered, setHovered] = useState(false);
   const [errored, setErrored] = useState(false);
   const [favorited, setFavorited] = useState(() => getFavorites().some((f) => f.id === photo.id));
@@ -244,7 +252,7 @@ function PhotoCard({ photo, onSelect }) {
           <div className="flex flex-wrap gap-1 mt-2">
             {photo.moods.map((mood) => (
               <span key={mood} className="text-white/70 text-[10px] uppercase tracking-wider border border-white/30 px-2 py-0.5 rounded-full">
-                {mood}
+                {tm.has(mood) ? tm(mood) : mood}
               </span>
             ))}
           </div>
@@ -254,7 +262,7 @@ function PhotoCard({ photo, onSelect }) {
         <div className="absolute top-3 left-3 z-30 flex flex-col gap-1">
           {photo.isNew && (
             <span className="bg-orange text-white text-[9px] font-700 uppercase tracking-wider px-2 py-0.5 rounded">
-              New
+              {tg('newBadge')}
             </span>
           )}
         </div>
@@ -263,7 +271,7 @@ function PhotoCard({ photo, onSelect }) {
         <div className="absolute top-3 right-3 z-30 flex flex-col gap-1.5">
           <button
             onClick={toggleFavorite}
-            aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={favorited ? tf('removeAria') : tf('addAria')}
             className={`w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
               favorited
                 ? 'bg-white text-orange'
@@ -283,6 +291,7 @@ function PhotoCard({ photo, onSelect }) {
 
 export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK }) {
   const t = useTranslations('gallery');
+  const tm = useTranslations('moods');
   const [activeFilters, setActiveFilters] = useState([]);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
@@ -317,7 +326,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
                     : 'border-[#d1d1d1] text-charcoal hover:border-orange hover:text-orange'
                 }`}
               >
-                {mood}
+                {tm.has(mood) ? tm(mood) : mood}
               </button>
             ))}
             {activeFilters.length > 0 && (
@@ -325,7 +334,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
                 onClick={() => setActiveFilters([])}
                 className="text-[10px] uppercase tracking-widest font-600 px-3 py-1.5 text-mid-gray hover:text-orange transition-colors"
               >
-                Clear
+                {t('clearFilters')}
               </button>
             )}
           </div>
@@ -334,7 +343,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
         {/* Masonry grid */}
         {filtered.length === 0 ? (
           <div className="text-center py-24 text-mid-gray">
-            <p className="text-sm uppercase tracking-widest">No photos match the selected filters.</p>
+            <p className="text-sm uppercase tracking-widest">{t('noMatches')}</p>
           </div>
         ) : (
           <div className="columns-1 sm:columns-2 gap-4">

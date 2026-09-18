@@ -78,10 +78,11 @@ function ThankYouContent() {
 }
 
 export default function ThankYouPage() {
+  const t = useTranslations('thankYou');
   return (
     <Suspense fallback={
       <div className="max-w-2xl mx-auto px-6 pt-[72px] pb-24 text-center pt-32">
-        <p className="text-sm text-mid-gray">Loading…</p>
+        <p className="text-sm text-mid-gray">{t('loading')}</p>
       </div>
     }>
       <ThankYouContent />

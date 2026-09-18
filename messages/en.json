@@ -12,7 +12,9 @@
   },
   "hero": {
     "cta": "View Portfolio",
-    "scrollHint": "Scroll to explore"
+    "scrollHint": "Scroll to explore",
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide"
   },
   "gallery": {
     "title": "Portfolio",
@@ -23,7 +25,9 @@
     "editions": "{sold} of {max} remaining",
     "openEdition": "Open edition",
     "noPhotos": "No photos yet — check back soon.",
-    "page": "Page {current} of {total}"
+    "page": "Page {current} of {total}",
+    "clearFilters": "Clear",
+    "noMatches": "No photos match the selected filters."
   },
   "moods": {
     "Golden Hour": "Golden Hour",
@@ -52,14 +56,27 @@
     "shutterSpeed": "Shutter speed",
     "edition": "Edition {sold} of {max}",
     "openEdition": "Open edition",
-    "availableForLicense": "Available for license"
+    "availableForLicense": "Available for license",
+    "untitled": "(untitled)",
+    "chooseSize": "Choose your size and pay in the basket",
+    "metaDescription": "{title} — Fine art photography by DAVEJAVU",
+    "wall": "Wall",
+    "wallWarm": "Warm White",
+    "wallStone": "Stone",
+    "wallDark": "Charcoal",
+    "size": "Size",
+    "lang": "Lang",
+    "close": "Close"
   },
   "favorites": {
     "title": "Your Favorites",
     "empty": "You haven't saved any favorites yet.",
     "browseCta": "Browse the portfolio",
     "inquireAll": "Inquire about all favorites",
-    "count": "{count} saved"
+    "count": "{count} saved",
+    "addAria": "Add to favorites",
+    "removeAria": "Remove from favorites",
+    "inquireOne": "Inquire about this photo"
   },
   "contact": {
     "title": "Get in Touch",
@@ -91,7 +108,11 @@
       "messageTooShort": "Message must be at least 20 characters",
       "gdprRequired": "You must agree to the data processing terms",
       "captchaRequired": "Please complete the captcha"
-    }
+    },
+    "metaDescription": "Inquire about licensing a photo or get in touch.",
+    "namePlaceholder": "John Doe",
+    "removeAria": "Remove",
+    "noPhotosSelected": "No photos selected — save photos from the gallery using the ♡ button and they'll appear here automatically."
   },
   "pricing": {
     "title": "Licensing",
@@ -132,13 +153,16 @@
     "ctaHeading": "Like what you see?",
     "ctaBody": "Browse the portfolio or get in touch about a license.",
     "ctaPortfolio": "View portfolio",
-    "ctaContact": "Get in touch"
+    "ctaContact": "Get in touch",
+    "metaDescription": "Landscape and cityscape photographer."
   },
   "collections": {
     "title": "Collections",
     "subtitle": "Series of photographs grouped by place and atmosphere.",
     "viewCollection": "View collection",
-    "photos": "{count} photos"
+    "photos": "{count, plural, one {# photo} other {# photos}}",
+    "empty": "No collections yet — check back soon.",
+    "untitled": "(untitled)"
   },
   "cookie": {
     "message": "This site uses cookies to improve your experience.",
@@ -173,11 +197,55 @@
     "licenseTerms": "License terms",
     "commercialCta": "Commercial use? Contact me.",
     "paypalError": "PayPal encountered an error. Please try again.",
-    "agreeTerms": "I have read and agree to the license terms and waive my right to withdrawal for this digital purchase."
+    "agreeTerms": "I have read and agree to the license terms and waive my right to withdrawal for this digital purchase.",
+    "close": "Close"
   },
   "license": {
-    "title": "License Terms",
-    "back": "Back to portfolio"
+    "title": "Terms & Conditions",
+    "back": "Back to portfolio",
+    "lastUpdated": "Last updated: April 2026",
+    "sections": [
+      {
+        "heading": "1. What you are buying",
+        "body": "You are purchasing a digital license to use a photograph for personal, non-commercial purposes. You are not purchasing a physical print. You are not acquiring copyright, ownership, or any intellectual property rights in the photograph."
+      },
+      {
+        "heading": "2. License grant",
+        "body": "Upon payment, DAVEJAVU grants you a non-exclusive, non-transferable, worldwide license to use the licensed photograph for personal use only, including: printing for personal display at home or in a private office; use as a screensaver or digital wallpaper; and sharing with family and friends in non-commercial contexts."
+      },
+      {
+        "heading": "3. Prohibited uses",
+        "body": "The license does not permit: any commercial use (advertising, editorial, product placement, merchandise); resale or sub-licensing of the file or derived prints; public redistribution of the digital file; use in AI training datasets or machine learning models; use in NFTs or blockchain applications; removal or alteration of embedded copyright metadata."
+      },
+      {
+        "heading": "4. Copyright",
+        "body": "The photographer retains full and exclusive copyright in all photographs at all times. A purchase grants a personal-use license only and does not transfer copyright, moral rights, or any other intellectual property rights."
+      },
+      {
+        "heading": "5. Delivery",
+        "body": "Files are delivered as high-quality JPEG files via a time-limited download link sent to the email address provided at checkout. Download links are valid for 14 days. If your link expires before you download, contact contact@davejavuphoto.com and a replacement will be issued."
+      },
+      {
+        "heading": "6. No-refund policy",
+        "body": "In accordance with Article 16(m) of the EU Consumer Rights Directive (2011/83/EU), the right of withdrawal does not apply to digital content made available immediately after purchase. By ticking the checkbox at checkout and proceeding with payment, you expressly consent to the immediate supply of digital content and acknowledge that you thereby waive your right of withdrawal. No refunds will be issued once a download link has been generated."
+      },
+      {
+        "heading": "7. Embedded metadata",
+        "body": "Each purchased file contains embedded EXIF and IPTC metadata identifying the buyer's email address and PayPal order ID. This metadata is used solely for copyright enforcement and is not shared with third parties."
+      },
+      {
+        "heading": "8. Data protection (GDPR)",
+        "body": "Controller: David Martins / DAVEJAVU — contact@davejavuphoto.com.\n\nData collected: your name and email address, received from PayPal at the time of purchase.\n\nPurpose & legal basis: order fulfilment and download delivery (Art. 6(1)(b) GDPR — performance of a contract); compliance with accounting and tax obligations (Art. 6(1)(c) GDPR — legal obligation).\n\nRetention: purchase records are kept for 7 years as required by Spanish accounting law (Ley 58/2003 General Tributaria). Contact records are deleted after 2 years.\n\nProcessors: PayPal (payment processing), Resend (transactional email), Supabase (database). All processors operate under GDPR-compliant data processing agreements.\n\nYour rights: you have the right to access, rectify, restrict processing, or request erasure of your personal data. Note that purchase records required for legal compliance cannot be erased during the mandatory retention period. To exercise your rights, email contact@davejavuphoto.com."
+      },
+      {
+        "heading": "9. Governing law",
+        "body": "These terms are governed by Spanish law. Any disputes shall be subject to the exclusive jurisdiction of the courts of Barcelona, Spain, without prejudice to your statutory rights as a consumer under the law of your country of residence within the European Union."
+      },
+      {
+        "heading": "10. Contact",
+        "body": "For any questions about these terms or your purchase, contact contact@davejavuphoto.com."
+      }
+    ]
   },
   "basket": {
     "title": "Basket",
@@ -207,6 +275,16 @@
     "save": "Save",
     "saved": "Saved",
     "basket": "Basket",
-    "inBasket": "In basket"
+    "inBasket": "In basket",
+    "addToBasket": "Add to basket"
+  },
+  "meta": {
+    "title": "DAVEJAVU — Landscape & Cityscape Photography",
+    "description": "Fine art landscape and cityscape photography. Browse and license images."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "That page does not exist, or it has moved.",
+    "cta": "Back to portfolio"
   }
 }
