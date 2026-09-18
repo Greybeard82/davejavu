@@ -1,12 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cache } from 'react';
+import { getTranslations } from 'next-intl/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getGridUrl, getHeroUrl } from '@/lib/cloudinary';
 import PhotoGrid from '@/components/PhotoGrid';
 
 const getCollection = cache(async (slug, locale) => {
   const supabase = createAdminClient();
+  const tc = await getTranslations({ locale, namespace: 'collections' });
 
   // Fetch collection metadata
   const { data, error } = await supabase
@@ -66,7 +68,7 @@ const getCollection = cache(async (slug, locale) => {
          || data.collection_translations?.find((x) => x.locale === 'en')
          || {};
 
-  return { title: t.title || '(untitled)', description: t.description || '', photos };
+  return { title: t.title || tc('untitled'), description: t.description || '', photos };
 });
 
 export async function generateMetadata({ params }) {
@@ -81,7 +83,10 @@ export async function generateMetadata({ params }) {
 
 export default async function CollectionPage({ params }) {
   const { slug, locale } = await params;
-  const collection = await getCollection(slug, locale);
+  const [collection, t] = await Promise.all([
+    getCollection(slug, locale),
+    getTranslations({ locale, namespace: 'collections' }),
+  ]);
 
   if (!collection) notFound();
 
@@ -90,7 +95,7 @@ export default async function CollectionPage({ params }) {
       <div className="max-w-[1800px] mx-auto px-6 pt-16 pb-10">
         <p className="text-[10px] uppercase tracking-widest text-mid-gray mb-4">
           <Link href={`/${locale}/collections`} className="hover:text-orange transition-colors">
-            Collections
+            {t('title')}
           </Link>
           {' / '}
           <span className="text-charcoal">{collection.title}</span>
@@ -100,7 +105,7 @@ export default async function CollectionPage({ params }) {
           <p className="text-sm text-mid-gray mt-3 leading-relaxed max-w-xl">{collection.description}</p>
         )}
         <p className="text-[10px] uppercase tracking-widest text-mid-gray mt-4">
-          {collection.photos.length} photo{collection.photos.length !== 1 ? 's' : ''}
+          {t('photos', { count: collection.photos.length })}
         </p>
       </div>
 

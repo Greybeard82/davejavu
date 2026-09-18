@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import ProtectedImage from '@/components/ProtectedImage';
 
-async function getCollections(locale) {
+async function getCollections(locale, untitled) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('collections')
@@ -25,7 +26,7 @@ async function getCollections(locale) {
     return {
       id: c.id,
       slug: c.slug,
-      title: t.title || '(untitled)',
+      title: t.title || untitled,
       description: t.description || '',
       photoCount: c.photo_collections?.length || 0,
       coverUrl: c.cover?.cloudinary_id
@@ -35,26 +36,31 @@ async function getCollections(locale) {
   });
 }
 
-export const metadata = {
-  title: 'Collections — DAVEJAVU',
-  description: 'Series of photographs grouped by place and atmosphere.',
-};
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'collections' });
+  return {
+    title: `${t('title')} — DAVEJAVU`,
+    description: t('subtitle'),
+  };
+}
 
 export default async function CollectionsPage({ params }) {
   const { locale } = await params;
-  const collections = await getCollections(locale);
+  const t = await getTranslations({ locale, namespace: 'collections' });
+  const collections = await getCollections(locale, t('untitled'));
 
   return (
     <div className="max-w-[1800px] mx-auto px-6 pt-[72px] pb-24">
       <div className="pt-16 mb-12">
-        <h1 className="text-3xl md:text-4xl font-700 text-charcoal tracking-tight">Collections</h1>
+        <h1 className="text-3xl md:text-4xl font-700 text-charcoal tracking-tight">{t('title')}</h1>
         <p className="text-sm text-mid-gray mt-2 leading-relaxed">
-          Series of photographs grouped by place and atmosphere.
+          {t('subtitle')}
         </p>
       </div>
 
       {collections.length === 0 ? (
-        <p className="text-sm text-mid-gray py-20 text-center">No collections yet — check back soon.</p>
+        <p className="text-sm text-mid-gray py-20 text-center">{t('empty')}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {collections.map((c) => (
@@ -78,7 +84,7 @@ export default async function CollectionsPage({ params }) {
                 <div className="absolute bottom-0 left-0 right-0 p-5">
                   <h2 className="text-white font-700 text-xl tracking-tight">{c.title}</h2>
                   <p className="text-white/60 text-[10px] uppercase tracking-[3px] mt-1">
-                    {c.photoCount} photo{c.photoCount !== 1 ? 's' : ''}
+                    {t('photos', { count: c.photoCount })}
                   </p>
                 </div>
               </div>

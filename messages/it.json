@@ -138,7 +138,9 @@
     "title": "Collezioni",
     "subtitle": "Serie di fotografie raggruppate per luogo e atmosfera.",
     "viewCollection": "Vedi collezione",
-    "photos": "{count} foto"
+    "photos": "{count, plural, one {# foto} other {# foto}}",
+    "empty": "Ancora nessuna collezione — torna presto.",
+    "untitled": "(senza titolo)"
   },
   "cookie": {
     "message": "Questo sito utilizza cookie per migliorare la tua esperienza.",
@@ -176,8 +178,51 @@
     "agreeTerms": "Ho letto e accetto i termini della licenza e rinuncio al mio diritto di recesso per questo acquisto digitale."
   },
   "license": {
-    "title": "Termini di Licenza",
-    "back": "Torna al portfolio"
+    "title": "Termini e Condizioni",
+    "back": "Torna al portfolio",
+    "lastUpdated": "Ultimo aggiornamento: aprile 2026",
+    "sections": [
+      {
+        "heading": "1. Cosa stai acquistando",
+        "body": "Stai acquistando una licenza digitale per utilizzare una fotografia per scopi personali e non commerciali. Non stai acquistando una stampa fisica. Non acquisisci diritti d'autore, proprietà né alcun diritto di proprietà intellettuale sulla fotografia."
+      },
+      {
+        "heading": "2. Concessione della licenza",
+        "body": "Dopo il pagamento, DAVEJAVU ti concede una licenza mondiale non esclusiva e non trasferibile per utilizzare la fotografia licenziata esclusivamente per uso personale, tra cui: stampa per esposizione personale a casa o in ufficio privato; uso come screensaver o sfondo digitale; condivisione con familiari e amici in contesti non commerciali."
+      },
+      {
+        "heading": "3. Usi vietati",
+        "body": "La licenza non consente: qualsiasi uso commerciale (pubblicità, editoriale, product placement, merchandising); rivendita o sublicenza del file o delle copie derivate; ridistribuzione pubblica del file digitale; utilizzo in dataset di addestramento IA o modelli di machine learning; utilizzo in NFT o applicazioni blockchain; rimozione o alterazione dei metadati di copyright incorporati."
+      },
+      {
+        "heading": "4. Diritto d'autore",
+        "body": "Il fotografo mantiene in ogni momento il copyright completo ed esclusivo su tutte le fotografie. Un acquisto concede solo una licenza per uso personale e non trasferisce diritti d'autore, diritti morali né alcun altro diritto di proprietà intellettuale."
+      },
+      {
+        "heading": "5. Consegna",
+        "body": "I file vengono consegnati come file JPEG di alta qualità tramite un link di download a tempo limitato inviato all'indirizzo email fornito al momento del pagamento. I link di download sono validi per 14 giorni. Se il tuo link scade prima del download, contatta contact@davejavuphoto.com e verrà emesso un sostituto."
+      },
+      {
+        "heading": "6. Politica di non rimborso",
+        "body": "Ai sensi dell'articolo 16(m) della direttiva UE sui diritti dei consumatori (2011/83/UE), il diritto di recesso non si applica ai contenuti digitali resi disponibili immediatamente dopo l'acquisto. Spuntando la casella al checkout e procedendo con il pagamento, acconsenti espressamente alla fornitura immediata di contenuti digitali e riconosci di rinunciare al tuo diritto di recesso. Non verranno emessi rimborsi una volta generato un link di download."
+      },
+      {
+        "heading": "7. Metadati incorporati",
+        "body": "Ogni file acquistato contiene metadati EXIF e IPTC incorporati che identificano l'indirizzo email dell'acquirente e l'ID ordine PayPal. Questi metadati sono utilizzati esclusivamente per la tutela del copyright e non vengono condivisi con terzi."
+      },
+      {
+        "heading": "8. Protezione dei dati (GDPR)",
+        "body": "Titolare del trattamento: David Martins / DAVEJAVU — contact@davejavuphoto.com.\n\nDati raccolti: il tuo nome e indirizzo email, ricevuti da PayPal al momento dell'acquisto.\n\nFinalità e base giuridica: esecuzione dell'ordine e consegna del download (Art. 6(1)(b) GDPR); conformità agli obblighi contabili e fiscali (Art. 6(1)(c) GDPR).\n\nConservazione: i registri degli acquisti sono conservati per 7 anni come richiesto dalla legge contabile spagnola.\n\nI tuoi diritti: hai il diritto di accedere, rettificare, limitare il trattamento o richiedere la cancellazione dei tuoi dati personali. Scrivi a contact@davejavuphoto.com."
+      },
+      {
+        "heading": "9. Legge applicabile",
+        "body": "Questi termini sono regolati dalla legge spagnola. Qualsiasi controversia sarà soggetta alla giurisdizione esclusiva dei tribunali di Barcellona, Spagna, fatti salvi i tuoi diritti come consumatore ai sensi della legislazione del tuo paese di residenza nell'Unione europea."
+      },
+      {
+        "heading": "10. Contatto",
+        "body": "Per qualsiasi domanda su questi termini o sul tuo acquisto, contatta contact@davejavuphoto.com."
+      }
+    ]
   },
   "basket": {
     "title": "Carrello",

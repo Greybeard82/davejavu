@@ -138,7 +138,9 @@
     "title": "Kollektionen",
     "subtitle": "FotoSerien nach Ort und Atmosphäre gruppiert.",
     "viewCollection": "Kollektion ansehen",
-    "photos": "{count} Fotos"
+    "photos": "{count, plural, one {# Foto} other {# Fotos}}",
+    "empty": "Noch keine Kollektionen — schauen Sie bald wieder vorbei.",
+    "untitled": "(ohne Titel)"
   },
   "cookie": {
     "message": "Diese Website verwendet Cookies, um Ihre Erfahrung zu verbessern.",
@@ -176,8 +178,51 @@
     "agreeTerms": "Ich habe die Lizenzbedingungen gelesen und akzeptiere sie und verzichte auf mein Widerrufsrecht für diesen digitalen Kauf."
   },
   "license": {
-    "title": "Lizenzbedingungen",
-    "back": "Zurück zum Portfolio"
+    "title": "Allgemeine Geschäftsbedingungen",
+    "back": "Zurück zum Portfolio",
+    "lastUpdated": "Zuletzt aktualisiert: April 2026",
+    "sections": [
+      {
+        "heading": "1. Was Sie kaufen",
+        "body": "Sie erwerben eine digitale Lizenz zur persönlichen, nicht-kommerziellen Nutzung einer Fotografie. Sie erwerben keinen physischen Druck. Sie erwerben kein Urheberrecht, kein Eigentum und keine sonstigen Rechte des geistigen Eigentums an der Fotografie."
+      },
+      {
+        "heading": "2. Lizenzgewährung",
+        "body": "Nach der Zahlung gewährt Ihnen DAVEJAVU eine nicht-exklusive, nicht übertragbare, weltweite Lizenz zur ausschließlich persönlichen Nutzung der lizenzierten Fotografie, einschließlich: Druck zur persönlichen Dekoration zu Hause oder im privaten Büro; Verwendung als Bildschirmschoner oder digitales Hintergrundbild; Teilen mit Familie und Freunden in nicht-kommerziellen Zusammenhängen."
+      },
+      {
+        "heading": "3. Verbotene Nutzungen",
+        "body": "Die Lizenz erlaubt nicht: jegliche kommerzielle Nutzung (Werbung, Redaktion, Produktplatzierung, Merchandising); Weiterverkauf oder Unterlizenzierung der Datei oder abgeleiteter Drucke; öffentliche Verbreitung der digitalen Datei; Nutzung in KI-Trainingsdatensätzen oder maschinellen Lernmodellen; Nutzung in NFTs oder Blockchain-Anwendungen; Entfernung oder Änderung eingebetteter Urheberrechts-Metadaten."
+      },
+      {
+        "heading": "4. Urheberrecht",
+        "body": "Der Fotograf behält jederzeit das vollständige und ausschließliche Urheberrecht an allen Fotografien. Ein Kauf gewährt lediglich eine Lizenz zur persönlichen Nutzung und überträgt keine Urheberrechte, Persönlichkeitsrechte oder sonstige Rechte des geistigen Eigentums."
+      },
+      {
+        "heading": "5. Lieferung",
+        "body": "Dateien werden als hochwertige JPEG-Dateien über einen zeitlich begrenzten Download-Link geliefert, der an die beim Kauf angegebene E-Mail-Adresse gesendet wird. Download-Links sind 14 Tage lang gültig. Wenn Ihr Link vor dem Download abläuft, kontaktieren Sie contact@davejavuphoto.com und ein Ersatzlink wird ausgestellt."
+      },
+      {
+        "heading": "6. Keine-Rückgabe-Richtlinie",
+        "body": "Gemäß Artikel 16(m) der EU-Verbraucherrechterichtlinie (2011/83/EU) gilt das Widerrufsrecht nicht für digitale Inhalte, die unmittelbar nach dem Kauf zur Verfügung gestellt werden. Durch das Ankreuzen der Checkbox beim Checkout und die Durchführung der Zahlung stimmen Sie ausdrücklich der sofortigen Bereitstellung digitaler Inhalte zu und bestätigen, dass Sie Ihr Widerrufsrecht damit aufgeben. Nach Generierung eines Download-Links werden keine Rückerstattungen gewährt."
+      },
+      {
+        "heading": "7. Eingebettete Metadaten",
+        "body": "Jede gekaufte Datei enthält eingebettete EXIF- und IPTC-Metadaten, die die E-Mail-Adresse des Käufers und die PayPal-Bestellnummer identifizieren. Diese Metadaten werden ausschließlich zur Durchsetzung des Urheberrechts verwendet und nicht an Dritte weitergegeben."
+      },
+      {
+        "heading": "8. Datenschutz (DSGVO)",
+        "body": "Verantwortlicher: David Martins / DAVEJAVU — contact@davejavuphoto.com.\n\nErhobene Daten: Ihr Name und Ihre E-Mail-Adresse, die zum Zeitpunkt des Kaufs von PayPal empfangen werden.\n\nZweck und Rechtsgrundlage: Auftragsabwicklung und Download-Lieferung (Art. 6(1)(b) DSGVO); Erfüllung buchhalterischer und steuerlicher Pflichten (Art. 6(1)(c) DSGVO).\n\nSpeicherung: Kaufaufzeichnungen werden gemäß spanischem Buchführungsrecht 7 Jahre aufbewahrt.\n\nIhre Rechte: Sie haben das Recht auf Auskunft, Berichtigung, Einschränkung der Verarbeitung oder Löschung Ihrer personenbezogenen Daten. Schreiben Sie an contact@davejavuphoto.com."
+      },
+      {
+        "heading": "9. Anwendbares Recht",
+        "body": "Diese Bedingungen unterliegen spanischem Recht. Alle Streitigkeiten unterliegen der ausschließlichen Zuständigkeit der Gerichte in Barcelona, Spanien, unbeschadet Ihrer Rechte als Verbraucher nach dem Recht Ihres Wohnsitzlandes in der Europäischen Union."
+      },
+      {
+        "heading": "10. Kontakt",
+        "body": "Bei Fragen zu diesen Bedingungen oder Ihrem Kauf wenden Sie sich an contact@davejavuphoto.com."
+      }
+    ]
   },
   "basket": {
     "title": "Warenkorb",
