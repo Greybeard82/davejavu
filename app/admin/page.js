@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase';
+
+// Shown for every credential failure and for a bounced-back session, so the
+// page never reveals whether an email exists or whether a user is an admin.
+const GENERIC_ERROR = 'Invalid credentials.';
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
@@ -21,6 +26,16 @@ export default function AdminLoginPage() {
   const [lockedUntil, setLockedUntil] = useState(null);
 
   const isLocked = lockedUntil && Date.now() < lockedUntil;
+
+  // Bounced back from an admin route (forged/expired cookie, or a signed-in
+  // non-admin). Show the generic message and clear the stale session so it
+  // cannot keep hitting protected routes.
+  useEffect(() => {
+    if (searchParams.get('e')) {
+      setError(GENERIC_ERROR);
+      createClient().auth.signOut().catch(() => {});
+    }
+  }, [searchParams]);
 
   const handleCredentials = async (e) => {
     e.preventDefault();
@@ -37,10 +52,10 @@ export default function AdminLoginPage() {
       setAttempts(newAttempts);
       if (newAttempts >= MAX_ATTEMPTS) {
         setLockedUntil(Date.now() + LOCKOUT_MS);
-        setError('Too many failed attempts. Try again in 15 minutes.');
-      } else {
-        setError(`Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempt${MAX_ATTEMPTS - newAttempts !== 1 ? 's' : ''} remaining.`);
       }
+      // Same message regardless of attempt count, unknown email, or wrong
+      // password — reveals nothing about whether the account exists.
+      setError(GENERIC_ERROR);
       setLoading(false);
       return;
     }
@@ -196,5 +211,14 @@ export default function AdminLoginPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary during prerender.
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminLoginForm />
+    </Suspense>
   );
 }
