@@ -39,13 +39,13 @@ async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderI
       .jpeg({ quality: 95 })
       .toBuffer();
 
-    const storagePath = `stamped/${orderId}_${tier}.jpg`;
-    const { error } = await supabase.storage.from('photos').upload(storagePath, stamped, {
+    const stampedPath = `stamped/${orderId}_${tier}.jpg`;
+    const { error } = await supabase.storage.from('photos').upload(stampedPath, stamped, {
       contentType: 'image/jpeg',
       upsert: true,
     });
     if (error) throw new Error(error.message);
-    return storagePath;
+    return stampedPath;
   } catch (err) {
     console.error('stampAndStore failed (non-fatal):', err.message);
     return null;
