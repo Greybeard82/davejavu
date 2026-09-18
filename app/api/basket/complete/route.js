@@ -56,6 +56,42 @@ async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderI
 const resend = new Resend(process.env.RESEND_API_KEY);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+// Rebuild the download links for an already-completed order (replay fast-path).
+async function linksForOrder(supabase, orderId) {
+  const { data: purchases } = await supabase
+    .from('purchases')
+    .select('id, photo_title, license_tier, price_paid')
+    .eq('paypal_order_id', orderId);
+  const links = [];
+  for (const p of purchases || []) {
+    const { data: tokenRow } = await supabase
+      .from('download_tokens').select('token').eq('purchase_id', p.id).single();
+    if (tokenRow) {
+      links.push({
+        title: p.photo_title,
+        tier: TIER_LABELS[p.license_tier] || p.license_tier,
+        price: p.price_paid,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
+      });
+    }
+  }
+  return links;
+}
+
+// Response for a basket that has already failed fulfilment (stamp/upload error).
+function preparingResponse(orderId) {
+  return NextResponse.json(
+    {
+      status: 'preparing',
+      orderId,
+      message:
+        'Payment received. Your download is being prepared — you will get an email shortly. ' +
+        'If it does not arrive, email contact@davejavuphoto.com with your order reference.',
+    },
+    { status: 503 }
+  );
+}
+
 export async function POST(request) {
   try {
     const { orderId, basketId } = await request.json();
@@ -65,35 +101,20 @@ export async function POST(request) {
     console.log('basket/complete called', { orderId, basketId });
     const supabase = createAdminClient();
 
-    // Idempotency — check purchases by paypal_order_id, return existing tokens if found
-    const { data: existingPurchases } = await supabase
-      .from('purchases')
-      .select('id, photo_title, license_tier, price_paid')
-      .eq('paypal_order_id', orderId);
-
-    if (existingPurchases?.length > 0) {
-      const links = [];
-      for (const p of existingPurchases) {
-        const { data: tokenRow } = await supabase
-          .from('download_tokens')
-          .select('token')
-          .eq('purchase_id', p.id)
-          .single();
-        if (tokenRow) {
-          links.push({
-            title: p.photo_title,
-            tier: TIER_LABELS[p.license_tier] || p.license_tier,
-            price: p.price_paid,
-            url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
-          });
-        }
-      }
-      return NextResponse.json({ links });
-    }
-
     // Load the basket first — needed to recompute the total and check binding
     const { data: basket } = await supabase.from('baskets').select('*').eq('id', basketId).single();
     if (!basket) return NextResponse.json({ error: 'Basket not found' }, { status: 404 });
+
+    // Replay / concurrency (PAY, item 6): a basket is claimed with 'processing'
+    // and only ever moves to 'completed' or 'failed'. Any status other than the
+    // initial 'pending' means another call already owns this order — create
+    // nothing here.
+    if (basket.status === 'completed')
+      return NextResponse.json({ links: await linksForOrder(supabase, orderId) });
+    if (basket.status === 'processing')
+      return NextResponse.json({ status: 'processing', message: 'This order is already being processed.' }, { status: 202 });
+    if (basket.status === 'failed')
+      return preparingResponse(orderId);
 
     // Fetch the PayPal order server-side
     const token = await getPayPalToken();
@@ -131,6 +152,23 @@ export async function POST(request) {
     const purchaseDate = new Date().toISOString();
     const captureId = capture?.id || '';
     const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+
+    // Claim the basket: pending -> processing, atomically. Only the winner of
+    // this compare-and-swap creates rows; a concurrent caller gets zero rows
+    // back and returns without writing anything.
+    const { data: claimed } = await supabase
+      .from('baskets')
+      .update({ status: 'processing', buyer_email: buyerEmail })
+      .eq('id', basketId)
+      .eq('status', 'pending')
+      .select();
+    if (!claimed || claimed.length === 0) {
+      const { data: fresh } = await supabase.from('baskets').select('status').eq('id', basketId).single();
+      if (fresh?.status === 'completed')
+        return NextResponse.json({ links: await linksForOrder(supabase, orderId) });
+      if (fresh?.status === 'failed') return preparingResponse(orderId);
+      return NextResponse.json({ status: 'processing', message: 'This order is already being processed.' }, { status: 202 });
+    }
 
     const links = [];
 
@@ -195,7 +233,7 @@ export async function POST(request) {
       });
     }
 
-    await supabase.from('baskets').update({ status: 'completed', buyer_email: buyerEmail }).eq('id', basketId);
+    await supabase.from('baskets').update({ status: 'completed' }).eq('id', basketId);
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const linkRows = links.map((l) => `
