@@ -3,57 +3,118 @@ export const maxDuration = 60; // seconds — needed for image stamp+upload per 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
+import { MASTERS_BUCKET } from '@/lib/storage';
 import { Resend } from 'resend';
 import sharp from 'sharp';
 
-async function stampAndStore(supabase, { storagePath, cloudinaryId, tier, orderId, buyerEmail, photoTitle, purchaseDate }) {
-  try {
-    let buffer;
+// Produce the licensed, EXIF-stamped derivative from the master and store it
+// under stamped/. THROWS on any failure — stamping is mandatory; the caller must
+// never substitute a display copy for a paid file (PAY-03).
+async function stampAndStore(supabase, { storagePath, tier, orderId, buyerEmail, purchaseDate }) {
+  if (!storagePath) throw new Error('no storage_path on photo');
+  const { data: signed } = await supabase.storage.from(MASTERS_BUCKET).createSignedUrl(storagePath, 120);
+  if (!signed?.signedUrl) throw new Error('could not sign master URL');
+  const res = await fetch(signed.signedUrl);
+  if (!res.ok) throw new Error(`master fetch failed: ${res.status}`);
+  let buffer = Buffer.from(await res.arrayBuffer());
 
-    // Always fetch from Supabase Storage original for best quality
-    if (!storagePath) throw new Error('No storage path — cannot generate download');
-    const { data: signed } = await supabase.storage.from('photos').createSignedUrl(storagePath, 120);
-    if (!signed?.signedUrl) throw new Error('Could not get signed URL for original');
-    const res = await fetch(signed.signedUrl);
-    if (!res.ok) throw new Error(`Supabase Storage fetch failed: ${res.status}`);
-    buffer = Buffer.from(await res.arrayBuffer());
-
-    // For web_small: resize so shortest side = 2000px, preserving aspect ratio
-    if (tier === 'web_small') {
-      buffer = await sharp(buffer)
-        .resize(2000, 2000, { fit: 'outside', withoutEnlargement: true })
-        .toBuffer();
-    }
-
-    const stamped = await sharp(buffer)
-      .withMetadata({
-        exif: {
-          IFD0: {
-            Copyright: `© ${new Date(purchaseDate).getFullYear()} David Martins / DAVEJAVU — davejavuphoto.com`,
-            Artist: 'David Martins / DAVEJAVU',
-            ImageDescription: `Licensed to: ${buyerEmail} | Order: ${orderId} | Personal use only`,
-            Software: 'DAVEJAVU',
-          },
-        },
-      })
-      .jpeg({ quality: 95 })
+  // web_small: shortest side = 2000px, preserving aspect ratio (never upscaled).
+  if (tier === 'web_small') {
+    buffer = await sharp(buffer)
+      .resize(2000, 2000, { fit: 'outside', withoutEnlargement: true })
       .toBuffer();
-
-    const storagePath = `stamped/${orderId}_${tier}.jpg`;
-    const { error } = await supabase.storage.from('photos').upload(storagePath, stamped, {
-      contentType: 'image/jpeg',
-      upsert: true,
-    });
-    if (error) throw new Error(error.message);
-    return storagePath;
-  } catch (err) {
-    console.error('stampAndStore failed (non-fatal):', err.message);
-    return null;
   }
+
+  const stamped = await sharp(buffer)
+    .withMetadata({
+      exif: {
+        IFD0: {
+          Copyright: `© ${new Date(purchaseDate).getFullYear()} David Martins / DAVEJAVU — davejavuphoto.com`,
+          Artist: 'David Martins / DAVEJAVU',
+          ImageDescription: `Licensed to: ${buyerEmail} | Order: ${orderId} | Personal use only`,
+          Software: 'DAVEJAVU',
+        },
+      },
+    })
+    .jpeg({ quality: 95 })
+    .toBuffer();
+
+  const stampedPath = `stamped/${orderId}_${tier}.jpg`;
+  const { error } = await supabase.storage.from(MASTERS_BUCKET).upload(stampedPath, stamped, {
+    contentType: 'image/jpeg',
+    upsert: true,
+  });
+  if (error) throw new Error(`stamped upload failed: ${error.message}`);
+  return stampedPath;
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// Rebuild the download links for an already-completed order (replay fast-path).
+async function linksForOrder(supabase, orderId) {
+  const { data: purchases } = await supabase
+    .from('purchases')
+    .select('id, photo_title, license_tier, price_paid')
+    .eq('paypal_order_id', orderId);
+  const links = [];
+  for (const p of purchases || []) {
+    const { data: tokenRow } = await supabase
+      .from('download_tokens').select('token').eq('purchase_id', p.id).single();
+    if (tokenRow) {
+      links.push({
+        title: p.photo_title,
+        tier: TIER_LABELS[p.license_tier] || p.license_tier,
+        price: p.price_paid,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
+      });
+    }
+  }
+  return links;
+}
+
+// Response for a basket that has already failed fulfilment (stamp/upload error).
+function preparingResponse(orderId) {
+  return NextResponse.json(
+    {
+      status: 'preparing',
+      orderId,
+      message:
+        'Payment received. Your download is being prepared — you will get an email shortly. ' +
+        'If it does not arrive, email contact@davejavuphoto.com with your order reference.',
+    },
+    { status: 503 }
+  );
+}
+
+// A paid order could not be fulfilled (the master could not be stamped/stored).
+// Mark the basket 'failed' so a retry finds it and the buyer is never given a
+// display copy; send a separate, minimal "being prepared" email so a charged
+// buyer is never left with nothing and no message; and return the preparing
+// response. Purchase rows already inserted are left in place — payment is real
+// and they are the record a manual reissue works from.
+async function failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason }) {
+  console.error('basket/complete: FULFILMENT FAILED — buyer charged, delivery deferred', { orderId, basketId, reason });
+  await supabase.from('baskets').update({ status: 'failed' }).eq('id', basketId);
+  if (buyerEmail) {
+    try {
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL,
+        to: buyerEmail,
+        subject: 'Your DAVEJAVU order — download being prepared',
+        html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;color:#36454F;font-size:14px;line-height:1.6">
+  <p>Hi ${esc(buyerName || 'there')},</p>
+  <p>Thank you — your payment was received. Your download couldn't be generated automatically, so I've been notified and will email your file shortly.</p>
+  <p>If you don't hear back soon, email <a href="mailto:contact@davejavuphoto.com">contact@davejavuphoto.com</a> and quote your order reference: <strong>${esc(orderId)}</strong>.</p>
+  <p>— DAVEJAVU</p>
+</div>`,
+      });
+    } catch (mailErr) {
+      console.error('basket/complete: being-prepared email failed to send', { orderId, error: mailErr.message });
+    }
+  }
+  return preparingResponse(orderId);
+}
 
 export async function POST(request) {
   try {
@@ -64,69 +125,91 @@ export async function POST(request) {
     console.log('basket/complete called', { orderId, basketId });
     const supabase = createAdminClient();
 
-    // Idempotency — check purchases by paypal_order_id, return existing tokens if found
-    const { data: existingPurchases } = await supabase
-      .from('purchases')
-      .select('id, photo_title, license_tier, price_paid')
-      .eq('paypal_order_id', orderId);
+    // Load the basket first — needed to recompute the total and check binding
+    const { data: basket } = await supabase.from('baskets').select('*').eq('id', basketId).single();
+    if (!basket) return NextResponse.json({ error: 'Basket not found' }, { status: 404 });
 
-    if (existingPurchases?.length > 0) {
-      const links = [];
-      for (const p of existingPurchases) {
-        const { data: tokenRow } = await supabase
-          .from('download_tokens')
-          .select('token')
-          .eq('purchase_id', p.id)
-          .single();
-        if (tokenRow) {
-          links.push({
-            title: p.photo_title,
-            tier: TIER_LABELS[p.license_tier] || p.license_tier,
-            price: p.price_paid,
-            url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
-          });
-        }
-      }
-      return NextResponse.json({ links });
-    }
+    // Replay / concurrency (PAY, item 6): a basket is claimed with 'processing'
+    // and only ever moves to 'completed' or 'failed'. Any status other than the
+    // initial 'pending' means another call already owns this order — create
+    // nothing here.
+    if (basket.status === 'completed')
+      return NextResponse.json({ links: await linksForOrder(supabase, orderId) });
+    if (basket.status === 'processing')
+      return NextResponse.json({ status: 'processing', message: 'This order is already being processed.' }, { status: 202 });
+    if (basket.status === 'failed')
+      return preparingResponse(orderId);
 
-    // Verify PayPal order is COMPLETED
+    // Fetch the PayPal order server-side
     const token = await getPayPalToken();
     const orderRes = await fetch(`${process.env.PAYPAL_BASE_URL}/v2/checkout/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const order = await orderRes.json();
-    if (order.status !== 'COMPLETED')
-      return NextResponse.json({ error: 'Payment not completed' }, { status: 402 });
 
-    // Load basket
-    const { data: basket, error: basketErr } = await supabase.from('baskets').select('*').eq('id', basketId).single();
-    console.log('basket loaded', basket, basketErr);
-    if (!basket) return NextResponse.json({ error: 'Basket not found' }, { status: 404 });
+    // ---- Bind payment to THIS basket before creating anything (PAY-04) ----
+    // The total is recomputed from basket.items via server-side PRICES — never
+    // taken from the request. Any mismatch aborts: no purchase rows, no tokens,
+    // no email. Basket ids in the request body are never trusted on their own.
+    const unit = order?.purchase_units?.[0];
+    const capture = unit?.payments?.captures?.[0];
+    const expectedTotal = basket.items.reduce((sum, i) => sum + (PRICES[i.tier] ?? NaN), 0);
+    const amountPaid = Number(capture?.amount?.value);
+    const bindingErrors = [];
+    if (order?.status !== 'COMPLETED') bindingErrors.push(`order status=${order?.status}`);
+    if (capture?.status !== 'COMPLETED') bindingErrors.push(`capture status=${capture?.status}`);
+    if (unit?.custom_id !== `basket:${basketId}`) bindingErrors.push(`custom_id=${unit?.custom_id}`);
+    if (basket.paypal_order_id !== orderId) bindingErrors.push(`basket.paypal_order_id=${basket.paypal_order_id}`);
+    if (!Number.isFinite(expectedTotal)) bindingErrors.push('basket has an unknown tier');
+    if (capture?.amount?.currency_code !== 'EUR') bindingErrors.push(`currency=${capture?.amount?.currency_code}`);
+    if (!Number.isFinite(amountPaid) || amountPaid !== Number(expectedTotal.toFixed(2)))
+      bindingErrors.push(`amount=${capture?.amount?.value} expected=${Number.isFinite(expectedTotal) ? expectedTotal.toFixed(2) : '?'}`);
+
+    if (bindingErrors.length) {
+      console.error('basket/complete: payment binding REJECTED', { orderId, basketId, bindingErrors });
+      return NextResponse.json({ error: 'Payment could not be verified against this order.' }, { status: 402 });
+    }
 
     const payer = order.payer;
     const buyerEmail = payer?.email_address || '';
     const buyerName = `${payer?.name?.given_name || ''} ${payer?.name?.surname || ''}`.trim();
     const purchaseDate = new Date().toISOString();
-    const captureId = order.purchase_units?.[0]?.payments?.captures?.[0]?.id || '';
+    const captureId = capture?.id || '';
     const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
-    const links = [];
+    // Claim the basket: pending -> processing, atomically. Only the winner of
+    // this compare-and-swap creates rows; a concurrent caller gets zero rows
+    // back and returns without writing anything.
+    const { data: claimed } = await supabase
+      .from('baskets')
+      .update({ status: 'processing', buyer_email: buyerEmail })
+      .eq('id', basketId)
+      .eq('status', 'pending')
+      .select();
+    if (!claimed || claimed.length === 0) {
+      const { data: fresh } = await supabase.from('baskets').select('status').eq('id', basketId).single();
+      if (fresh?.status === 'completed')
+        return NextResponse.json({ links: await linksForOrder(supabase, orderId) });
+      if (fresh?.status === 'failed') return preparingResponse(orderId);
+      return NextResponse.json({ status: 'processing', message: 'This order is already being processed.' }, { status: 202 });
+    }
 
+    // Record a purchase row per item first — payment is real, so this is the
+    // record that they paid (and what a manual reissue works from).
+    const prepared = [];
     for (const item of basket.items) {
-      console.log('processing item', JSON.stringify(item));
-      const { data: photo, error: photoErr } = await supabase
+      const { data: photo } = await supabase
         .from('photos')
         .select('id, cloudinary_id, storage_path, photo_translations(locale, title)')
         .eq('id', item.photoId)
         .single();
-      console.log('photo lookup result', photo, photoErr);
-      if (!photo) continue;
+      if (!photo) {
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `photo ${item.photoId} not found` });
+      }
       const photoTitle = photo.photo_translations?.find((t) => t.locale === 'en')?.title
         || photo.photo_translations?.[0]?.title
         || item.title;
 
-      console.log('inserting purchase for photo', photo.id, photoTitle);
       const { data: purchase, error: purchaseErr } = await supabase.from('purchases').insert({
         buyer_email: buyerEmail,
         buyer_name: buyerName,
@@ -139,42 +222,55 @@ export async function POST(request) {
         purchase_date: purchaseDate,
         exif_stamped: false,
       }).select().single();
+      if (purchaseErr || !purchase) {
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `purchase insert failed: ${purchaseErr?.message}` });
+      }
+      prepared.push({ item, photo, photoTitle, purchase });
+    }
 
-      if (purchaseErr) { console.error('purchase insert error', JSON.stringify(purchaseErr)); continue; }
-
-      // Stamp EXIF metadata and store in Supabase — non-blocking best-effort
-      const stamped = await stampAndStore(supabase, {
-        storagePath: photo.storage_path,
-        cloudinaryId: photo.cloudinary_id,
-        tier: item.tier,
-        orderId,
-        buyerEmail,
-        photoTitle,
-        purchaseDate,
-      });
-      if (stamped) {
-        await supabase.from('purchases').update({ exif_stamped: true }).eq('id', purchase.id);
+    // Stamp every item from the master. Stamping is mandatory: if ANY item
+    // fails, fail the whole basket — never deliver a display copy (PAY-03).
+    const links = [];
+    for (const p of prepared) {
+      let stampedPath;
+      try {
+        stampedPath = await stampAndStore(supabase, {
+          storagePath: p.photo.storage_path,
+          tier: p.item.tier,
+          orderId,
+          buyerEmail,
+          purchaseDate,
+        });
+      } catch (err) {
+        console.error('basket/complete: STAMP FAILED — no fallback served', {
+          orderId, captureId, buyerEmail, photoId: p.photo.id, tier: p.item.tier, error: err.message,
+        });
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `stamp failed for ${p.photo.id}/${p.item.tier}: ${err.message}` });
       }
 
+      await supabase.from('purchases').update({ exif_stamped: true }).eq('id', p.purchase.id);
+
       const { data: tokenRow, error: tokenErr } = await supabase.from('download_tokens').insert({
-        purchase_id: purchase.id,
-        photo_id: photo.id,
+        purchase_id: p.purchase.id,
+        photo_id: p.photo.id,
         email: buyerEmail,
         expires_at: expiresAt,
         basket_id: basketId,
       }).select().single();
-
-      if (tokenErr) { console.error('token insert error', JSON.stringify(tokenErr)); continue; }
+      if (tokenErr || !tokenRow) {
+        return await failBasket(supabase, { basketId, orderId, buyerEmail, buyerName, reason: `token insert failed: ${tokenErr?.message}` });
+      }
 
       links.push({
-        title: photoTitle,
-        tier: TIER_LABELS[item.tier] || item.tier,
-        price: PRICES[item.tier],
+        title: p.photoTitle,
+        tier: TIER_LABELS[p.item.tier] || p.item.tier,
+        price: PRICES[p.item.tier],
         url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/download/${tokenRow.token}`,
       });
     }
 
-    await supabase.from('baskets').update({ status: 'completed', buyer_email: buyerEmail }).eq('id', basketId);
+    // Every item stamped and tokenised — only now is the order complete.
+    await supabase.from('baskets').update({ status: 'completed' }).eq('id', basketId);
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const linkRows = links.map((l) => `

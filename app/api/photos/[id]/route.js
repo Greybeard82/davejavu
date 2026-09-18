@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { requireAdmin } from '@/lib/admin-guard';
+import { MASTERS_BUCKET } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,7 +133,7 @@ export async function DELETE(request, { params }) {
 
     // Delete from Supabase Storage
     if (photo.storage_path) {
-      await supabase.storage.from('photos').remove([photo.storage_path]).catch(console.error);
+      await supabase.storage.from(MASTERS_BUCKET).remove([photo.storage_path]).catch(console.error);
     }
 
     // Delete DB record (cascades to translations, metadata, moods)

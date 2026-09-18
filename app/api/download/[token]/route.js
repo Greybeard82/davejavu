@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-admin';
-import { getDownloadUrl } from '@/lib/cloudinary';
+import { MASTERS_BUCKET } from '@/lib/storage';
 
 export async function GET(_request, { params }) {
   const { token } = await params;
@@ -8,7 +8,7 @@ export async function GET(_request, { params }) {
 
   const { data, error } = await supabase
     .from('download_tokens')
-    .select('*, purchases(license_tier, paypal_order_id, photo_id), photos(storage_path, cloudinary_id)')
+    .select('*, purchases(license_tier, paypal_order_id, photo_id)')
     .eq('token', token)
     .single();
 
@@ -17,21 +17,22 @@ export async function GET(_request, { params }) {
   }
 
   if (new Date(data.expires_at) < new Date()) {
-    return htmlResponse('This download link has expired. Reply to your purchase email and I\'ll send a fresh one.', 410);
+    return htmlResponse('This download link has expired. Email contact@davejavuphoto.com and I\'ll send a fresh one.', 410);
   }
 
   const tier = data.purchases?.license_tier;
-  const storagePath = data.photos?.storage_path;
-  const cloudinaryId = data.photos?.cloudinary_id;
 
-  // Try stamped file in Supabase Storage first
+  // The ONLY thing we serve is the licensed, EXIF-stamped derivative produced
+  // from the master. We never fall back to a Cloudinary display copy (that is
+  // the free, 1920px, watermark-by-URL gallery image — PAY-03) or to the raw
+  // unstamped master. If the stamped file is missing, the download is not ready.
   const stampedPath = data.purchases?.paypal_order_id
     ? `stamped/${data.purchases.paypal_order_id}_${tier}.jpg`
     : null;
 
   if (stampedPath) {
     const { data: signed } = await supabase.storage
-      .from('photos')
+      .from(MASTERS_BUCKET)
       .createSignedUrl(stampedPath, 60, { download: true });
 
     if (signed?.signedUrl) {
@@ -39,21 +40,12 @@ export async function GET(_request, { params }) {
     }
   }
 
-  // Fallback: Cloudinary URL for the appropriate tier (no watermark)
-  if (cloudinaryId) {
-    return NextResponse.redirect(getDownloadUrl(cloudinaryId, tier));
-  }
-
-  // Last resort: original from Supabase Storage
-  if (storagePath) {
-    const { data: signed } = await supabase.storage
-      .from('photos')
-      .createSignedUrl(storagePath, 60, { download: true });
-
-    if (signed?.signedUrl) return NextResponse.redirect(signed.signedUrl);
-  }
-
-  return htmlResponse('File not found. Please contact the photographer.', 404);
+  // Paid, but the licensed file is not ready (stamping failed or is pending).
+  // Never hand over a display copy — tell the buyer it is being prepared.
+  return htmlResponse(
+    'Your download is being prepared. If it does not arrive shortly, email contact@davejavuphoto.com with your order reference and I\'ll sort it out right away.',
+    503
+  );
 }
 
 function htmlResponse(message, status) {

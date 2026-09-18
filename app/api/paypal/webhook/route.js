@@ -7,7 +7,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { getPayPalToken, PRICES, TIER_LABELS } from '@/lib/paypal';
-import { getDownloadUrl } from '@/lib/cloudinary';
+import { MASTERS_BUCKET } from '@/lib/storage';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -133,13 +133,13 @@ export async function POST(request) {
 
     // EXIF stamp — attempt, fall back gracefully on any failure
     let stampedPath = null;
-    const { data: fileData } = await supabase.storage.from('photos').download(photo.storage_path);
+    const { data: fileData } = await supabase.storage.from(MASTERS_BUCKET).download(photo.storage_path);
     if (fileData) {
       try {
         const fileBuffer = Buffer.from(await fileData.arrayBuffer());
         const stamped = await stampExif(fileBuffer, { buyerEmail, captureId, orderId, tier, purchaseDate });
         stampedPath = `stamped/${orderId}_${tier}.jpg`;
-        await supabase.storage.from('photos').upload(stampedPath, stamped, {
+        await supabase.storage.from(MASTERS_BUCKET).upload(stampedPath, stamped, {
           contentType: 'image/jpeg',
           upsert: true,
         });
@@ -185,18 +185,8 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Token error' }, { status: 500 });
     }
 
-    // Build download URL — stamped file if available, else Cloudinary tier URL
-    let downloadUrl;
-    if (stampedPath) {
-      const { data: signed } = await supabase.storage
-        .from('photos')
-        .createSignedUrl(stampedPath, 60, { download: true });
-      downloadUrl = signed?.signedUrl;
-    }
-    if (!downloadUrl) {
-      downloadUrl = getDownloadUrl(photo.cloudinary_id, tier);
-    }
-
+    // Delivery is always via the tokenised /api/download route below, which
+    // serves only the stamped file and never a Cloudinary display copy (PAY-03).
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const tokenDownloadUrl = `${siteUrl}/api/download/${tokenRow.token}`;
     const tierLabel = TIER_LABELS[tier] || tier;
