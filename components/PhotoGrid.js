@@ -197,6 +197,7 @@ function Lightbox({ photo, locale, onClose }) {
 }
 
 function PhotoCard({ photo, onSelect }) {
+  const tm = useTranslations('moods');
   const [hovered, setHovered] = useState(false);
   const [errored, setErrored] = useState(false);
   const [favorited, setFavorited] = useState(() => getFavorites().some((f) => f.id === photo.id));
@@ -244,7 +245,7 @@ function PhotoCard({ photo, onSelect }) {
           <div className="flex flex-wrap gap-1 mt-2">
             {photo.moods.map((mood) => (
               <span key={mood} className="text-white/70 text-[10px] uppercase tracking-wider border border-white/30 px-2 py-0.5 rounded-full">
-                {mood}
+                {tm.has(mood) ? tm(mood) : mood}
               </span>
             ))}
           </div>
@@ -283,6 +284,7 @@ function PhotoCard({ photo, onSelect }) {
 
 export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK }) {
   const t = useTranslations('gallery');
+  const tm = useTranslations('moods');
   const [activeFilters, setActiveFilters] = useState([]);
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
 
@@ -317,7 +319,7 @@ export default function PhotoGrid({ photos = [], locale, moods = MOODS_FALLBACK 
                     : 'border-[#d1d1d1] text-charcoal hover:border-orange hover:text-orange'
                 }`}
               >
-                {mood}
+                {tm.has(mood) ? tm(mood) : mood}
               </button>
             ))}
             {activeFilters.length > 0 && (

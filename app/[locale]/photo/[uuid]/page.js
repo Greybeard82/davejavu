@@ -68,9 +68,10 @@ export async function generateMetadata({ params }) {
 
 export default async function PhotoDetailPage({ params }) {
   const { uuid, locale } = await params;
-  const [photo, t] = await Promise.all([
+  const [photo, t, tm] = await Promise.all([
     getPhotoDetail(uuid, locale),
     getTranslations({ locale, namespace: 'photo' }),
+    getTranslations({ locale, namespace: 'moods' }),
   ]);
 
   if (!photo) notFound();
@@ -126,7 +127,7 @@ export default async function PhotoDetailPage({ params }) {
                 key={mood}
                 className="text-[10px] uppercase tracking-wider border border-[#d1d1d1] text-charcoal px-3 py-1 rounded-full"
               >
-                {mood}
+                {tm.has(mood) ? tm(mood) : mood}
               </span>
             ))}
           </div>
